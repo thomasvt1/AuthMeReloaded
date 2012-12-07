@@ -193,6 +193,7 @@ public class AuthMe extends JavaPlugin {
             ConsoleLogger.info("ATTENTION by disabling ForceSingleSession Your server protection is set to low");
         }
         
+        
         //onReload(this.getServer().getOnlinePlayers());
         ConsoleLogger.info("Authme " + this.getDescription().getVersion() + " enabled");
     }
@@ -201,7 +202,7 @@ public class AuthMe extends JavaPlugin {
     public void onDisable() {
         if (Bukkit.getOnlinePlayers() != null)
         for(Player player : Bukkit.getOnlinePlayers()) {
-        	this.savePlayer(player);
+        		this.savePlayer(player);
         }
         
         if (database != null) {
@@ -232,11 +233,14 @@ public class AuthMe extends JavaPlugin {
 		return instance;
 	}
 	
-	public void savePlayer(Player player) {
+	public void savePlayer(Player player) throws IllegalStateException {
+		try {
 	      if ((CitizensCommunicator.isNPC(player)) || (Utils.getInstance().isUnrestricted(player)) || (CombatTagComunicator.isNPC(player))) {
 	          return;
 	        }
-
+		} catch (Exception e) { }
+		
+		try {
 	        String name = player.getName().toLowerCase();
 	        if ((PlayerCache.getInstance().isAuthenticated(name)) && (!player.isDead()) && 
 	          (Settings.isSaveQuitLocationEnabled.booleanValue())) {
@@ -264,6 +268,9 @@ public class AuthMe extends JavaPlugin {
 
 	        PlayerCache.getInstance().removePlayer(name);
 	        player.saveData();
+	      } catch (Exception ex) {
+	    	  ex.printStackTrace();
 	      }
+	}
    
 }
