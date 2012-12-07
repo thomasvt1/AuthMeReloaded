@@ -34,6 +34,7 @@ import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.settings.Messages;
+import uk.org.whoami.authme.settings.PlayersLogs;
 import uk.org.whoami.authme.settings.Settings;
 import uk.org.whoami.authme.task.MessageTask;
 import uk.org.whoami.authme.task.TimeoutTask;
@@ -41,6 +42,7 @@ import uk.org.whoami.authme.task.TimeoutTask;
 public class UnregisterCommand implements CommandExecutor {
 
     private Messages m = Messages.getInstance();
+    private PlayersLogs pllog = PlayersLogs.getInstance();
     //private Settings settings = Settings.getInstance();
     private JavaPlugin plugin;
     private DataSource database;
@@ -112,6 +114,10 @@ public class UnregisterCommand implements CommandExecutor {
                         playerCache.removeCache(name);
                  }   
                 
+                 if (PlayersLogs.players.contains(player.getName())) {
+                	 PlayersLogs.players.remove(player.getName());
+                	 pllog.save();
+                 }
                  player.sendMessage("unregistered");
                  ConsoleLogger.info(player.getDisplayName() + " unregistered himself");                
                 return true;

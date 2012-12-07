@@ -52,7 +52,6 @@ public class AdminCommand implements CommandExecutor {
     private SpoutCfg s = SpoutCfg.getInstance();
     //private Settings settings = Settings.getInstance();
     private DataSource database;
-    private FlatToSql converter;
     
     public AdminCommand(DataSource database) {
         this.database = database;

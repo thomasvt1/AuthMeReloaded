@@ -16,8 +16,10 @@
 
 package uk.org.whoami.authme;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -49,12 +51,14 @@ import uk.org.whoami.authme.listener.AuthMeSpoutListener;
 import uk.org.whoami.authme.plugin.manager.CitizensCommunicator;
 import uk.org.whoami.authme.plugin.manager.CombatTagComunicator;
 import uk.org.whoami.authme.settings.Messages;
+import uk.org.whoami.authme.settings.PlayersLogs;
 import uk.org.whoami.authme.settings.Settings;
 
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
+
 import uk.org.whoami.authme.commands.PasspartuCommand;
 import uk.org.whoami.authme.datasource.SqliteDataSource;
 
@@ -62,8 +66,9 @@ public class AuthMe extends JavaPlugin {
 
     private DataSource database;
     private Settings settings;
-    @SuppressWarnings("unused")
+	@SuppressWarnings("unused")
 	private Messages m;
+    private PlayersLogs pllog;
 	public Management management;
     public static Server server;
     public static Plugin authme;
@@ -72,6 +77,8 @@ public class AuthMe extends JavaPlugin {
     private Utils utils = Utils.getInstance();
     private JavaPlugin plugin;
     private FileCache playerBackup = new FileCache();
+
+    
     @Override
     public void onEnable() {
     	instance = this;
@@ -91,6 +98,7 @@ public class AuthMe extends JavaPlugin {
         settings.loadConfigOptions();
         
         m = Messages.getInstance();
+        pllog = PlayersLogs.getInstance();
         
         server = getServer();
         
@@ -189,12 +197,21 @@ public class AuthMe extends JavaPlugin {
         // Check for correct sintax in config file!
         //
         
+        if (!new File(getDataFolder() + File.separator + "players.yml").exists()) {
+        	pllog = new PlayersLogs();
+        }
+        
         if(!Settings.isForceSingleSessionEnabled) {
             ConsoleLogger.info("ATTENTION by disabling ForceSingleSession Your server protection is set to low");
         }
         
+        onReload();
+
+        if (server.getOnlinePlayers().length < 1) {
+        	PlayersLogs.players.clear();
+        	pllog.save();
+        }
         
-        //onReload(this.getServer().getOnlinePlayers());
         ConsoleLogger.info("Authme " + this.getDescription().getVersion() + " enabled");
     }
 
@@ -204,6 +221,7 @@ public class AuthMe extends JavaPlugin {
         for(Player player : Bukkit.getOnlinePlayers()) {
         		this.savePlayer(player);
         }
+        pllog.save();
         
         if (database != null) {
             database.close();
@@ -223,9 +241,21 @@ public class AuthMe extends JavaPlugin {
         
     }
 
-    @SuppressWarnings("unused")
-	private void onReload(Player[] players) {
-      ConsoleLogger.showError("AuthMe dont support /reload command yet, please use /authme relaod");
+	private void onReload() {
+    	if (Bukkit.getServer().getOnlinePlayers() != null && !PlayersLogs.players.isEmpty()) {
+    		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+    			if (PlayersLogs.players.contains(player.getName())) {
+    				String name = player.getName().toLowerCase();
+    		        PlayerAuth pAuth = database.getAuth(name);
+    	            // if Mysql is unavaible
+    	            if(pAuth == null)
+    	                break;
+    	            PlayerAuth auth = new PlayerAuth(name, pAuth.getHash(), pAuth.getIp(), new Date().getTime());
+    	            database.updateSession(auth);
+    				PlayerCache.getInstance().addPlayer(auth); 
+    			}
+    		}
+    	}
         return;
     }
     

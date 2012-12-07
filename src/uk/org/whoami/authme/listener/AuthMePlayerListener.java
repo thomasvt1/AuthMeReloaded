@@ -54,6 +54,7 @@ import uk.org.whoami.authme.plugin.manager.CitizensCommunicator;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.plugin.manager.CombatTagComunicator;
 import uk.org.whoami.authme.settings.Messages;
+import uk.org.whoami.authme.settings.PlayersLogs;
 import uk.org.whoami.authme.settings.Settings;
 import uk.org.whoami.authme.task.MessageTask;
 import uk.org.whoami.authme.task.TimeoutTask;
@@ -444,6 +445,8 @@ public class AuthMePlayerListener implements Listener {
             }
         }
         PlayerCache.getInstance().removePlayer(name);
+        PlayersLogs.players.remove(player.getName());
+        PlayersLogs.getInstance().save();
         player.saveData();
     }
 
@@ -491,6 +494,8 @@ public class AuthMePlayerListener implements Listener {
       }
 
       PlayerCache.getInstance().removePlayer(name);
+      PlayersLogs.players.remove(player.getName());
+      PlayersLogs.getInstance().save();
       player.saveData();
     }
 

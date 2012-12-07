@@ -17,11 +17,13 @@ import uk.org.whoami.authme.cache.limbo.LimboPlayer;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.settings.Messages;
+import uk.org.whoami.authme.settings.PlayersLogs;
 import uk.org.whoami.authme.settings.Settings;
 
 public class Management {
 
     private Messages m = Messages.getInstance();
+    private PlayersLogs pllog = PlayersLogs.getInstance();
     private Utils utils = Utils.getInstance();
     private FileCache playerCache = new FileCache();
     private DataSource database;
@@ -123,8 +125,10 @@ public class Management {
                     AuthMe.permission.playerRemoveGroup(player.getWorld(), player.getName(), Settings.unRegisteredGroup);
                     AuthMe.permission.playerAddGroup(player.getWorld(), player.getName(), Settings.getRegisteredGroup);
                 }
-                    
-                    
+                
+                if (!PlayersLogs.players.contains(player.getName()))
+                	PlayersLogs.players.add(player.getName());
+                pllog.save();
                 player.sendMessage(m._("login"));
                 ConsoleLogger.info(player.getDisplayName() + " logged in!");
                 player.saveData();
@@ -211,7 +215,9 @@ public class Management {
                     AuthMe.permission.playerAddGroup(player.getWorld(), player.getName(), Settings.getRegisteredGroup);
                 }
                     
-                    
+                if (!PlayersLogs.players.contains(player.getName()))
+                	PlayersLogs.players.add(player.getName());
+                pllog.save();
                 player.sendMessage(m._("login"));
                 ConsoleLogger.info(player.getDisplayName() + " logged in!");
                 player.saveData(); 
@@ -224,4 +230,6 @@ public class Management {
         }
         return "";
 	}
+    
+    
 }

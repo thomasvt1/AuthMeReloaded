@@ -34,11 +34,13 @@ import uk.org.whoami.authme.cache.limbo.LimboPlayer;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.settings.Messages;
+import uk.org.whoami.authme.settings.PlayersLogs;
 import uk.org.whoami.authme.settings.Settings;
 
 public class RegisterCommand implements CommandExecutor {
 
     private Messages m = Messages.getInstance();
+    private PlayersLogs pllog = PlayersLogs.getInstance();
     //private Settings settings = Settings.getInstance();
     private DataSource database;
     public boolean isFirstTimeJoin;
@@ -86,6 +88,9 @@ public class RegisterCommand implements CommandExecutor {
 
         if (database.isAuthAvailable(player.getName().toLowerCase())) {
             player.sendMessage(m._("user_regged"));
+            if (pllog.getStringList("players").contains(player.getName())) {
+           	 pllog.getStringList("players").remove(player.getName());
+            }
             return true;
         }
         //

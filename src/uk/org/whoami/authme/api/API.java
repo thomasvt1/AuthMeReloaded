@@ -17,7 +17,6 @@ import uk.org.whoami.authme.settings.Settings;
 
 public class API {
 	
-	private static API api;
 	private static AuthMe instance;
 	
 	/**

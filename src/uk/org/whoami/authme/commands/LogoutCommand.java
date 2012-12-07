@@ -33,6 +33,7 @@ import uk.org.whoami.authme.cache.backup.FileCache;
 import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.settings.Messages;
+import uk.org.whoami.authme.settings.PlayersLogs;
 import uk.org.whoami.authme.settings.Settings;
 import uk.org.whoami.authme.task.MessageTask;
 import uk.org.whoami.authme.task.TimeoutTask;
@@ -40,6 +41,7 @@ import uk.org.whoami.authme.task.TimeoutTask;
 public class LogoutCommand implements CommandExecutor {
 
     private Messages m = Messages.getInstance();
+    private PlayersLogs pllog = PlayersLogs.getInstance();
     //private Settings settings = Settings.getInstance();
     private JavaPlugin plugin;
     private DataSource database;
@@ -99,6 +101,10 @@ public class LogoutCommand implements CommandExecutor {
         }
         sched.scheduleSyncDelayedTask(plugin, new MessageTask(plugin, name, m._("login_msg"), interval));
 
+         if (PlayersLogs.players.contains(player.getName())) {
+        	 PlayersLogs.players.remove(player.getName());
+        	 pllog.save();
+         }
         player.sendMessage(m._("logout"));
         ConsoleLogger.info(player.getDisplayName() + " logged out");
 
