@@ -46,6 +46,7 @@ import uk.org.whoami.authme.datasource.MiniConnectionPoolManager.TimeoutExceptio
 import uk.org.whoami.authme.datasource.MySQLDataSource;
 import uk.org.whoami.authme.listener.AuthMeBlockListener;
 import uk.org.whoami.authme.listener.AuthMeEntityListener;
+import uk.org.whoami.authme.listener.AuthMeJoinListener;
 import uk.org.whoami.authme.listener.AuthMePlayerListener;
 import uk.org.whoami.authme.listener.AuthMeSpoutListener;
 import uk.org.whoami.authme.plugin.manager.CitizensCommunicator;
@@ -101,6 +102,7 @@ public class AuthMe extends JavaPlugin {
         pllog = PlayersLogs.getInstance();
         
         server = getServer();
+        PluginManager pm = getServer().getPluginManager();
         
         /*
          *  Back style on start if avaible
@@ -120,6 +122,14 @@ public class AuthMe extends JavaPlugin {
                     database = new FileDataSource();
                 } catch (IOException ex) {
                     ConsoleLogger.showError(ex.getMessage());
+                    if (Settings.isStopEnabled) {
+                    	ConsoleLogger.info("Can't use flat file... shutdown...");
+                    	server.shutdown();
+                    } else if (Settings.isLockEnabled) {
+                    	ConsoleLogger.info("Can't use flat file... lock server join");
+                    	pm.registerEvents(new AuthMeJoinListener(this), this);
+                    }
+                    if (!Settings.isStopEnabled && !Settings.isLockEnabled)
                     this.getServer().getPluginManager().disablePlugin(this);
                     return;
                 }
@@ -129,14 +139,38 @@ public class AuthMe extends JavaPlugin {
                     database = new MySQLDataSource();
                 } catch (ClassNotFoundException ex) {
                     ConsoleLogger.showError(ex.getMessage());
+                    if (Settings.isStopEnabled) {
+                    	ConsoleLogger.info("Can't use MySQL... shutdown...");
+                    	server.shutdown();
+                    } else if (Settings.isLockEnabled) {
+                    	ConsoleLogger.info("Can't use MySQL... lock server join");
+                    	pm.registerEvents(new AuthMeJoinListener(this), this);
+                    }
+                    if (!Settings.isStopEnabled && !Settings.isLockEnabled)
                     this.getServer().getPluginManager().disablePlugin(this);
                     return;
                 } catch (SQLException ex) {
                     ConsoleLogger.showError(ex.getMessage());
+                    if (Settings.isStopEnabled) {
+                    	ConsoleLogger.info("Can't use MySQL... shutdown...");
+                    	server.shutdown();
+                    } else if (Settings.isLockEnabled) {
+                    	ConsoleLogger.info("Can't use MySQL... lock server join");
+                    	pm.registerEvents(new AuthMeJoinListener(this), this);
+                    }
+                    if (!Settings.isStopEnabled && !Settings.isLockEnabled)
                     this.getServer().getPluginManager().disablePlugin(this);
                     return;
                 } catch(TimeoutException ex) {
                     ConsoleLogger.showError(ex.getMessage());
+                    if (Settings.isStopEnabled) {
+                    	ConsoleLogger.info("Can't use MySQL... shutdown...");
+                    	server.shutdown();
+                    } else if (Settings.isLockEnabled) {
+                    	ConsoleLogger.info("Can't use MySQL... lock server join");
+                    	pm.registerEvents(new AuthMeJoinListener(this), this);
+                    }
+                    if (!Settings.isStopEnabled && !Settings.isLockEnabled)
                     this.getServer().getPluginManager().disablePlugin(this);
                     return;
                 }
@@ -146,10 +180,26 @@ public class AuthMe extends JavaPlugin {
                      database = new SqliteDataSource();
                 } catch (ClassNotFoundException ex) {
                     ConsoleLogger.showError(ex.getMessage());
+                    if (Settings.isStopEnabled) {
+                    	ConsoleLogger.info("Can't use sqlite... shutdown...");
+                    	server.shutdown();
+                    } else if (Settings.isLockEnabled) {
+                    	ConsoleLogger.info("Can't use sqlite... lock server join");
+                    	pm.registerEvents(new AuthMeJoinListener(this), this);
+                    }
+                    if (!Settings.isStopEnabled && !Settings.isLockEnabled)
                     this.getServer().getPluginManager().disablePlugin(this);
                     return;
                 } catch (SQLException ex) {
                     ConsoleLogger.showError(ex.getMessage());
+                    if (Settings.isStopEnabled) {
+                    	ConsoleLogger.info("Can't use sqlite... shutdown...");
+                    	server.shutdown();
+                    } else if (Settings.isLockEnabled) {
+                    	ConsoleLogger.info("Can't use sqlite... lock server join");
+                    	pm.registerEvents(new AuthMeJoinListener(this), this);
+                    }
+                    if (!Settings.isStopEnabled && !Settings.isLockEnabled)
                     this.getServer().getPluginManager().disablePlugin(this);
                     return;
                 }
@@ -162,7 +212,6 @@ public class AuthMe extends JavaPlugin {
         
         management =  new Management(database);
         
-        PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new AuthMePlayerListener(this,database),this);
         pm.registerEvents(new AuthMeBlockListener(database),this);
         pm.registerEvents(new AuthMeEntityListener(database),this);

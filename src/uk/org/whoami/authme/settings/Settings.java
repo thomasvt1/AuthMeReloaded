@@ -41,6 +41,7 @@ public final class Settings extends YamlConfiguration {
     public static List<String> getJoinPermissions = null;
     public static List<String> getUnrestrictedName = null;
     private static List<String> getRestrictedIp;
+    public static List<String> playersWhiteList = null;
    
     public final Plugin plugin;
     private final File file;    
@@ -54,7 +55,7 @@ public final class Settings extends YamlConfiguration {
             isForceSpawnLocOnJoinEnabled, isForceExactSpawnEnabled, isSaveQuitLocationEnabled,
             isForceSurvivalModeEnabled, isResetInventoryIfCreative, isCachingEnabled, isKickOnWrongPasswordEnabled,
             getEnablePasswordVerifier, protectInventoryBeforeLogInEnabled, isBackupActivated, isBackupOnStart,
-            isBackupOnStop, enablePasspartu;
+            isBackupOnStop, enablePasspartu, isLockEnabled, isStopEnabled;
             
             
     public static String getNickRegex, getUnloggedinGroup, getMySQLHost, getMySQLPort, 
@@ -94,7 +95,8 @@ public final class Settings extends YamlConfiguration {
         
     }
    
-   public void loadConfigOptions() {
+   @SuppressWarnings("unchecked")
+public void loadConfigOptions() {
        
         plugin.getLogger().info("Loading Configuration File...");
         
@@ -158,6 +160,9 @@ public final class Settings extends YamlConfiguration {
         isBackupOnStop = configFile.getBoolean("BackupSystem.OnServeStop",false);
         backupWindowsPath = configFile.getString("BackupSystem.MysqlWindowsPath", "C:\\Program Files\\MySQL\\MySQL Server 5.1\\");
         enablePasspartu = configFile.getBoolean("Passpartu.enablePasspartu",false);
+        isLockEnabled = configFile.getBoolean("Security.SQLProblem.lockServer", true);
+        isStopEnabled = configFile.getBoolean("Security.SQLProblem.stopServer", false);
+        playersWhiteList = (List<String>) configFile.getList("Security.LockServer.playersWhiteList");
 
 
         saveDefaults();
@@ -168,7 +173,9 @@ public final class Settings extends YamlConfiguration {
  
    }
    
-   public static void reloadConfigOptions(YamlConfiguration newConfig) {
+
+@SuppressWarnings("unchecked")
+public static void reloadConfigOptions(YamlConfiguration newConfig) {
        configFile = newConfig;
               
        //plugin.getLogger().info("RELoading Configuration File...");
@@ -230,6 +237,9 @@ public final class Settings extends YamlConfiguration {
         isBackupOnStop = configFile.getBoolean("BackupSystem.OnServeStop",false);     
         backupWindowsPath = configFile.getString("BackupSystem.MysqlWindowsPath", "C:\\Program Files\\MySQL\\MySQL Server 5.1\\");
         enablePasspartu = configFile.getBoolean("Passpartu.enablePasspartu",false);
+        isLockEnabled = configFile.getBoolean("Security.SQLProblem.lockServer", true);
+        isStopEnabled = configFile.getBoolean("Security.SQLProblem.stopServer", false);
+        playersWhiteList = (List<String>) configFile.getList("Security.LockServer.playersWhiteList");
        
         //System.out.println(getMySQLDatabase);
         

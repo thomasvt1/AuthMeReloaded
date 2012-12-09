@@ -67,3 +67,11 @@ BackupSystem:
     OnServerStart: false
     OnServerStop: true
     MysqlWindowsPath: 'C:\\Program Files\\MySQL\\MySQL Server 5.1\\'
+Passpartu:
+    enablePasspartu: false
+Security:
+    SQLProblem:
+        lockServer: true
+        stopServer: false
+    LockServer:
+        playersWhiteList: []
