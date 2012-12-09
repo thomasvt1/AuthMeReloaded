@@ -54,7 +54,7 @@ public final class Settings extends YamlConfiguration {
             isForceSpawnLocOnJoinEnabled, isForceExactSpawnEnabled, isSaveQuitLocationEnabled,
             isForceSurvivalModeEnabled, isResetInventoryIfCreative, isCachingEnabled, isKickOnWrongPasswordEnabled,
             getEnablePasswordVerifier, protectInventoryBeforeLogInEnabled, isBackupActivated, isBackupOnStart,
-            isBackupOnStop, enablePasspartu, isStopEnabled;
+            isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport;
             
             
     public static String getNickRegex, getUnloggedinGroup, getMySQLHost, getMySQLPort, 
@@ -94,7 +94,7 @@ public final class Settings extends YamlConfiguration {
         
     }
    
-   @SuppressWarnings("unchecked")
+
 public void loadConfigOptions() {
        
         plugin.getLogger().info("Loading Configuration File...");
@@ -160,6 +160,7 @@ public void loadConfigOptions() {
         backupWindowsPath = configFile.getString("BackupSystem.MysqlWindowsPath", "C:\\Program Files\\MySQL\\MySQL Server 5.1\\");
         enablePasspartu = configFile.getBoolean("Passpartu.enablePasspartu",false);
         isStopEnabled = configFile.getBoolean("Security.SQLProblem.stopServer", true);
+        reloadSupport = configFile.getBoolean("Security.ReloadCommand.useReloadCommandSupport", true);
 
 
         saveDefaults();
@@ -171,7 +172,6 @@ public void loadConfigOptions() {
    }
    
 
-@SuppressWarnings("unchecked")
 public static void reloadConfigOptions(YamlConfiguration newConfig) {
        configFile = newConfig;
               
@@ -235,6 +235,7 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         backupWindowsPath = configFile.getString("BackupSystem.MysqlWindowsPath", "C:\\Program Files\\MySQL\\MySQL Server 5.1\\");
         enablePasspartu = configFile.getBoolean("Passpartu.enablePasspartu",false);
         isStopEnabled = configFile.getBoolean("Security.SQLProblem.stopServer", true);
+        reloadSupport = configFile.getBoolean("Security.ReloadCommand.useReloadCommandSupport", true);
        
         //System.out.println(getMySQLDatabase);
         
@@ -273,11 +274,15 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
     	   set("Security.SQLProblem.stopServer", true);
        }
        
+       if(!contains("Security.ReloadCommand.useReloadCommandSupport")) {
+    	   set("Security.ReloadCommand.useReloadCommandSupport", true);
+       }
+       
        if(!contains("passpartu.enablePasspartu")) {
            set("Passpartu.enablePasspartu",false);
-       } else return;
+       }
        
-       plugin.getLogger().info("Merge new Config Options..");
+       plugin.getLogger().info("Merge new Config Options if needed..");
        plugin.saveConfig();
        
        return;

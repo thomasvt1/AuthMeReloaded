@@ -47,6 +47,9 @@ import uk.org.whoami.authme.settings.Settings;
 import uk.org.whoami.authme.settings.SpoutCfg;
 
 public class AdminCommand implements CommandExecutor {
+	
+	@SuppressWarnings("unused")
+	private AuthMe plugin;
 
     private Messages m = Messages.getInstance();
     private SpoutCfg s = SpoutCfg.getInstance();

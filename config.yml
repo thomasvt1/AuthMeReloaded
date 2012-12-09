@@ -72,3 +72,5 @@ Passpartu:
 Security:
     SQLProblem:
         stopServer: true
+    ReloadCommand:
+        useReloadCommandSupport: true

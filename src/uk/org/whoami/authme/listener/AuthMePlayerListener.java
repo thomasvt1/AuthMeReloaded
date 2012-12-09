@@ -247,6 +247,7 @@ public class AuthMePlayerListener implements Listener {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
         }
+        
 
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
@@ -296,12 +297,7 @@ public class AuthMePlayerListener implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
-     
-        if (event.getResult() != Result.ALLOWED || event.getPlayer() == null) {
-            //System.out.println("non permesso?");
-            return;
-        }
-
+    	
         final Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
        
@@ -347,7 +343,6 @@ public class AuthMePlayerListener implements Listener {
                
         }
         
-
         int min = Settings.getMinNickLength;
         int max = Settings.getMaxNickLength;
         String regex = Settings.getNickRegex;
@@ -376,6 +371,7 @@ public class AuthMePlayerListener implements Listener {
             }
         }
     }
+    
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {

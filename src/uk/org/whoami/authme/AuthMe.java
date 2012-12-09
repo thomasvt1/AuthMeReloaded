@@ -74,7 +74,6 @@ public class AuthMe extends JavaPlugin {
     public static Plugin authme;
     public static Permission permission;
 	private static AuthMe instance;
-	private boolean lock = false;
     private Utils utils = Utils.getInstance();
     private JavaPlugin plugin;
     private FileCache playerBackup = new FileCache();
@@ -194,7 +193,7 @@ public class AuthMe extends JavaPlugin {
         management =  new Management(database);
         
         PluginManager pm = getServer().getPluginManager();
-        pm.registerEvents(new AuthMePlayerListener(this,database,lock),this);
+        pm.registerEvents(new AuthMePlayerListener(this,database),this);
         pm.registerEvents(new AuthMeBlockListener(database),this);
         pm.registerEvents(new AuthMeEntityListener(database),this);
         if (pm.isPluginEnabled("Spout")) 
@@ -236,6 +235,7 @@ public class AuthMe extends JavaPlugin {
             ConsoleLogger.info("ATTENTION by disabling ForceSingleSession Your server protection is set to low");
         }
         
+        if (Settings.reloadSupport)
         onReload();
 
         if (server.getOnlinePlayers().length < 1) {
@@ -333,5 +333,4 @@ public class AuthMe extends JavaPlugin {
 	    	  ex.printStackTrace();
 	      }
 	}
-   
 }
