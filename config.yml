@@ -71,4 +71,4 @@ Passpartu:
     enablePasspartu: false
 Security:
     SQLProblem:
-        stopServer: false
+        stopServer: true
