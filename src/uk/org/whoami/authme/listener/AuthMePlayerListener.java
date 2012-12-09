@@ -486,7 +486,7 @@ public class AuthMePlayerListener implements Listener {
         }
     
     if (PlayerCache.getInstance().isAuthenticated(name) && !player.isDead()) { 
-        if(Settings.isSaveQuitLocationEnabled) {
+        if(Settings.isSaveQuitLocationEnabled && data.isAuthAvailable(name)) {
             PlayerAuth auth = new PlayerAuth(event.getPlayer().getName().toLowerCase(),(int)player.getLocation().getX(),(int)player.getLocation().getY(),(int)player.getLocation().getZ());
             data.updateQuitLoc(auth);
         }
@@ -534,7 +534,7 @@ public class AuthMePlayerListener implements Listener {
 
       String name = player.getName().toLowerCase();
       if ((PlayerCache.getInstance().isAuthenticated(name)) && (!player.isDead()) && 
-        (Settings.isSaveQuitLocationEnabled.booleanValue())) {
+        (Settings.isSaveQuitLocationEnabled.booleanValue())  && data.isAuthAvailable(name)) {
         PlayerAuth auth = new PlayerAuth(event.getPlayer().getName().toLowerCase(), (int)player.getLocation().getX(), (int)player.getLocation().getY(), (int)player.getLocation().getZ());
         this.data.updateQuitLoc(auth);
       }
