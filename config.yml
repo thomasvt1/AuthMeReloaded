@@ -71,7 +71,4 @@ Passpartu:
     enablePasspartu: false
 Security:
     SQLProblem:
-        lockServer: true
         stopServer: false
-    LockServer:
-        playersWhiteList: []

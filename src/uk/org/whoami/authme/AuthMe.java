@@ -46,7 +46,6 @@ import uk.org.whoami.authme.datasource.MiniConnectionPoolManager.TimeoutExceptio
 import uk.org.whoami.authme.datasource.MySQLDataSource;
 import uk.org.whoami.authme.listener.AuthMeBlockListener;
 import uk.org.whoami.authme.listener.AuthMeEntityListener;
-import uk.org.whoami.authme.listener.AuthMeJoinListener;
 import uk.org.whoami.authme.listener.AuthMePlayerListener;
 import uk.org.whoami.authme.listener.AuthMeSpoutListener;
 import uk.org.whoami.authme.plugin.manager.CitizensCommunicator;
@@ -65,7 +64,7 @@ import uk.org.whoami.authme.datasource.SqliteDataSource;
 
 public class AuthMe extends JavaPlugin {
 
-    private DataSource database;
+    private DataSource database = null;
     private Settings settings;
 	@SuppressWarnings("unused")
 	private Messages m;
@@ -75,6 +74,7 @@ public class AuthMe extends JavaPlugin {
     public static Plugin authme;
     public static Permission permission;
 	private static AuthMe instance;
+	private boolean lock = false;
     private Utils utils = Utils.getInstance();
     private JavaPlugin plugin;
     private FileCache playerBackup = new FileCache();
@@ -102,7 +102,6 @@ public class AuthMe extends JavaPlugin {
         pllog = PlayersLogs.getInstance();
         
         server = getServer();
-        PluginManager pm = getServer().getPluginManager();
         
         /*
          *  Back style on start if avaible
@@ -125,11 +124,8 @@ public class AuthMe extends JavaPlugin {
                     if (Settings.isStopEnabled) {
                     	ConsoleLogger.info("Can't use flat file... shutdown...");
                     	server.shutdown();
-                    } else if (Settings.isLockEnabled) {
-                    	ConsoleLogger.info("Can't use flat file... lock server join");
-                    	pm.registerEvents(new AuthMeJoinListener(this), this);
-                    }
-                    if (!Settings.isStopEnabled && !Settings.isLockEnabled)
+                    } 
+                    if (!Settings.isStopEnabled)
                     this.getServer().getPluginManager().disablePlugin(this);
                     return;
                 }
@@ -142,11 +138,8 @@ public class AuthMe extends JavaPlugin {
                     if (Settings.isStopEnabled) {
                     	ConsoleLogger.info("Can't use MySQL... shutdown...");
                     	server.shutdown();
-                    } else if (Settings.isLockEnabled) {
-                    	ConsoleLogger.info("Can't use MySQL... lock server join");
-                    	pm.registerEvents(new AuthMeJoinListener(this), this);
-                    }
-                    if (!Settings.isStopEnabled && !Settings.isLockEnabled)
+                    } 
+                    if (!Settings.isStopEnabled)
                     this.getServer().getPluginManager().disablePlugin(this);
                     return;
                 } catch (SQLException ex) {
@@ -154,11 +147,8 @@ public class AuthMe extends JavaPlugin {
                     if (Settings.isStopEnabled) {
                     	ConsoleLogger.info("Can't use MySQL... shutdown...");
                     	server.shutdown();
-                    } else if (Settings.isLockEnabled) {
-                    	ConsoleLogger.info("Can't use MySQL... lock server join");
-                    	pm.registerEvents(new AuthMeJoinListener(this), this);
                     }
-                    if (!Settings.isStopEnabled && !Settings.isLockEnabled)
+                    if (!Settings.isStopEnabled)
                     this.getServer().getPluginManager().disablePlugin(this);
                     return;
                 } catch(TimeoutException ex) {
@@ -166,11 +156,8 @@ public class AuthMe extends JavaPlugin {
                     if (Settings.isStopEnabled) {
                     	ConsoleLogger.info("Can't use MySQL... shutdown...");
                     	server.shutdown();
-                    } else if (Settings.isLockEnabled) {
-                    	ConsoleLogger.info("Can't use MySQL... lock server join");
-                    	pm.registerEvents(new AuthMeJoinListener(this), this);
                     }
-                    if (!Settings.isStopEnabled && !Settings.isLockEnabled)
+                    if (!Settings.isStopEnabled)
                     this.getServer().getPluginManager().disablePlugin(this);
                     return;
                 }
@@ -183,11 +170,8 @@ public class AuthMe extends JavaPlugin {
                     if (Settings.isStopEnabled) {
                     	ConsoleLogger.info("Can't use sqlite... shutdown...");
                     	server.shutdown();
-                    } else if (Settings.isLockEnabled) {
-                    	ConsoleLogger.info("Can't use sqlite... lock server join");
-                    	pm.registerEvents(new AuthMeJoinListener(this), this);
                     }
-                    if (!Settings.isStopEnabled && !Settings.isLockEnabled)
+                    if (!Settings.isStopEnabled)
                     this.getServer().getPluginManager().disablePlugin(this);
                     return;
                 } catch (SQLException ex) {
@@ -195,11 +179,8 @@ public class AuthMe extends JavaPlugin {
                     if (Settings.isStopEnabled) {
                     	ConsoleLogger.info("Can't use sqlite... shutdown...");
                     	server.shutdown();
-                    } else if (Settings.isLockEnabled) {
-                    	ConsoleLogger.info("Can't use sqlite... lock server join");
-                    	pm.registerEvents(new AuthMeJoinListener(this), this);
                     }
-                    if (!Settings.isStopEnabled && !Settings.isLockEnabled)
+                    if (!Settings.isStopEnabled)
                     this.getServer().getPluginManager().disablePlugin(this);
                     return;
                 }
@@ -212,7 +193,8 @@ public class AuthMe extends JavaPlugin {
         
         management =  new Management(database);
         
-        pm.registerEvents(new AuthMePlayerListener(this,database),this);
+        PluginManager pm = getServer().getPluginManager();
+        pm.registerEvents(new AuthMePlayerListener(this,database,lock),this);
         pm.registerEvents(new AuthMeBlockListener(database),this);
         pm.registerEvents(new AuthMeEntityListener(database),this);
         if (pm.isPluginEnabled("Spout")) 
