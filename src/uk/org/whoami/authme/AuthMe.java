@@ -211,9 +211,7 @@ public class AuthMe extends JavaPlugin {
             this.getServer().getPluginManager().disablePlugin(this);   
             }
         }
-        
-        //System.out.println("[debug perm]"+permission);
-        
+   
         this.getCommand("authme").setExecutor(new AdminCommand(database));
         this.getCommand("register").setExecutor(new RegisterCommand(database));
         this.getCommand("login").setExecutor(new LoginCommand());
@@ -222,10 +220,6 @@ public class AuthMe extends JavaPlugin {
         this.getCommand("unregister").setExecutor(new UnregisterCommand(this, database));
         this.getCommand("passpartu").setExecutor(new PasspartuCommand(database));
 
-        
-        //
-        // Check for correct sintax in config file!
-        //
         
         if (!new File(getDataFolder() + File.separator + "players.yml").exists()) {
         	pllog = new PlayersLogs();

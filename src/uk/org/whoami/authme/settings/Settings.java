@@ -164,11 +164,6 @@ public void loadConfigOptions() {
 
 
         saveDefaults();
-            
-            //System.out.println("[AuthMe debug] Config " + getEnablePasswordVerifier.toString());
-            //System.out.println("[AuthMe debug] Config " + getEnablePasswordVerifier.toString());
-
- 
    }
    
 

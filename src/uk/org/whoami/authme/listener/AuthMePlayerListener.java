@@ -114,6 +114,131 @@ public class AuthMePlayerListener implements Listener {
         event.setCancelled(true);
     }
     
+    @EventHandler( priority = EventPriority.NORMAL)
+    public void onPlayerNormalChat(AsyncPlayerChatEvent event) {
+        if (event.isCancelled() || event.getPlayer() == null) {
+            return;
+        }
+        
+        
+        final Player player = event.getPlayer();
+        String name = player.getName().toLowerCase();
+
+        if (CitizensCommunicator.isNPC(player) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
+            return;
+        }
+
+        if (PlayerCache.getInstance().isAuthenticated(name)) {
+            return;
+        }
+        
+        String cmd = event.getMessage().split(" ")[0];
+
+        if (!Settings.isChatAllowed && !(cmd.equalsIgnoreCase("/login") || cmd.equalsIgnoreCase("/register") || cmd.equalsIgnoreCase("/passpartu") || cmd.equalsIgnoreCase("/l") || cmd.equalsIgnoreCase("/reg"))) {
+            //System.out.println("debug chat: chat isnt allowed");
+            event.setCancelled(true);
+            return;
+        }
+        
+        if (!event.isAsynchronous()) {
+        	if (data.isAuthAvailable(name)) {
+        		player.sendMessage(m._("login_msg"));
+        	} else {
+        		if (!Settings.isForcedRegistrationEnabled) {
+        			return;
+        		}
+        		player.sendMessage(m._("reg_msg"));
+        	}
+        } else {
+        	if (data.isAuthAvailable(name)) {
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		{
+        			@Override
+        			public void run() {
+        				player.sendMessage(m._("login_msg"));
+        			}
+        		});
+        		
+        	} else {
+        		if (!Settings.isForcedRegistrationEnabled) {
+        			return;
+        		}
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		{
+        			@Override
+        			public void run() {
+        				player.sendMessage(m._("reg_msg"));
+        			}
+        		});
+        		
+        	}
+        }
+
+                
+    }
+    
+    @EventHandler( priority = EventPriority.HIGH)
+    public void onPlayerHighChat(AsyncPlayerChatEvent event) {
+        if (event.isCancelled() || event.getPlayer() == null) {
+            return;
+        }
+        
+        
+        final Player player = event.getPlayer();
+        String name = player.getName().toLowerCase();
+
+        if (CitizensCommunicator.isNPC(player) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
+            return;
+        }
+
+        if (PlayerCache.getInstance().isAuthenticated(name)) {
+            return;
+        }
+        
+        String cmd = event.getMessage().split(" ")[0];
+
+        if (!Settings.isChatAllowed && !(cmd.equalsIgnoreCase("/login") || cmd.equalsIgnoreCase("/register") || cmd.equalsIgnoreCase("/passpartu") || cmd.equalsIgnoreCase("/l") || cmd.equalsIgnoreCase("/reg"))) {
+            //System.out.println("debug chat: chat isnt allowed");
+            event.setCancelled(true);
+            return;
+        }
+        
+        if (!event.isAsynchronous()) {
+        	if (data.isAuthAvailable(name)) {
+        		player.sendMessage(m._("login_msg"));
+        	} else {
+        		if (!Settings.isForcedRegistrationEnabled) {
+        			return;
+        		}
+        		player.sendMessage(m._("reg_msg"));
+        	}
+        } else {
+        	if (data.isAuthAvailable(name)) {
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		{
+        			@Override
+        			public void run() {
+        				player.sendMessage(m._("login_msg"));
+        			}
+        		});
+        		
+        	} else {
+        		if (!Settings.isForcedRegistrationEnabled) {
+        			return;
+        		}
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		{
+        			@Override
+        			public void run() {
+        				player.sendMessage(m._("reg_msg"));
+        			}
+        		});
+        		
+        	}
+        }
+
+                
+    }
     
     @EventHandler( priority = EventPriority.MONITOR)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
@@ -178,9 +303,135 @@ public class AuthMePlayerListener implements Listener {
                 
     }
     
+    @EventHandler( priority = EventPriority.HIGHEST)
+    public void onPlayerHighestChat(AsyncPlayerChatEvent event) {
+        if (event.isCancelled() || event.getPlayer() == null) {
+            return;
+        }
+        
+        
+        final Player player = event.getPlayer();
+        String name = player.getName().toLowerCase();
+
+        if (CitizensCommunicator.isNPC(player) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
+            return;
+        }
+
+        if (PlayerCache.getInstance().isAuthenticated(name)) {
+            return;
+        }
+        
+        String cmd = event.getMessage().split(" ")[0];
+
+        if (!Settings.isChatAllowed && !(cmd.equalsIgnoreCase("/login") || cmd.equalsIgnoreCase("/register") || cmd.equalsIgnoreCase("/passpartu") || cmd.equalsIgnoreCase("/l") || cmd.equalsIgnoreCase("/reg"))) {
+            //System.out.println("debug chat: chat isnt allowed");
+            event.setCancelled(true);
+            return;
+        }
+        
+        if (!event.isAsynchronous()) {
+        	if (data.isAuthAvailable(name)) {
+        		player.sendMessage(m._("login_msg"));
+        	} else {
+        		if (!Settings.isForcedRegistrationEnabled) {
+        			return;
+        		}
+        		player.sendMessage(m._("reg_msg"));
+        	}
+        } else {
+        	if (data.isAuthAvailable(name)) {
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		{
+        			@Override
+        			public void run() {
+        				player.sendMessage(m._("login_msg"));
+        			}
+        		});
+        		
+        	} else {
+        		if (!Settings.isForcedRegistrationEnabled) {
+        			return;
+        		}
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		{
+        			@Override
+        			public void run() {
+        				player.sendMessage(m._("reg_msg"));
+        			}
+        		});
+        		
+        	}
+        }
+
+                
+    }
+    
     
     @EventHandler( priority = EventPriority.LOWEST)
     public void onPlayerEarlyChat(AsyncPlayerChatEvent event) {
+        if (event.isCancelled() || event.getPlayer() == null) {
+            return;
+        }
+        
+        
+        final Player player = event.getPlayer();
+        String name = player.getName().toLowerCase();
+
+        if (CitizensCommunicator.isNPC(player) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
+            return;
+        }
+
+        if (PlayerCache.getInstance().isAuthenticated(name)) {
+            return;
+        }
+        
+        String cmd = event.getMessage().split(" ")[0];
+
+        if (!Settings.isChatAllowed && !(cmd.equalsIgnoreCase("/login") || cmd.equalsIgnoreCase("/register") || cmd.equalsIgnoreCase("/passpartu") || cmd.equalsIgnoreCase("/l") || cmd.equalsIgnoreCase("/reg"))) {
+            //System.out.println("debug chat: chat isnt allowed");
+            event.setCancelled(true);
+            return;
+        }
+        
+        if (!event.isAsynchronous()) {
+        	if (data.isAuthAvailable(name)) {
+        		player.sendMessage(m._("login_msg"));
+        	} else {
+        		if (!Settings.isForcedRegistrationEnabled) {
+        			return;
+        		}
+        		player.sendMessage(m._("reg_msg"));
+        	}
+        } else {
+        	if (data.isAuthAvailable(name)) {
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		{
+        			@Override
+        			public void run() {
+        				player.sendMessage(m._("login_msg"));
+        			}
+        		});
+        		
+        	} else {
+        		if (!Settings.isForcedRegistrationEnabled) {
+        			return;
+        		}
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		{
+        			@Override
+        			public void run() {
+        				player.sendMessage(m._("reg_msg"));
+        			}
+        		});
+        		
+        	}
+        }
+
+                
+    }
+
+    @EventHandler( priority = EventPriority.LOW)
+    public void onPlayerLowChat(AsyncPlayerChatEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
         }
