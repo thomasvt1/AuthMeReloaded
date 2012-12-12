@@ -38,6 +38,7 @@ public final class Settings extends YamlConfiguration {
     public static final String AUTH_FILE = Settings.PLUGIN_FOLDER + "/auths.db";
     public static final String MESSAGE_FILE = Settings.PLUGIN_FOLDER + "/messages";
     public static final String SETTINGS_FILE = Settings.PLUGIN_FOLDER + "/config.yml";
+    public static List<String> allowCommands = null;
     public static List<String> getJoinPermissions = null;
     public static List<String> getUnrestrictedName = null;
     private static List<String> getRestrictedIp;
@@ -95,6 +96,7 @@ public final class Settings extends YamlConfiguration {
     }
    
 
+@SuppressWarnings("unchecked")
 public void loadConfigOptions() {
        
         plugin.getLogger().info("Loading Configuration File...");
@@ -161,12 +163,24 @@ public void loadConfigOptions() {
         enablePasspartu = configFile.getBoolean("Passpartu.enablePasspartu",false);
         isStopEnabled = configFile.getBoolean("Security.SQLProblem.stopServer", true);
         reloadSupport = configFile.getBoolean("Security.ReloadCommand.useReloadCommandSupport", true);
-
+        allowCommands = (List<String>) configFile.getList("settings.restrictions.allowCommands");
+        
+        if (!allowCommands.contains("/login"))
+        	allowCommands.add("/login");
+        if (!allowCommands.contains("/register"))
+        	allowCommands.add("/register");
+        if (!allowCommands.contains("/l"))
+        	allowCommands.add("/l");
+        if (!allowCommands.contains("/reg"))
+        	allowCommands.add("/reg");
+        if (!allowCommands.contains("/passpartu"))
+        	allowCommands.add("/passpartu");
 
         saveDefaults();
    }
    
 
+@SuppressWarnings("unchecked")
 public static void reloadConfigOptions(YamlConfiguration newConfig) {
        configFile = newConfig;
               
@@ -231,8 +245,18 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         enablePasspartu = configFile.getBoolean("Passpartu.enablePasspartu",false);
         isStopEnabled = configFile.getBoolean("Security.SQLProblem.stopServer", true);
         reloadSupport = configFile.getBoolean("Security.ReloadCommand.useReloadCommandSupport", true);
-       
-        //System.out.println(getMySQLDatabase);
+        allowCommands = (List<String>) configFile.getList("settings.restrictions.allowCommands");
+        
+        if (!allowCommands.contains("/login"))
+        	allowCommands.add("/login");
+        if (!allowCommands.contains("/register"))
+        	allowCommands.add("/register");
+        if (!allowCommands.contains("/l"))
+        	allowCommands.add("/l");
+        if (!allowCommands.contains("/reg"))
+        	allowCommands.add("/reg");
+        if (!allowCommands.contains("/passpartu"))
+        	allowCommands.add("/passpartu");
         
          
    }
@@ -276,6 +300,7 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
        if(!contains("passpartu.enablePasspartu")) {
            set("Passpartu.enablePasspartu",false);
        }
+       
        
        plugin.getLogger().info("Merge new Config Options if needed..");
        plugin.saveConfig();
@@ -447,6 +472,6 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
     }
     
     public enum messagesLang {
-        en, de, br, cz, pl, fr
+        en, de, br, cz, pl, fr, ru
     } 
 }

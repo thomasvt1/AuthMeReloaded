@@ -109,6 +109,10 @@ public class AuthMePlayerListener implements Listener {
         if (cmd.equalsIgnoreCase("/login") || cmd.equalsIgnoreCase("/register") || cmd.equalsIgnoreCase("/passpartu") || cmd.equalsIgnoreCase("/l") || cmd.equalsIgnoreCase("/reg")) {
             return;
         }
+        
+        if (Settings.allowCommands.contains(cmd)) {
+        	return;
+        }
 
         event.setMessage("/notloggedin");
         event.setCancelled(true);
@@ -134,7 +138,7 @@ public class AuthMePlayerListener implements Listener {
         
         String cmd = event.getMessage().split(" ")[0];
 
-        if (!Settings.isChatAllowed && !(cmd.equalsIgnoreCase("/login") || cmd.equalsIgnoreCase("/register") || cmd.equalsIgnoreCase("/passpartu") || cmd.equalsIgnoreCase("/l") || cmd.equalsIgnoreCase("/reg"))) {
+        if (!Settings.isChatAllowed && !(Settings.allowCommands.contains(cmd))) {
             //System.out.println("debug chat: chat isnt allowed");
             event.setCancelled(true);
             return;
@@ -197,7 +201,7 @@ public class AuthMePlayerListener implements Listener {
         
         String cmd = event.getMessage().split(" ")[0];
 
-        if (!Settings.isChatAllowed && !(cmd.equalsIgnoreCase("/login") || cmd.equalsIgnoreCase("/register") || cmd.equalsIgnoreCase("/passpartu") || cmd.equalsIgnoreCase("/l") || cmd.equalsIgnoreCase("/reg"))) {
+        if (!Settings.isChatAllowed && !(Settings.allowCommands.contains(cmd))) {
             //System.out.println("debug chat: chat isnt allowed");
             event.setCancelled(true);
             return;
@@ -260,7 +264,7 @@ public class AuthMePlayerListener implements Listener {
         
         String cmd = event.getMessage().split(" ")[0];
 
-        if (!Settings.isChatAllowed && !(cmd.equalsIgnoreCase("/login") || cmd.equalsIgnoreCase("/register") || cmd.equalsIgnoreCase("/passpartu") || cmd.equalsIgnoreCase("/l") || cmd.equalsIgnoreCase("/reg"))) {
+        if (!Settings.isChatAllowed && !(Settings.allowCommands.contains(cmd))) {
             //System.out.println("debug chat: chat isnt allowed");
             event.setCancelled(true);
             return;
@@ -323,7 +327,7 @@ public class AuthMePlayerListener implements Listener {
         
         String cmd = event.getMessage().split(" ")[0];
 
-        if (!Settings.isChatAllowed && !(cmd.equalsIgnoreCase("/login") || cmd.equalsIgnoreCase("/register") || cmd.equalsIgnoreCase("/passpartu") || cmd.equalsIgnoreCase("/l") || cmd.equalsIgnoreCase("/reg"))) {
+        if (!Settings.isChatAllowed && !(Settings.allowCommands.contains(cmd))) {
             //System.out.println("debug chat: chat isnt allowed");
             event.setCancelled(true);
             return;
@@ -387,7 +391,7 @@ public class AuthMePlayerListener implements Listener {
         
         String cmd = event.getMessage().split(" ")[0];
 
-        if (!Settings.isChatAllowed && !(cmd.equalsIgnoreCase("/login") || cmd.equalsIgnoreCase("/register") || cmd.equalsIgnoreCase("/passpartu") || cmd.equalsIgnoreCase("/l") || cmd.equalsIgnoreCase("/reg"))) {
+        if (!Settings.isChatAllowed && !(Settings.allowCommands.contains(cmd))) {
             //System.out.println("debug chat: chat isnt allowed");
             event.setCancelled(true);
             return;
@@ -450,7 +454,7 @@ public class AuthMePlayerListener implements Listener {
         
         String cmd = event.getMessage().split(" ")[0];
 
-        if (!Settings.isChatAllowed && !(cmd.equalsIgnoreCase("/login") || cmd.equalsIgnoreCase("/register") || cmd.equalsIgnoreCase("/passpartu") || cmd.equalsIgnoreCase("/l") || cmd.equalsIgnoreCase("/reg"))) {
+        if (!Settings.isChatAllowed && !(Settings.allowCommands.contains(cmd))) {
             //System.out.println("debug chat: chat isnt allowed");
             event.setCancelled(true);
             return;

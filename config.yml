@@ -25,6 +25,12 @@ settings:
         timeout: 10
     restrictions:
         allowChat: false
+        allowCommands:
+        - /login
+        - /register
+        - /l
+        - /reg
+        - /passpartu
         maxRegPerIp: 1
         maxNicknameLength: 20
         ForceSingleSession: true
