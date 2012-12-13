@@ -48,6 +48,7 @@ public final class Settings extends YamlConfiguration {
     
     public static DataSourceType getDataSource;
     public static HashAlgorithm getPasswordHash;
+    public static HashAlgorithm rakamakHash;
     
     public static Boolean isPermissionCheckEnabled, isRegistrationEnabled, isForcedRegistrationEnabled,
             isTeleportToSpawnEnabled, isSessionsEnabled, isChatAllowed, isAllowRestrictedIp, 
@@ -55,14 +56,15 @@ public final class Settings extends YamlConfiguration {
             isForceSpawnLocOnJoinEnabled, isForceExactSpawnEnabled, isSaveQuitLocationEnabled,
             isForceSurvivalModeEnabled, isResetInventoryIfCreative, isCachingEnabled, isKickOnWrongPasswordEnabled,
             getEnablePasswordVerifier, protectInventoryBeforeLogInEnabled, isBackupActivated, isBackupOnStart,
-            isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport;
+            isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport, rakamakUseIp;
             
             
     public static String getNickRegex, getUnloggedinGroup, getMySQLHost, getMySQLPort, 
             getMySQLUsername, getMySQLPassword, getMySQLDatabase, getMySQLTablename, 
             getMySQLColumnName, getMySQLColumnPassword, getMySQLColumnIp, getMySQLColumnLastLogin,
             getMySQLColumnSalt, getMySQLColumnGroup, unRegisteredGroup, backupWindowsPath,
-            getcUnrestrictedName, getRegisteredGroup, messagesLanguage, getMySQLlastlocX, getMySQLlastlocY, getMySQLlastlocZ;
+            getcUnrestrictedName, getRegisteredGroup, messagesLanguage, getMySQLlastlocX, getMySQLlastlocY, getMySQLlastlocZ,
+            rakamakUsers, rakamakUsersIp;
             
     
     public static int getWarnMessageInterval, getSessionTimeout, getRegistrationTimeout, getMaxNickLength,
@@ -175,6 +177,11 @@ public void loadConfigOptions() {
         	allowCommands.add("/reg");
         if (!allowCommands.contains("/passpartu"))
         	allowCommands.add("/passpartu");
+        
+        rakamakUsers = configFile.getString("Converter.Rakamak.fileName", "users.rak");
+        rakamakUsersIp = configFile.getString("Converter.Rakamak.ipFileName", "UsersIp.rak");
+        rakamakUseIp = configFile.getBoolean("Converter.Rakamak.useIp", false);
+        rakamakHash = getRakamakHash();
 
         saveDefaults();
    }
@@ -258,6 +265,10 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         if (!allowCommands.contains("/passpartu"))
         	allowCommands.add("/passpartu");
         
+        rakamakUsers = configFile.getString("Converter.Rakamak.fileName", "users.rak");
+        rakamakUsersIp = configFile.getString("Converter.Rakamak.ipFileName", "UsersIp.rak");
+        rakamakUseIp = configFile.getBoolean("Converter.Rakamak.useIp", false);
+        rakamakHash = getRakamakHash();
          
    }
    
@@ -301,6 +312,23 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
            set("Passpartu.enablePasspartu",false);
        }
        
+       if (!contains("Converter.Rakamak.fileName")) {
+           set("Converter.Rakamak.fileName", "users.rak");
+       }
+       
+       if (!contains("Converter.Rakamak.useIp")) {
+    	   set("Converter.Rakamak.useIp", false);
+       }
+       
+       if (!contains("Converter.Rakamak.ipFileName")) {
+    	   set("Converter.Rakamak.ipFileName", "UsersIp.rak");
+       }
+       
+       if (!contains("Converter.Rakamak.newPasswordHash")) {
+    	   set("Converter.Rakamak.newPasswordHash", "SHA256");
+       }
+       
+       
        
        plugin.getLogger().info("Merge new Config Options if needed..");
        plugin.saveConfig();
@@ -314,6 +342,18 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
     */   
     private static HashAlgorithm getPasswordHash() {
         String key = "settings.security.passwordHash";
+
+        try {
+            return PasswordSecurity.HashAlgorithm.valueOf(configFile.getString(key,"SHA256").toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            ConsoleLogger.showError("Unknown Hash Algorithm; defaulting to SHA256");
+            return PasswordSecurity.HashAlgorithm.SHA256;
+        }
+    }
+    
+    
+    private static HashAlgorithm getRakamakHash() {
+        String key = "Converter.Rakamak.newPasswordHash";
 
         try {
             return PasswordSecurity.HashAlgorithm.valueOf(configFile.getString(key,"SHA256").toUpperCase());

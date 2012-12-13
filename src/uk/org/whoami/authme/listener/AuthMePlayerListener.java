@@ -695,7 +695,7 @@ public class AuthMePlayerListener implements Listener {
             player.getInventory().setArmorContents(new ItemStack[4]);
             player.getInventory().setContents(new ItemStack[36]);
         }
-        
+        if (!event.isAsynchronous())
         player.setGameMode(GameMode.SURVIVAL);
         
         if(player.isOp()) 
@@ -717,7 +717,17 @@ public class AuthMePlayerListener implements Listener {
             LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id);
         }
         sched.scheduleSyncDelayedTask(plugin, new MessageTask(plugin, name, msg, msgInterval));
+        
+        final PlayerJoinEvent e = event;
+        
+        if (Settings.isForceSurvivalModeEnabled && !event.getPlayer().isOp())
+        	sched.scheduleSyncDelayedTask(plugin, new Runnable() {
+        		public void run() {
+        			e.getPlayer().setGameMode(GameMode.SURVIVAL);
+        		}
+        	});
     }
+    
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {

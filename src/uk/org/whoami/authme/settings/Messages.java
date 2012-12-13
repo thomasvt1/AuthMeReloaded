@@ -41,11 +41,11 @@ public class Messages extends CustomConfiguration {
         this.set("usage_log", "&cUsage: /login password");
         this.set("user_unknown", "&cUsername not registered");
         this.set("pwd_changed", "&cPassword changed!");
-        this.set("reg_only", "Registered players only! Please visit http://example.com to register");
+        this.set("reg_only", "&fRegistered players only! Please visit http://example.com to register");
         this.set("valid_session", "&cSession login");
         this.set("login_msg", "&cPlease login with \"/login password\"");
         this.set("reg_msg", "&cPlease register with \"/register password ConfirmPassword\"");
-        this.set("timeout", "Login Timeout");
+        this.set("timeout", "&fLogin Timeout");
         this.set("wrong_pwd", "&cWrong password");
         this.set("logout", "&cSuccessful logout");
         this.set("usage_unreg", "&cUsage: /unregister password");
@@ -53,18 +53,18 @@ public class Messages extends CustomConfiguration {
         this.set("unregistered", "&cSuccessfully unregistered!");
         this.set("login", "&cSuccessful login!");
         this.set("no_perm", "&cNo Permission");
-        this.set("same_nick", "Same nick is already playing");
-        this.set("reg_voluntarily", "You can register your nickname with the server with the command \"/register password ConfirmPassword\"");
-        this.set("reload", "Configuration and database has been reloaded");
-        this.set("error", "An error ocurred; Please contact the admin");
-        this.set("unknown_user", "User is not in database");
-        this.set("unsafe_spawn","Your Quit location was unsafe, teleporting you to World Spawn");
-        this.set("unvalid_session","Session Dataes doesnt corrispond Plaese wait the end of session");
-        this.set("max_reg","You have Exeded the max number of Registration for your Account"); 
-        this.set("password_error","Password doesnt match");
-        this.set("pass_len","Your password dind't reach the minimum length or exeded the max length");
-        this.set("vb_nonActiv","Your Account isent Activated yet check your Emails!");
-        this.set("usage_changepassword", "Usage: /changepassword oldPassword newPassword");
+        this.set("same_nick", "&fSame nick is already playing");
+        this.set("reg_voluntarily", "&fYou can register your nickname with the server with the command \"/register password ConfirmPassword\"");
+        this.set("reload", "&fConfiguration and database has been reloaded");
+        this.set("error", "&fAn error ocurred; Please contact the admin");
+        this.set("unknown_user", "&fUser is not in database");
+        this.set("unsafe_spawn","&fYour Quit location was unsafe, teleporting you to World Spawn");
+        this.set("unvalid_session","&fSession Dataes doesnt corrispond Plaese wait the end of session");
+        this.set("max_reg","&fYou have Exceded the max number of Registration for your Account"); 
+        this.set("password_error","&fPassword doesnt match");
+        this.set("pass_len","&fYour password dind''t reach the minimum length or exeded the max length");
+        this.set("vb_nonActiv","&fYour Account isent Activated yet check your Emails!");
+        this.set("usage_changepassword", "&fUsage: /changepassword oldPassword newPassword");
         
     }
 
@@ -75,7 +75,7 @@ public class Messages extends CustomConfiguration {
     }
 
     public String _(String msg) {
-        String loc = this.getString(msg);
+        String loc = (String) this.get(msg);
         if (loc != null) {
             return loc.replace("&", "\u00a7");
         }

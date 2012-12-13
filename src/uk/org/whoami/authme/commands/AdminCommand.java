@@ -40,6 +40,7 @@ import uk.org.whoami.authme.Utils;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
 import uk.org.whoami.authme.converter.FlatToSql;
+import uk.org.whoami.authme.converter.RakamakConverter;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.settings.Messages;
@@ -183,6 +184,17 @@ public class AdminCommand implements CommandExecutor {
 					System.out.println(ex.getMessage());
 				}
         	
+        } else if (args[0].equalsIgnoreCase("convertfromrakamak")) {
+    		try {
+    			RakamakConverter.RakamakConvert();
+    			if (sender instanceof Player)
+    				sender.sendMessage("[AuthMe] Rakamak database converted to auths.db");
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (NullPointerException ex) {
+				System.out.println(ex.getMessage());
+			}
+    	
         } else if (args[0].equalsIgnoreCase("changepassword")) {
             if (args.length != 3) {
                 sender.sendMessage("Usage: /authme changepassword playername newpassword");

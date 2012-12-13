@@ -80,3 +80,9 @@ Security:
         stopServer: true
     ReloadCommand:
         useReloadCommandSupport: true
+Converter:
+    Rakamak:
+        fileName: users.rak
+        useIP: false
+        ipFileName: UsersIp.rak
+        newPasswordHash: SHA256
