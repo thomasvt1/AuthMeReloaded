@@ -17,6 +17,7 @@
 package uk.org.whoami.authme.listener;
 
 import java.util.Date;
+import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -63,7 +64,9 @@ import uk.org.whoami.authme.task.TimeoutTask;
 public class AuthMePlayerListener implements Listener {
 
     
-    private Utils utils = Utils.getInstance();
+    public static int gm = 0;
+    public static HashMap<String, Integer> gameMode = new HashMap<String, Integer>();
+	private Utils utils = Utils.getInstance();
     private Messages m = Messages.getInstance();
     private JavaPlugin plugin;
     private DataSource data;
@@ -570,21 +573,16 @@ public class AuthMePlayerListener implements Listener {
         }
         
         if(data.isAuthAvailable(name) && !LimboCache.getInstance().hasLimboPlayer(name)) {
-            if(!Settings.isSessionsEnabled) {
-            //System.out.println("resetta il nick");  
+            if(!Settings.isSessionsEnabled) { 
             LimboCache.getInstance().addLimboPlayer(player , utils.removeAll(player));
             } else if(PlayerCache.getInstance().isAuthenticated(name)) {
                 if(LimboCache.getInstance().hasLimboPlayer(player.getName().toLowerCase())) {
                         LimboCache.getInstance().deleteLimboPlayer(name);  
-                    } 
-                //System.out.println("nick gia autenticato");
+                    }
                 LimboCache.getInstance().addLimboPlayer(player , utils.removeAll(player));
             }
         }
         
-        
-       
-        // Big problem on this chek
         //Check if forceSingleSession is set to true, so kick player that has joined with same nick of online player
         if(player.isOnline() && Settings.isForceSingleSessionEnabled ) {
              LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(player.getName().toLowerCase()); 
@@ -603,19 +601,13 @@ public class AuthMePlayerListener implements Listener {
         String regex = Settings.getNickRegex;
 
         if (name.length() > max || name.length() < min) {
-            
-            //LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name); 
-            //utils.addNormal(player, limbo.getGroup());
-            //LimboCache.getInstance().deleteLimboPlayer(name);
+
             event.disallow(Result.KICK_OTHER, "Your nickname is too Short or too long");
             return;
         }
         if (!player.getName().matches(regex) || name.equals("Player")) {
-          //LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name); 
             
             event.disallow(Result.KICK_OTHER, "Your nickname contains illegal characters. Allowed chars: " + regex);
-           // utils.addNormal(player, limbo.getGroup());
-          //  LimboCache.getInstance().deleteLimboPlayer(name);
             return;
         }
  
@@ -635,7 +627,11 @@ public class AuthMePlayerListener implements Listener {
         }
 
         Player player = event.getPlayer();
+        gm = player.getGameMode().getValue();
         String name = player.getName().toLowerCase();
+        gameMode.put(name, gm);
+        BukkitScheduler sched = plugin.getServer().getScheduler();
+        final PlayerJoinEvent e = event;
 
        
         if (CitizensCommunicator.isNPC(player) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
@@ -644,6 +640,8 @@ public class AuthMePlayerListener implements Listener {
 
         String ip = player.getAddress().getAddress().getHostAddress();
             if(Settings.isAllowRestrictedIp && !Settings.getRestrictedIp(name, ip)) {
+                int gM = gameMode.get(name);
+            	player.setGameMode(GameMode.getByValue(gM));
                 player.kickPlayer("You are not the Owner of this account, please try another name!");
                 return;           
                 }         
@@ -665,7 +663,9 @@ public class AuthMePlayerListener implements Listener {
                     PlayerCache.getInstance().addPlayer(auth);
                     player.sendMessage(m._("valid_session"));
                     return;
-                } else {          
+                } else {
+                    int gM = gameMode.get(name);
+                	player.setGameMode(GameMode.getByValue(gM));
                     player.kickPlayer(m._("unvalid_session"));
                     return;
                 }
@@ -673,7 +673,6 @@ public class AuthMePlayerListener implements Listener {
 
                 PlayerCache.getInstance().removePlayer(name);
                 LimboCache.getInstance().addLimboPlayer(player , utils.removeAll(player));
-                //LimboCache.getInstance().addLimboPlayer(player);
                 }
           } 
           // isent in session or session was ended correctly
@@ -695,9 +694,7 @@ public class AuthMePlayerListener implements Listener {
             player.getInventory().setArmorContents(new ItemStack[4]);
             player.getInventory().setContents(new ItemStack[36]);
         }
-        if (!event.isAsynchronous())
-        player.setGameMode(GameMode.SURVIVAL);
-        
+ 
         if(player.isOp()) 
             player.setOp(false);
 
@@ -708,7 +705,6 @@ public class AuthMePlayerListener implements Listener {
         String msg = data.isAuthAvailable(name) ? m._("login_msg") : m._("reg_msg");
         int time = Settings.getRegistrationTimeout * 20;
         int msgInterval = Settings.getWarnMessageInterval;
-        BukkitScheduler sched = plugin.getServer().getScheduler();
         if (time != 0) {
             int id = sched.scheduleSyncDelayedTask(plugin, new TimeoutTask(plugin, name), time);
             if(!LimboCache.getInstance().hasLimboPlayer(name))
@@ -718,9 +714,7 @@ public class AuthMePlayerListener implements Listener {
         }
         sched.scheduleSyncDelayedTask(plugin, new MessageTask(plugin, name, msg, msgInterval));
         
-        final PlayerJoinEvent e = event;
-        
-        if (Settings.isForceSurvivalModeEnabled && !event.getPlayer().isOp())
+        if (Settings.isForceSurvivalModeEnabled)
         	sched.scheduleSyncDelayedTask(plugin, new Runnable() {
         		public void run() {
         			e.getPlayer().setGameMode(GameMode.SURVIVAL);
@@ -738,8 +732,7 @@ public class AuthMePlayerListener implements Listener {
         
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
-    //
-    // Fix for Exact spawn usses that bukkit has
+
     // Fix for Quit location when player where kicked for timeout
         
         if (CitizensCommunicator.isNPC(player) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
@@ -771,6 +764,7 @@ public class AuthMePlayerListener implements Listener {
         }
         PlayerCache.getInstance().removePlayer(name);
         PlayersLogs.players.remove(player.getName());
+        if (gameMode.containsKey(name)) gameMode.remove(name);
         PlayersLogs.getInstance().save();
         player.saveData();
     }
@@ -820,6 +814,7 @@ public class AuthMePlayerListener implements Listener {
 
       PlayerCache.getInstance().removePlayer(name);
       PlayersLogs.players.remove(player.getName());
+      if (gameMode.containsKey(name)) gameMode.remove(name);
       PlayersLogs.getInstance().save();
       player.saveData();
     }

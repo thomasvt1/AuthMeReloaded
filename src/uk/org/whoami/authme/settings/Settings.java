@@ -327,9 +327,7 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
        if (!contains("Converter.Rakamak.newPasswordHash")) {
     	   set("Converter.Rakamak.newPasswordHash", "SHA256");
        }
-       
-       
-       
+
        plugin.getLogger().info("Merge new Config Options if needed..");
        plugin.saveConfig();
        

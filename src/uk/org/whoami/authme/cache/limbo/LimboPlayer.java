@@ -38,13 +38,13 @@ public class LimboPlayer {
         this.gameMode = gameMode;
         this.operator = operator;
         this.group = group;
-        //System.out.println("il gruppo in limboPlayer "+group);
     }
     
     public LimboPlayer(String name, String group) {
         this.name = name;
         this.group = group;
     }
+    
     
     public String getName() {
         return name;

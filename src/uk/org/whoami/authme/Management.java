@@ -15,6 +15,7 @@ import uk.org.whoami.authme.cache.backup.FileCache;
 import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.cache.limbo.LimboPlayer;
 import uk.org.whoami.authme.datasource.DataSource;
+import uk.org.whoami.authme.listener.AuthMePlayerListener;
 import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.settings.Messages;
 import uk.org.whoami.authme.settings.PlayersLogs;
@@ -136,6 +137,8 @@ public class Management {
             } else {
                 ConsoleLogger.info(player.getDisplayName() + " used the wrong password");
                 if (Settings.isKickOnWrongPasswordEnabled) {
+                    int gm = AuthMePlayerListener.gameMode.get(name);
+                	player.setGameMode(GameMode.getByValue(gm));
                     player.kickPlayer(m._("wrong_pwd"));
                 } else {
                     return (m._("wrong_pwd"));
