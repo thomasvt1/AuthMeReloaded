@@ -30,3 +30,7 @@ pass_len: '&fYour password dind''t reach the minimum length or exeded the max le
 reload: '&fConfiguration and database has been reloaded'
 timeout: '&fLogin Timeout'
 usage_changepassword: '&fUsage: /changepassword oldPassword newPassword'
+name_len: '&cYour nickname is too Short or too long'
+regex: '&cYour nickname contains illegal characters. Allowed chars: REG_EX'
+
+

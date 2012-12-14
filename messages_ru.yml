@@ -30,3 +30,5 @@ pass_len: '&cТвой пароль либо слишком длинный, ли�
 reload: '&aКонфигурация и база данных перезагружена'
 timeout: '&cТы не успел войти в игру'
 usage_changepassword: '&eСинтаксис: &d/changepassword СТАРЫЙ_ПАРОЛЬ НОВЫЙ_ПАРОЛЬ'
+name_len: '&cYour nickname is too Short or too long'
+regex: '&cYour nickname contains illegal characters. Allowed chars: REG_EX'

@@ -65,6 +65,8 @@ public class Messages extends CustomConfiguration {
         this.set("pass_len","&fYour password dind''t reach the minimum length or exeded the max length");
         this.set("vb_nonActiv","&fYour Account isent Activated yet check your Emails!");
         this.set("usage_changepassword", "&fUsage: /changepassword oldPassword newPassword");
+        this.set("name_len", "&cYour nickname is too Short or too long");
+        this.set("regex", "&cYour nickname contains illegal characters. Allowed chars: REG_EX");
         
     }
 

@@ -602,12 +602,12 @@ public class AuthMePlayerListener implements Listener {
 
         if (name.length() > max || name.length() < min) {
 
-            event.disallow(Result.KICK_OTHER, "Your nickname is too Short or too long");
+            event.disallow(Result.KICK_OTHER, m._("name_len"));
             return;
         }
         if (!player.getName().matches(regex) || name.equals("Player")) {
             
-            event.disallow(Result.KICK_OTHER, "Your nickname contains illegal characters. Allowed chars: " + regex);
+            event.disallow(Result.KICK_OTHER, m._("regex").replaceAll("REG_EX", regex));
             return;
         }
  
