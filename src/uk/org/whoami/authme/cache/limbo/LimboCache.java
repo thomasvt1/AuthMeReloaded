@@ -28,7 +28,6 @@ public class LimboCache {
 
     private static LimboCache singleton = null;
     private HashMap<String, LimboPlayer> cache;
-   //private Settings settings = Settings.getInstance();
     private FileCache playerData = new FileCache();
     
     private LimboCache() {
@@ -44,8 +43,7 @@ public class LimboCache {
         boolean operator;
         String playerGroup = "";
         
-        if (playerData.doesCacheExist(name)) {
-            //DataFileCache playerInvArmor =  playerData.readCache(name);    
+        if (playerData.doesCacheExist(name)) {   
              inv =  playerData.readCache(name).getInventory();
              arm =  playerData.readCache(name).getArmour();
              playerGroup = playerData.readCache(name).getGroup();
@@ -53,11 +51,8 @@ public class LimboCache {
         } else {
         inv =  player.getInventory().getContents();
         arm =  player.getInventory().getArmorContents();
-            
-        // check if player is an operator, then save it to ram if cache dosent exist!
-        
+   
             if(player.isOp() ) {
-                //System.out.println("player is an operator in limboCache");
                 operator = true;
                 }
                    else operator = false;      
@@ -78,19 +73,16 @@ public class LimboCache {
         }
         
         if(cache.containsKey(name) && playerGroup.isEmpty()) {
-            //System.out.println("contiene il player "+name);
             LimboPlayer groupLimbo = cache.get(name);
             playerGroup = groupLimbo.getGroup();
         }
         
         cache.put(player.getName().toLowerCase(), new LimboPlayer(name, loc, inv, arm, gameMode, operator, playerGroup));
-    //System.out.println("il gruppo in limboChace "+playerGroup);
     }
     
     public void addLimboPlayer(Player player, String group) {
         
         cache.put(player.getName().toLowerCase(), new LimboPlayer(player.getName().toLowerCase(), group));
-   //System.out.println("il gruppo in limboChace "+group);
     }
     
     public void deleteLimboPlayer(String name) {

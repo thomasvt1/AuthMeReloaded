@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import uk.org.whoami.authme.AuthMe;
@@ -144,6 +145,12 @@ public class API {
     
     public static String getUnloggedinGroup() {
     	return Settings.getUnloggedinGroup;
+    }
+    
+    public static void setPlayerInventory(Player player, ItemStack[] content, ItemStack[] armor) {
+    	player.getInventory().setContents(content);
+    	player.getInventory().setArmorContents(armor);
+    	
     }
     
 }

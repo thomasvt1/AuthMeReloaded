@@ -87,10 +87,28 @@ public class AdminCommand implements CommandExecutor {
             sender.sendMessage(m._("no_perm"));
             return true;
         }
+       
         
         if (args[0].equalsIgnoreCase("version")) {
             sender.sendMessage("AuthMe Version: "+AuthMe.getInstance().getDescription().getVersion());
             return true;
+        }
+        
+        if (args[0].equalsIgnoreCase("lastlogin")) {
+        	if (args.length != 2) {
+        		sender.sendMessage("Usage: /authme lastlogin <playername>");
+        		return true;
+        	}
+        	try {
+        		if (database.getAuth(args[1]) != null) {
+                    PlayerAuth player = database.getAuth(args[1].toLowerCase());
+                    long lastLogin = player.getLastLogin();
+                    Date d = new Date(lastLogin);
+                    sender.sendMessage("[AuthMe] " + args[1].toLowerCase() + " lastlogin : " + d.toString());	
+        		}	
+        	} catch (NullPointerException e) {
+        		sender.sendMessage("This player does not exist");
+        	}
         }
         
         if (args[0].equalsIgnoreCase("purge")) {

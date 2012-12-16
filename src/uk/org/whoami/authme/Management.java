@@ -4,17 +4,20 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import uk.org.whoami.authme.api.API;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
 import uk.org.whoami.authme.cache.backup.FileCache;
 import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.cache.limbo.LimboPlayer;
 import uk.org.whoami.authme.datasource.DataSource;
+import uk.org.whoami.authme.events.RestoreInventoryEvent;
 import uk.org.whoami.authme.listener.AuthMePlayerListener;
 import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.settings.Messages;
@@ -71,8 +74,11 @@ public class Management {
                 LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
                 if (limbo != null) {
                     if (Settings.protectInventoryBeforeLogInEnabled.booleanValue()) {
-                        player.getInventory().setContents(limbo.getInventory());
-                        player.getInventory().setArmorContents(limbo.getArmour());
+                    	RestoreInventoryEvent event = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
+                    	Bukkit.getServer().getPluginManager().callEvent(event);
+                    	if (!event.isCancelled()) {
+                    		API.setPlayerInventory(player, limbo.getInventory(), limbo.getArmour());
+                    	}
                                 }
                       player.setGameMode(GameMode.getByValue(limbo.getGameMode()));
                       player.setOp(limbo.getOperator());
@@ -152,11 +158,14 @@ public class Management {
                 LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
                 if (limbo != null) {
                     if (Settings.protectInventoryBeforeLogInEnabled.booleanValue()) {
-                        player.getInventory().setContents(limbo.getInventory());
-                        player.getInventory().setArmorContents(limbo.getArmour());
+                    	RestoreInventoryEvent event = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
+                    	Bukkit.getServer().getPluginManager().callEvent(event);
+                    	if (!event.isCancelled()) {
+                    		API.setPlayerInventory(player, limbo.getInventory(), limbo.getArmour());
+                    	}
                                 }
                       player.setGameMode(GameMode.getByValue(limbo.getGameMode()));
-                     player.setOp(limbo.getOperator());
+                      player.setOp(limbo.getOperator());
                       
                       this.utils.addNormal(player, limbo.getGroup());
                       

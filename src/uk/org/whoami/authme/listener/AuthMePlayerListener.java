@@ -43,6 +43,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+
+import uk.org.whoami.authme.api.API;
 import uk.org.whoami.authme.cache.backup.DataFileCache;
 import uk.org.whoami.authme.cache.backup.FileCache;
 import uk.org.whoami.authme.AuthMe;
@@ -53,6 +55,7 @@ import uk.org.whoami.authme.cache.limbo.LimboPlayer;
 import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.plugin.manager.CitizensCommunicator;
 import uk.org.whoami.authme.datasource.DataSource;
+import uk.org.whoami.authme.events.RestoreInventoryEvent;
 import uk.org.whoami.authme.plugin.manager.CombatTagComunicator;
 import uk.org.whoami.authme.settings.Messages;
 import uk.org.whoami.authme.settings.PlayersLogs;
@@ -691,8 +694,7 @@ public class AuthMePlayerListener implements Listener {
 
 
         if(Settings.protectInventoryBeforeLogInEnabled) {
-            player.getInventory().setArmorContents(new ItemStack[4]);
-            player.getInventory().setContents(new ItemStack[36]);
+            API.setPlayerInventory(player, new ItemStack[36], new ItemStack[4]);
         }
  
         if(player.isOp()) 
@@ -750,8 +752,11 @@ public class AuthMePlayerListener implements Listener {
             //System.out.println("e' nel quit");
             LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
             if(Settings.protectInventoryBeforeLogInEnabled) {
-                player.getInventory().setArmorContents(limbo.getArmour());
-                player.getInventory().setContents(limbo.getInventory());
+            	RestoreInventoryEvent ev = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
+            	Bukkit.getServer().getPluginManager().callEvent(ev);
+            	if (!ev.isCancelled()) {
+            		API.setPlayerInventory(player, limbo.getInventory(), limbo.getArmour());
+            	}
             }
             utils.addNormal(player, limbo.getGroup());
             player.setOp(limbo.getOperator());
@@ -798,8 +803,11 @@ public class AuthMePlayerListener implements Listener {
       {
         LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
         if (Settings.protectInventoryBeforeLogInEnabled.booleanValue()) {
-          player.getInventory().setArmorContents(limbo.getArmour());
-          player.getInventory().setContents(limbo.getInventory());
+        	RestoreInventoryEvent ev = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
+        	Bukkit.getServer().getPluginManager().callEvent(ev);
+        	if (!ev.isCancelled()) {
+        		API.setPlayerInventory(player, limbo.getInventory(), limbo.getArmour());
+        	}
         }
         player.teleport(limbo.getLoc());
         this.utils.addNormal(player, limbo.getGroup());
