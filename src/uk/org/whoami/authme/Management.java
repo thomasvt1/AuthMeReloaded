@@ -137,10 +137,12 @@ public class Management {
                 	PlayersLogs.players.add(player.getName());
                 pllog.save();
                 player.sendMessage(m._("login"));
+                if (!Settings.noConsoleSpam)
                 ConsoleLogger.info(player.getDisplayName() + " logged in!");
                 player.saveData();
                 
             } else {
+            	if (!Settings.noConsoleSpam)
                 ConsoleLogger.info(player.getDisplayName() + " used the wrong password");
                 if (Settings.isKickOnWrongPasswordEnabled) {
                     int gm = AuthMePlayerListener.gameMode.get(name);
@@ -231,6 +233,7 @@ public class Management {
                 	PlayersLogs.players.add(player.getName());
                 pllog.save();
                 player.sendMessage(m._("login"));
+                if(!Settings.noConsoleSpam)
                 ConsoleLogger.info(player.getDisplayName() + " logged in!");
                 player.saveData(); 
                 this.passpartu = false;

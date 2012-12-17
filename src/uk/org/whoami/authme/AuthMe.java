@@ -288,7 +288,7 @@ public class AuthMe extends JavaPlugin {
 		return instance;
 	}
 	
-	public void savePlayer(Player player) throws IllegalStateException {
+	public void savePlayer(Player player) throws IllegalStateException, NullPointerException {
 		try {
 	      if ((CitizensCommunicator.isNPC(player)) || (Utils.getInstance().isUnrestricted(player)) || (CombatTagComunicator.isNPC(player))) {
 	          return;
@@ -324,7 +324,6 @@ public class AuthMe extends JavaPlugin {
 	        PlayerCache.getInstance().removePlayer(name);
 	        player.saveData();
 	      } catch (Exception ex) {
-	    	  ex.printStackTrace();
 	      }
 	}
 }

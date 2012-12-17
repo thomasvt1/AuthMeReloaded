@@ -56,7 +56,7 @@ public final class Settings extends YamlConfiguration {
             isForceSpawnLocOnJoinEnabled, isForceExactSpawnEnabled, isSaveQuitLocationEnabled,
             isForceSurvivalModeEnabled, isResetInventoryIfCreative, isCachingEnabled, isKickOnWrongPasswordEnabled,
             getEnablePasswordVerifier, protectInventoryBeforeLogInEnabled, isBackupActivated, isBackupOnStart,
-            isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport, rakamakUseIp;
+            isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport, rakamakUseIp, noConsoleSpam;
             
             
     public static String getNickRegex, getUnloggedinGroup, getMySQLHost, getMySQLPort, 
@@ -165,8 +165,7 @@ public void loadConfigOptions() {
         enablePasspartu = configFile.getBoolean("Passpartu.enablePasspartu",false);
         isStopEnabled = configFile.getBoolean("Security.SQLProblem.stopServer", true);
         reloadSupport = configFile.getBoolean("Security.ReloadCommand.useReloadCommandSupport", true);
-        allowCommands = (List<String>) configFile.getList("settings.restrictions.allowCommands");
-        
+        allowCommands = (List<String>) configFile.getList("settings.restrictions.allowCommands");        
         if (!allowCommands.contains("/login"))
         	allowCommands.add("/login");
         if (!allowCommands.contains("/register"))
@@ -182,6 +181,8 @@ public void loadConfigOptions() {
         rakamakUsersIp = configFile.getString("Converter.Rakamak.ipFileName", "UsersIp.rak");
         rakamakUseIp = configFile.getBoolean("Converter.Rakamak.useIp", false);
         rakamakHash = getRakamakHash();
+        
+        noConsoleSpam = configFile.getBoolean("Security.console.noConsoleSpam", false);
 
         saveDefaults();
    }
@@ -269,6 +270,8 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         rakamakUsersIp = configFile.getString("Converter.Rakamak.ipFileName", "UsersIp.rak");
         rakamakUseIp = configFile.getBoolean("Converter.Rakamak.useIp", false);
         rakamakHash = getRakamakHash();
+        
+        noConsoleSpam = configFile.getBoolean("Security.console.noConsoleSpam", false);
          
    }
    
@@ -326,6 +329,10 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
        
        if (!contains("Converter.Rakamak.newPasswordHash")) {
     	   set("Converter.Rakamak.newPasswordHash", "SHA256");
+       }
+       
+       if(!contains("Security.console.noConsoleSpam")) {
+    	   set("Security.console.noConsoleSpam", false);
        }
 
        plugin.getLogger().info("Merge new Config Options if needed..");

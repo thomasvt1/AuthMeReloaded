@@ -80,6 +80,8 @@ Security:
         stopServer: true
     ReloadCommand:
         useReloadCommandSupport: true
+    Console:
+        noConsoleSpam: false
 Converter:
     Rakamak:
         fileName: users.rak

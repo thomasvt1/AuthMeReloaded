@@ -165,7 +165,7 @@ public class AdminCommand implements CommandExecutor {
             m.reload();
             s.reload();
             sender.sendMessage(m._("reload"));
-        } else if (args[0].equalsIgnoreCase("register")) {
+        } else if (args[0].equalsIgnoreCase("register") || args[0].equalsIgnoreCase("reg")) {
             if (args.length != 3) {
                 sender.sendMessage("Usage: /authme register playername password");
                 return true;
@@ -213,7 +213,7 @@ public class AdminCommand implements CommandExecutor {
 				System.out.println(ex.getMessage());
 			}
     	
-        } else if (args[0].equalsIgnoreCase("changepassword")) {
+        } else if (args[0].equalsIgnoreCase("changepassword") || args[0].equalsIgnoreCase("cp")) {
             if (args.length != 3) {
                 sender.sendMessage("Usage: /authme changepassword playername newpassword");
                 return true;
@@ -245,7 +245,7 @@ public class AdminCommand implements CommandExecutor {
                 ConsoleLogger.showError(ex.getMessage());
                 sender.sendMessage(m._("error"));
             }
-        } else if (args[0].equalsIgnoreCase("unregister")) {
+        } else if (args[0].equalsIgnoreCase("unregister") || args[0].equalsIgnoreCase("unreg") || args[0].equalsIgnoreCase("del") ) {
             if (args.length != 2) {
                 sender.sendMessage("Usage: /authme unregister playername");
                 return true;
