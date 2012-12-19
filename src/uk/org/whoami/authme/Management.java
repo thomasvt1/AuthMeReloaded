@@ -79,7 +79,7 @@ public class Management {
                     	if (!event.isCancelled()) {
                     		API.setPlayerInventory(player, limbo.getInventory(), limbo.getArmour());
                     	}
-                                }
+                      }
                       player.setGameMode(GameMode.getByValue(limbo.getGameMode()));
                       player.setOp(limbo.getOperator());
                     

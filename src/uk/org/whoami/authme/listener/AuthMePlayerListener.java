@@ -35,7 +35,6 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
@@ -48,6 +47,7 @@ import uk.org.whoami.authme.api.API;
 import uk.org.whoami.authme.cache.backup.DataFileCache;
 import uk.org.whoami.authme.cache.backup.FileCache;
 import uk.org.whoami.authme.AuthMe;
+import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.Utils;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
@@ -55,6 +55,7 @@ import uk.org.whoami.authme.cache.limbo.LimboPlayer;
 import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.plugin.manager.CitizensCommunicator;
 import uk.org.whoami.authme.datasource.DataSource;
+import uk.org.whoami.authme.events.ProtectInventoryEvent;
 import uk.org.whoami.authme.events.RestoreInventoryEvent;
 import uk.org.whoami.authme.plugin.manager.CombatTagComunicator;
 import uk.org.whoami.authme.settings.Messages;
@@ -680,7 +681,7 @@ public class AuthMePlayerListener implements Listener {
           } 
           // isent in session or session was ended correctly
           LimboCache.getInstance().addLimboPlayer(player);
-          DataFileCache playerData = new DataFileCache(player.getInventory().getContents(),player.getInventory().getArmorContents());      
+          DataFileCache playerData = new DataFileCache(LimboCache.getInstance().getLimboPlayer(name).getInventory(),LimboCache.getInstance().getLimboPlayer(name).getArmour());      
           playerBackup.createCache(name, playerData, LimboCache.getInstance().getLimboPlayer(name).getGroup(),LimboCache.getInstance().getLimboPlayer(name).getOperator());                      
         } else {  
             if(!Settings.unRegisteredGroup.isEmpty()){
@@ -694,7 +695,19 @@ public class AuthMePlayerListener implements Listener {
 
 
         if(Settings.protectInventoryBeforeLogInEnabled) {
-            API.setPlayerInventory(player, new ItemStack[36], new ItemStack[4]);
+        	try {
+        		LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(player.getName().toLowerCase());
+            	ProtectInventoryEvent ev = new ProtectInventoryEvent(player, limbo.getInventory(), limbo.getArmour(), 36, 4);
+            	Bukkit.getServer().getPluginManager().callEvent(ev);
+            	if (ev.isCancelled()) {
+            		if (!Settings.noConsoleSpam)
+            		ConsoleLogger.showError("ProtectInventoryEvent has been cancelled...");
+            	}
+            		
+        	} catch (NullPointerException ex) {
+        		ConsoleLogger.showError("Problem while try to protectInventory, the player " + event.getPlayer().getName() + "doesn't exist for AuthMe");
+        	}
+
         }
  
         if(player.isOp()) 

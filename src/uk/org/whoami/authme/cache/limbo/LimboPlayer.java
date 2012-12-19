@@ -40,6 +40,14 @@ public class LimboPlayer {
         this.group = group;
     }
     
+    public LimboPlayer(String name, Location loc, int gameMode, boolean operator, String group) {
+        this.name = name;
+        this.loc = loc;
+        this.gameMode = gameMode;
+        this.operator = operator;
+        this.group = group;
+    }
+    
     public LimboPlayer(String name, String group) {
         this.name = name;
         this.group = group;

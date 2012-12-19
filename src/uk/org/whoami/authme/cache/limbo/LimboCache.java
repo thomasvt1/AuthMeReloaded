@@ -18,10 +18,13 @@ package uk.org.whoami.authme.cache.limbo;
 
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import uk.org.whoami.authme.cache.backup.FileCache;
+import uk.org.whoami.authme.events.ResetInventoryEvent;
+import uk.org.whoami.authme.events.StoreInventoryEvent;
 import uk.org.whoami.authme.settings.Settings;
 
 public class LimboCache {
@@ -38,19 +41,27 @@ public class LimboCache {
         String name = player.getName().toLowerCase();
         Location loc = player.getLocation();
         int gameMode = player.getGameMode().getValue();
-        ItemStack[] arm;
-        ItemStack[] inv;
+        ItemStack[] arm = null;
+        ItemStack[] inv = null;
         boolean operator;
         String playerGroup = "";
         
-        if (playerData.doesCacheExist(name)) {   
-             inv =  playerData.readCache(name).getInventory();
-             arm =  playerData.readCache(name).getArmour();
+        if (playerData.doesCacheExist(name)) {
+        	StoreInventoryEvent event = new StoreInventoryEvent(player, playerData);
+        	Bukkit.getServer().getPluginManager().callEvent(event);
+        	if (!event.isCancelled()) {
+                inv =  playerData.readCache(name).getInventory();
+                arm =  playerData.readCache(name).getArmour();
+        	}
              playerGroup = playerData.readCache(name).getGroup();
              operator = playerData.readCache(name).getOperator();
         } else {
-        inv =  player.getInventory().getContents();
-        arm =  player.getInventory().getArmorContents();
+        	StoreInventoryEvent event = new StoreInventoryEvent(player);
+        	Bukkit.getServer().getPluginManager().callEvent(event);
+        	if (!event.isCancelled()) {
+        		inv =  player.getInventory().getContents();
+        		arm =  player.getInventory().getArmorContents();
+        	}
    
             if(player.isOp() ) {
                 operator = true;
@@ -62,9 +73,11 @@ public class LimboCache {
         
         if(Settings.isForceSurvivalModeEnabled) {
             if(Settings.isResetInventoryIfCreative && gameMode != 0 ) {
-               player.sendMessage("Your inventory has been cleaned!");
-               inv = new ItemStack[36];
-               arm = new ItemStack[4];
+            	ResetInventoryEvent event = new ResetInventoryEvent(player);
+            	Bukkit.getServer().getPluginManager().callEvent(event);
+            	if (!event.isCancelled()) {
+            		player.sendMessage("Your inventory has been cleaned!");
+            	}
             }
             gameMode = 0;
         } 
@@ -77,7 +90,9 @@ public class LimboCache {
             playerGroup = groupLimbo.getGroup();
         }
         
+        if (inv != null && arm != null)
         cache.put(player.getName().toLowerCase(), new LimboPlayer(name, loc, inv, arm, gameMode, operator, playerGroup));
+        else cache.put(player.getName().toLowerCase(), new LimboPlayer(name, loc, gameMode, operator, playerGroup));
     }
     
     public void addLimboPlayer(Player player, String group) {

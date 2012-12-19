@@ -16,6 +16,7 @@
 
 package uk.org.whoami.authme.task;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -56,13 +57,7 @@ public class TimeoutTask implements Runnable {
                 if (LimboCache.getInstance().hasLimboPlayer(name)) {
                     LimboPlayer inv = LimboCache.getInstance().getLimboPlayer(name);
                     player.getServer().getScheduler().cancelTask(inv.getTimeoutTaskId());
-                    /*
-                    player.getInventory().setArmorContents(inv.getArmour());
-                    player.getInventory().setContents(inv.getInventory());
-                    utils.addNormal(player, inv.getGroup());
-                    player.setOp(inv.getOperator());
-                    //System.out.println("debug timout group reset "+inv.getGroup());
-                    LimboCache.getInstance().deleteLimboPlayer(name); */
+                    
                     if(playerCache.doesCacheExist(name)) {
                         playerCache.removeCache(name);
                     } 

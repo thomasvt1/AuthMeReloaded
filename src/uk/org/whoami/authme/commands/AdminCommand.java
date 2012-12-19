@@ -64,7 +64,13 @@ public class AdminCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmnd, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage("Usage: /authme reload|register playername password|changepassword playername password|unregister playername|purge|version");
+            sender.sendMessage("Usage: /authme reload - Reload the config");
+            sender.sendMessage("/authme register <playername> <password> - Register a player");
+            sender.sendMessage("/authme changepassword <playername> <password> - Change player password");
+            sender.sendMessage("/authme unregister <playername> - Unregister a player");
+            sender.sendMessage("/authme purge <days> - Purge Database");
+            sender.sendMessage("/authme version - Get AuthMe version infos");
+            sender.sendMessage("/authme lastlogin <playername> - Display Date about the Player's LastLogin");
             return true;
         }
         
@@ -94,22 +100,6 @@ public class AdminCommand implements CommandExecutor {
             return true;
         }
         
-        if (args[0].equalsIgnoreCase("lastlogin")) {
-        	if (args.length != 2) {
-        		sender.sendMessage("Usage: /authme lastlogin <playername>");
-        		return true;
-        	}
-        	try {
-        		if (database.getAuth(args[1]) != null) {
-                    PlayerAuth player = database.getAuth(args[1].toLowerCase());
-                    long lastLogin = player.getLastLogin();
-                    Date d = new Date(lastLogin);
-                    sender.sendMessage("[AuthMe] " + args[1].toLowerCase() + " lastlogin : " + d.toString());	
-        		}	
-        	} catch (NullPointerException e) {
-        		sender.sendMessage("This player does not exist");
-        	}
-        }
         
         if (args[0].equalsIgnoreCase("purge")) {
             if (args.length != 2) {
@@ -165,6 +155,24 @@ public class AdminCommand implements CommandExecutor {
             m.reload();
             s.reload();
             sender.sendMessage(m._("reload"));
+        } else if (args[0].equalsIgnoreCase("lastlogin")) {
+        	if (args.length != 2) {
+        		sender.sendMessage("Usage: /authme lastlogin <playername>");
+        		return true;
+        	}
+        	try {
+        		if (database.getAuth(args[1].toLowerCase()) != null) {
+                    PlayerAuth player = database.getAuth(args[1].toLowerCase());
+                    long lastLogin = player.getLastLogin();
+                    Date d = new Date(lastLogin);
+                    final long diff = System.currentTimeMillis() - lastLogin;
+                    final String msg = (int)(diff / 86400000) + " days " + (int)(diff / 3600000 % 24) + " hours " + (int)(diff / 60000 % 60) + " mins " + (int)(diff / 1000 % 60) + " secs.";
+                    sender.sendMessage("[AuthMe] " + args[1].toLowerCase() + " lastlogin : " + d.toString());
+                    sender.sendMessage("[AuthMe] The player : " + player.getNickname() + " is unlogged since " + msg);
+        		}	
+        	} catch (NullPointerException e) {
+        		sender.sendMessage("This player does not exist");
+        	}
         } else if (args[0].equalsIgnoreCase("register") || args[0].equalsIgnoreCase("reg")) {
             if (args.length != 3) {
                 sender.sendMessage("Usage: /authme register playername password");
