@@ -41,8 +41,8 @@ public class LimboCache {
         String name = player.getName().toLowerCase();
         Location loc = player.getLocation();
         int gameMode = player.getGameMode().getValue();
-        ItemStack[] arm = null;
-        ItemStack[] inv = null;
+        ItemStack[] arm;
+        ItemStack[] inv;
         boolean operator;
         String playerGroup = "";
         
@@ -52,6 +52,9 @@ public class LimboCache {
         	if (!event.isCancelled()) {
                 inv =  playerData.readCache(name).getInventory();
                 arm =  playerData.readCache(name).getArmour();
+        	} else {
+        		inv = null;
+        		arm = null;
         	}
              playerGroup = playerData.readCache(name).getGroup();
              operator = playerData.readCache(name).getOperator();
@@ -61,6 +64,9 @@ public class LimboCache {
         	if (!event.isCancelled()) {
         		inv =  player.getInventory().getContents();
         		arm =  player.getInventory().getArmorContents();
+        	} else {
+        		inv = null;
+        		arm = null;
         	}
    
             if(player.isOp() ) {
@@ -90,9 +96,7 @@ public class LimboCache {
             playerGroup = groupLimbo.getGroup();
         }
         
-        if (inv != null && arm != null)
         cache.put(player.getName().toLowerCase(), new LimboPlayer(name, loc, inv, arm, gameMode, operator, playerGroup));
-        else cache.put(player.getName().toLowerCase(), new LimboPlayer(name, loc, gameMode, operator, playerGroup));
     }
     
     public void addLimboPlayer(Player player, String group) {
