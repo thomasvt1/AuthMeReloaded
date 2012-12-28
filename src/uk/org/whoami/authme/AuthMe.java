@@ -84,16 +84,7 @@ public class AuthMe extends JavaPlugin {
     	instance = this;
     	authme = instance;
     	API.setPlugin(this);
-        /*
-         *  Metric part from Hidendra Stats
-         */
-        try {
-        Metrics metrics = new Metrics();
-        metrics.beginMeasuringPlugin(this);
-            } catch (IOException e) {
-            // Failed to submit the stats :-(
-        }
-         
+
         settings = new Settings(this);
         settings.loadConfigOptions();
         
@@ -106,7 +97,7 @@ public class AuthMe extends JavaPlugin {
          *  Back style on start if avaible
          */
         if(Settings.isBackupActivated && Settings.isBackupOnStart) {
-        Boolean Backup = new PerformBackup().PerformBackup();
+        Boolean Backup = new PerformBackup(this).DoBackup();
         if(Backup) ConsoleLogger.info("Backup Complete");
             else ConsoleLogger.showError("Error while making Backup");
         }
@@ -230,11 +221,19 @@ public class AuthMe extends JavaPlugin {
         }
         
         if (Settings.reloadSupport)
-        onReload();
+        	try {
+                onReload();
+        	} catch (NullPointerException ex) {
+        		
+        	}
 
         if (server.getOnlinePlayers().length < 1) {
-        	PlayersLogs.players.clear();
-        	pllog.save();
+        	try {
+            	PlayersLogs.players.clear();
+            	pllog.save();
+        	} catch (NullPointerException ex) {
+        		
+        	}
         }
         
         ConsoleLogger.info("Authme " + this.getDescription().getVersion() + " enabled");
@@ -257,7 +256,7 @@ public class AuthMe extends JavaPlugin {
          *  Back style on start if avaible
          */
         if(Settings.isBackupActivated && Settings.isBackupOnStop) {
-        Boolean Backup = new PerformBackup().PerformBackup();
+        Boolean Backup = new PerformBackup(this).DoBackup();
         if(Backup) ConsoleLogger.info("Backup Complete");
             else ConsoleLogger.showError("Error while making Backup");
         }       
@@ -267,21 +266,25 @@ public class AuthMe extends JavaPlugin {
     }
 
 	private void onReload() {
-    	if (Bukkit.getServer().getOnlinePlayers() != null && !PlayersLogs.players.isEmpty()) {
-    		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-    			if (PlayersLogs.players.contains(player.getName())) {
-    				String name = player.getName().toLowerCase();
-    		        PlayerAuth pAuth = database.getAuth(name);
-    	            // if Mysql is unavaible
-    	            if(pAuth == null)
-    	                break;
-    	            PlayerAuth auth = new PlayerAuth(name, pAuth.getHash(), pAuth.getIp(), new Date().getTime());
-    	            database.updateSession(auth);
-    				PlayerCache.getInstance().addPlayer(auth); 
-    			}
-    		}
-    	}
-        return;
+		try {
+	    	if (Bukkit.getServer().getOnlinePlayers() != null && !PlayersLogs.players.isEmpty()) {
+	    		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+	    			if (PlayersLogs.players.contains(player.getName())) {
+	    				String name = player.getName().toLowerCase();
+	    		        PlayerAuth pAuth = database.getAuth(name);
+	    	            // if Mysql is unavaible
+	    	            if(pAuth == null)
+	    	                break;
+	    	            PlayerAuth auth = new PlayerAuth(name, pAuth.getHash(), pAuth.getIp(), new Date().getTime());
+	    	            database.updateSession(auth);
+	    				PlayerCache.getInstance().addPlayer(auth); 
+	    			}
+	    		}
+	    	}
+	    	return;
+		} catch (NullPointerException ex) {
+			return;
+		}
     }
     
 	public static AuthMe getInstance() {

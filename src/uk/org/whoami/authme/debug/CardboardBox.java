@@ -13,17 +13,11 @@ import java.util.Map;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
-/**
- * A serializable ItemStack form @NuclearW
- * TODO: add writeobject to file
- * https://github.com/NuclearW/PostOffice/blob/master/src/main/java/com/nuclearw/postoffice/PostMaster.java#L279
- */
 public class CardboardBox implements Serializable {
     private static final long serialVersionUID = 729890133797629668L;
 
     private final int type, amount;
     private final short damage;
-    private final byte data;
 
     private final HashMap<CardboardEnchantment, Integer> enchants;
 
@@ -31,7 +25,6 @@ public class CardboardBox implements Serializable {
         this.type = item.getTypeId();
         this.amount = item.getAmount();
         this.damage = item.getDurability();
-        this.data = item.getData().getData();
 
         HashMap<CardboardEnchantment, Integer> map = new HashMap<CardboardEnchantment, Integer>();
 
@@ -45,7 +38,7 @@ public class CardboardBox implements Serializable {
     }
 
     public ItemStack unbox() {
-        ItemStack item = new ItemStack(type, amount, damage, data);
+        ItemStack item = new ItemStack(type, amount, damage);
 
         HashMap<Enchantment, Integer> map = new HashMap<Enchantment, Integer>();
 

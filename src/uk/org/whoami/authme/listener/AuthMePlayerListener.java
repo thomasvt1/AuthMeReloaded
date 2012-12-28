@@ -705,7 +705,8 @@ public class AuthMePlayerListener implements Listener {
             	}
             		
         	} catch (NullPointerException ex) {
-        		ConsoleLogger.showError("Problem while try to protectInventory, the player " + event.getPlayer().getName() + "doesn't exist for AuthMe");
+        		if (player.hasPlayedBefore())
+        		ConsoleLogger.showError("Problem while try to protectInventory, the player " + event.getPlayer().getName() + " doesn't exist for AuthMe");
         	}
 
         }
@@ -781,9 +782,13 @@ public class AuthMePlayerListener implements Listener {
             }
         }
         PlayerCache.getInstance().removePlayer(name);
-        PlayersLogs.players.remove(player.getName());
+        try {
+        	PlayersLogs.players.remove(player.getName());
+        	PlayersLogs.getInstance().save();
+        } catch (NullPointerException ex) {
+        	
+        }
         if (gameMode.containsKey(name)) gameMode.remove(name);
-        PlayersLogs.getInstance().save();
         player.saveData();
     }
 
@@ -834,9 +839,11 @@ public class AuthMePlayerListener implements Listener {
       }
 
       PlayerCache.getInstance().removePlayer(name);
-      PlayersLogs.players.remove(player.getName());
+      try {
+          PlayersLogs.players.remove(player.getName());
+    	  PlayersLogs.getInstance().save();
+      } catch (NullPointerException ex) {}
       if (gameMode.containsKey(name)) gameMode.remove(name);
-      PlayersLogs.getInstance().save();
       player.saveData();
     }
 
@@ -966,4 +973,5 @@ public class AuthMePlayerListener implements Listener {
         }
         event.setCancelled(true);
     }
+    
 }

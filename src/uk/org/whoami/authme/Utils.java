@@ -14,6 +14,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
+
 import uk.org.whoami.authme.settings.Settings;
 
 /**
@@ -155,7 +157,7 @@ public class Utils {
     /*     */ 
     /* 163 */     pl.teleport(loc);
     /*     */ 
-    			final int id = Bukkit.getScheduler().scheduleAsyncRepeatingTask(AuthMe.authme, new Runnable()
+    			final BukkitTask id = Bukkit.getScheduler().runTaskTimerAsynchronously(AuthMe.authme, new Runnable()
     			{
 					public void run() {
     		            int current = (int)pl.getLocation().getY();
@@ -168,12 +170,12 @@ public class Utils {
 
     			}, 1L, 20L);
     
-      Bukkit.getScheduler().scheduleAsyncDelayedTask(AuthMe.authme, new Runnable()
+      Bukkit.getScheduler().runTaskLaterAsynchronously(AuthMe.authme, new Runnable()
       {
 
 		@Override
 		public void run() {
-			Bukkit.getScheduler().cancelTask(id);
+			id.cancel();
 			
 		}
     	  

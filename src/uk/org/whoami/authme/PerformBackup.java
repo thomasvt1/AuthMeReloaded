@@ -28,8 +28,14 @@ public class PerformBackup {
    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm");
    String dateString = format.format( new Date()   );
    private String path = AuthMe.getInstance().getDataFolder()+"/backups/backup"+dateString;
+   private AuthMe instance;
    
-   public boolean PerformBackup() {
+   public PerformBackup(AuthMe instance) {
+	   this.setInstance(instance);
+	   
+   }
+   
+   public boolean DoBackup() {
        
        switch(Settings.getDataSource) {
            case FILE: return FileBackup("auths.db"); 
@@ -142,5 +148,13 @@ public class PerformBackup {
     in.close();
     out.close();
     }
+
+public void setInstance(AuthMe instance) {
+	this.instance = instance;
+}
+
+public AuthMe getInstance() {
+	return instance;
+}
    
 }

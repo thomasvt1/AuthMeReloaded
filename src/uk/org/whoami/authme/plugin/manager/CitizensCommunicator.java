@@ -31,8 +31,8 @@ public class CitizensCommunicator {
          
         if(plugin != null) {
 
-            String Ver = plugin.getDescription().getVersion();
-            String[] args = Ver.split("\\.");
+            String ver = plugin.getDescription().getVersion();
+            String[] args = ver.split("\\.");
             
             if(args[0].equals("1")) 
                 return CitizensManager.isNPC(player);

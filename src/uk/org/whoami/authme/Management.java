@@ -133,9 +133,13 @@ public class Management {
                     AuthMe.permission.playerAddGroup(player.getWorld(), player.getName(), Settings.getRegisteredGroup);
                 }
                 
-                if (!PlayersLogs.players.contains(player.getName()))
-                	PlayersLogs.players.add(player.getName());
-                pllog.save();
+                try {
+                    if (!PlayersLogs.players.contains(player.getName()))
+                    	PlayersLogs.players.add(player.getName());
+                    pllog.save();
+                } catch (NullPointerException ex) {
+                	
+                }
                 player.sendMessage(m._("login"));
                 if (!Settings.noConsoleSpam)
                 ConsoleLogger.info(player.getDisplayName() + " logged in!");
@@ -228,10 +232,13 @@ public class Management {
                     AuthMe.permission.playerRemoveGroup(player.getWorld(), player.getName(), Settings.unRegisteredGroup);
                     AuthMe.permission.playerAddGroup(player.getWorld(), player.getName(), Settings.getRegisteredGroup);
                 }
-                    
-                if (!PlayersLogs.players.contains(player.getName()))
-                	PlayersLogs.players.add(player.getName());
-                pllog.save();
+                
+                try {
+                    if (!PlayersLogs.players.contains(player.getName()))
+                    	PlayersLogs.players.add(player.getName());
+                    pllog.save();
+                } catch (NullPointerException ex) { }
+                
                 player.sendMessage(m._("login"));
                 if(!Settings.noConsoleSpam)
                 ConsoleLogger.info(player.getDisplayName() + " logged in!");

@@ -6,6 +6,8 @@ package uk.org.whoami.authme.plugin.manager;
 
 import com.trc202.CombatTag.CombatTag;
 import com.trc202.CombatTagApi.CombatTagApi;
+
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -16,11 +18,11 @@ import org.bukkit.entity.Player;
 public abstract class CombatTagComunicator {
         static CombatTagApi combatApi;
         
-	public CombatTagComunicator(Player player) {	
-        if(player.getServer().getPluginManager().getPlugin("CombatTag") != null){
-			combatApi = new CombatTagApi((CombatTag)player.getServer().getPluginManager().getPlugin("CombatTag")); 
+	public CombatTagComunicator() {
+        if(Bukkit.getServer().getPluginManager().getPlugin("CombatTag") != null){
+			combatApi = new CombatTagApi((CombatTag)Bukkit.getServer().getPluginManager().getPlugin("CombatTag")); 
 		}
-        }
+    }
 	/**
 	 * Checks to see if the player is in combat. The combat time can be configured by the server owner
 	 * If the player has died while in combat the player is no longer considered in combat and as such will return false
@@ -53,11 +55,14 @@ public abstract class CombatTagComunicator {
 	 * @return true if the player is an NPC
 	 */
         public static boolean isNPC(Entity player) {
-            if(player.getServer().getPluginManager().getPlugin("CombatTag") != null){
-			combatApi = new CombatTagApi((CombatTag)player.getServer().getPluginManager().getPlugin("CombatTag")); 
-                        return combatApi.isNPC(player);
-            } 
-
+        	try {
+                if(Bukkit.getServer().getPluginManager().getPlugin("CombatTag") != null){
+        			combatApi = new CombatTagApi((CombatTag) Bukkit.getServer().getPluginManager().getPlugin("CombatTag"));
+                                return combatApi.isNPC(player);
+                    }
+        	} catch (ClassCastException ex) {
+        		return false;
+        	}
         return false;
         }
 }
