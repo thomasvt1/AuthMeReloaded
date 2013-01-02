@@ -314,8 +314,8 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
     	   set("Security.ReloadCommand.useReloadCommandSupport", true);
        }
        
-       if(!contains("passpartu.enablePasspartu")) {
-           set("Passpartu.enablePasspartu",false);
+       if(!contains("Passpartu.enablePasspartu")) {
+           set("Passpartu.enablePasspartu", false);
        }
        
        if (!contains("Converter.Rakamak.fileName")) {

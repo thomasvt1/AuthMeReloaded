@@ -90,10 +90,12 @@ public class LimboCache {
         if(player.isDead()) {
         	loc = player.getWorld().getSpawnLocation();
         }
-        
-        if(cache.containsKey(name) && playerGroup.isEmpty()) {
-            LimboPlayer groupLimbo = cache.get(name);
-            playerGroup = groupLimbo.getGroup();
+        try {
+            if(cache.containsKey(name) && playerGroup.isEmpty()) {
+                LimboPlayer groupLimbo = cache.get(name);
+                playerGroup = groupLimbo.getGroup();
+            }
+        } catch (NullPointerException ex) {
         }
         
         cache.put(player.getName().toLowerCase(), new LimboPlayer(name, loc, inv, arm, gameMode, operator, playerGroup));
