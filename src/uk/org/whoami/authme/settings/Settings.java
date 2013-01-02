@@ -166,16 +166,19 @@ public void loadConfigOptions() {
         isStopEnabled = configFile.getBoolean("Security.SQLProblem.stopServer", true);
         reloadSupport = configFile.getBoolean("Security.ReloadCommand.useReloadCommandSupport", true);
         allowCommands = (List<String>) configFile.getList("settings.restrictions.allowCommands");        
-        if (!allowCommands.contains("/login"))
-        	allowCommands.add("/login");
-        if (!allowCommands.contains("/register"))
-        	allowCommands.add("/register");
-        if (!allowCommands.contains("/l"))
-        	allowCommands.add("/l");
-        if (!allowCommands.contains("/reg"))
-        	allowCommands.add("/reg");
-        if (!allowCommands.contains("/passpartu"))
-        	allowCommands.add("/passpartu");
+
+        if (configFile.contains("allowCommands")) {
+            if (!allowCommands.contains("/login"))
+            	allowCommands.add("/login");
+            if (!allowCommands.contains("/register"))
+            	allowCommands.add("/register");
+            if (!allowCommands.contains("/l"))
+            	allowCommands.add("/l");
+            if (!allowCommands.contains("/reg"))
+            	allowCommands.add("/reg");
+            if (!allowCommands.contains("/passpartu"))
+            	allowCommands.add("/passpartu");
+        }
         
         rakamakUsers = configFile.getString("Converter.Rakamak.fileName", "users.rak");
         rakamakUsersIp = configFile.getString("Converter.Rakamak.ipFileName", "UsersIp.rak");
@@ -255,16 +258,18 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         reloadSupport = configFile.getBoolean("Security.ReloadCommand.useReloadCommandSupport", true);
         allowCommands = (List<String>) configFile.getList("settings.restrictions.allowCommands");
         
-        if (!allowCommands.contains("/login"))
-        	allowCommands.add("/login");
-        if (!allowCommands.contains("/register"))
-        	allowCommands.add("/register");
-        if (!allowCommands.contains("/l"))
-        	allowCommands.add("/l");
-        if (!allowCommands.contains("/reg"))
-        	allowCommands.add("/reg");
-        if (!allowCommands.contains("/passpartu"))
-        	allowCommands.add("/passpartu");
+        if (configFile.contains("allowCommands")) {
+            if (!allowCommands.contains("/login"))
+            	allowCommands.add("/login");
+            if (!allowCommands.contains("/register"))
+            	allowCommands.add("/register");
+            if (!allowCommands.contains("/l"))
+            	allowCommands.add("/l");
+            if (!allowCommands.contains("/reg"))
+            	allowCommands.add("/reg");
+            if (!allowCommands.contains("/passpartu"))
+            	allowCommands.add("/passpartu");
+        }
         
         rakamakUsers = configFile.getString("Converter.Rakamak.fileName", "users.rak");
         rakamakUsersIp = configFile.getString("Converter.Rakamak.ipFileName", "UsersIp.rak");
@@ -277,8 +282,6 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
    
    public void mergeConfig() {
       
-       //options().copyDefaults(false);
-       //System.out.println("merging config?"+contains("settings.restrictions.ProtectInventoryBeforeLogIn")+checkDefaults());
        if(!contains("settings.restrictions.ProtectInventoryBeforeLogIn")) {
            set("settings.restrictions.enablePasswordVerifier", true);
            set("settings.restrictions.ProtectInventoryBeforeLogIn", true);
@@ -394,10 +397,8 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
               Iterator<String> iter = getRestrictedIp.iterator();
                 while (iter.hasNext()) {
                    String[] args =  iter.next().split(";");
-                  //System.out.println("name restricted "+args[0]+"name 2:"+name+"ip"+args[1]+"ip2"+ip);
                    if(args[0].equalsIgnoreCase(name) ) {
                            if(args[1].equalsIgnoreCase(ip)) {
-                       //System.out.println("name restricted "+args[0]+"name 2:"+name+"ip"+args[1]+"ip2"+ip);
                            return true;
                             } else return false;
                         } 

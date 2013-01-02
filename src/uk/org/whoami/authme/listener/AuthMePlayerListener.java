@@ -610,8 +610,11 @@ public class AuthMePlayerListener implements Listener {
             return;
         }
         if (!player.getName().matches(regex) || name.equals("Player")) {
-            
-            event.disallow(Result.KICK_OTHER, m._("regex").replaceAll("REG_EX", regex));
+            try {
+            	event.disallow(Result.KICK_OTHER, m._("regex").replaceAll("REG_EX", regex));
+            } catch (StringIndexOutOfBoundsException exc) {
+            	event.disallow(Result.KICK_OTHER, "allowed char : " + regex);
+            }
             return;
         }
  
