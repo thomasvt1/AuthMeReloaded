@@ -46,7 +46,6 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import uk.org.whoami.authme.api.API;
 import uk.org.whoami.authme.cache.backup.DataFileCache;
 import uk.org.whoami.authme.cache.backup.FileCache;
-import uk.org.whoami.authme.AuthMe;
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.Utils;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
@@ -75,11 +74,10 @@ public class AuthMePlayerListener implements Listener {
     private JavaPlugin plugin;
     private DataSource data;
     private FileCache playerBackup = new FileCache();
-    private AuthMe authme;
 
     public AuthMePlayerListener(JavaPlugin plugin, DataSource data) {
         this.plugin = plugin;
-        this.data = data; 
+        this.data = data;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -162,7 +160,7 @@ public class AuthMePlayerListener implements Listener {
         	}
         } else {
         	if (data.isAuthAvailable(name)) {
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -174,7 +172,7 @@ public class AuthMePlayerListener implements Listener {
         		if (!Settings.isForcedRegistrationEnabled) {
         			return;
         		}
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -225,7 +223,7 @@ public class AuthMePlayerListener implements Listener {
         	}
         } else {
         	if (data.isAuthAvailable(name)) {
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -237,7 +235,7 @@ public class AuthMePlayerListener implements Listener {
         		if (!Settings.isForcedRegistrationEnabled) {
         			return;
         		}
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -288,7 +286,7 @@ public class AuthMePlayerListener implements Listener {
         	}
         } else {
         	if (data.isAuthAvailable(name)) {
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -300,7 +298,7 @@ public class AuthMePlayerListener implements Listener {
         		if (!Settings.isForcedRegistrationEnabled) {
         			return;
         		}
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -351,7 +349,7 @@ public class AuthMePlayerListener implements Listener {
         	}
         } else {
         	if (data.isAuthAvailable(name)) {
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -363,7 +361,7 @@ public class AuthMePlayerListener implements Listener {
         		if (!Settings.isForcedRegistrationEnabled) {
         			return;
         		}
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -415,7 +413,7 @@ public class AuthMePlayerListener implements Listener {
         	}
         } else {
         	if (data.isAuthAvailable(name)) {
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -427,7 +425,7 @@ public class AuthMePlayerListener implements Listener {
         		if (!Settings.isForcedRegistrationEnabled) {
         			return;
         		}
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -478,7 +476,7 @@ public class AuthMePlayerListener implements Listener {
         	}
         } else {
         	if (data.isAuthAvailable(name)) {
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -490,7 +488,7 @@ public class AuthMePlayerListener implements Listener {
         		if (!Settings.isForcedRegistrationEnabled) {
         			return;
         		}
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(authme, new Runnable()
+        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {

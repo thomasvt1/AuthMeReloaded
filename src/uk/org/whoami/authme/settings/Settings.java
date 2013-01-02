@@ -19,6 +19,7 @@ package uk.org.whoami.authme.settings;
 import java.io.File;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.bukkit.configuration.MemoryConfiguration;
@@ -336,6 +337,10 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
        
        if(!contains("Security.console.noConsoleSpam")) {
     	   set("Security.console.noConsoleSpam", false);
+       }
+       
+       if(!contains("settings.restrictions.allowCommands")) {
+    	   set("settings.restrictions.allowCommands", new ArrayList<String>());
        }
 
        plugin.getLogger().info("Merge new Config Options if needed..");
