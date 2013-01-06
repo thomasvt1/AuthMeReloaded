@@ -663,8 +663,6 @@ public class AuthMePlayerListener implements Listener {
 
              if((cur - lastLogin < timeout || timeout == 0) && !auth.getIp().equals("198.18.0.1") ) {
                 if (auth.getNickname().equalsIgnoreCase(name) && auth.getIp().equals(ip) ) {
-                  //  System.out.println("[Debug same name] "+auth.getNickname()+ "  "+name);
-                  //  System.out.println("[Debug same ip] "+auth.getIp()+ "  "+ip);
                     PlayerCache.getInstance().addPlayer(auth);
                     player.sendMessage(m._("valid_session"));
                     return;
@@ -706,8 +704,8 @@ public class AuthMePlayerListener implements Listener {
             	}
             		
         	} catch (NullPointerException ex) {
-        		if (player.hasPlayedBefore())
-        		ConsoleLogger.showError("Problem while try to protectInventory, the player " + event.getPlayer().getName() + " doesn't exist for AuthMe");
+        		//if (player.hasPlayedBefore())
+        		//ConsoleLogger.showError("Problem while try to protectInventory, the player " + event.getPlayer().getName() + " doesn't exist for AuthMe");
         	}
 
         }

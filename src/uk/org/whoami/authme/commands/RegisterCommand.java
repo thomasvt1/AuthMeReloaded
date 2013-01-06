@@ -149,6 +149,7 @@ public class RegisterCommand implements CommandExecutor {
             player.sendMessage(m._("registered"));
             this.isFirstTimeJoin = true;
             player.saveData();
+            if (!Settings.noConsoleSpam)
             ConsoleLogger.info(player.getDisplayName() + " registered "+player.getAddress().getAddress().getHostAddress());
 
         } catch (NoSuchAlgorithmException ex) {

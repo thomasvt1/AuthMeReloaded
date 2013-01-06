@@ -27,6 +27,7 @@ public class Utils {
      private String currentGroup;
      private static Utils singleton;
      private String unLoggedGroup = Settings.getUnloggedinGroup;
+     BukkitTask id;
   /*   
   public Utils(Player player) {
       this.player = player;
@@ -146,32 +147,33 @@ public class Utils {
             
     }
     
-    public void packCoords(World world, int x, final int y, int z, final Player pl)
-    /*     */   {
-    /* 156 */     final Location loc = new Location(world, x + 0.5D, y + 0.6D, z + 0.5D);
-    /*     */ 
-    /* 158 */     if (!world.getChunkAt(loc).isLoaded())
-    /*     */     {
-    /* 160 */       world.getChunkAt(loc).load();
-    /*     */     }
-    /*     */ 
-    /* 163 */     pl.teleport(loc);
-    /*     */ 
-    			final BukkitTask id = Bukkit.getScheduler().runTaskTimerAsynchronously(AuthMe.authme, new Runnable()
-    			{
-					public void run() {
-    		            int current = (int)pl.getLocation().getY();
-    	    		     
-   		             	if (current != y) {
-   		             		//ConsoleLogger.showError("Problems on SpawnLocation: " + pl.getLocation());
-   		             		pl.teleport(loc);
-   		             	}
-					}
+    public void packCoords(int x, final int y, int z, final Player pl)
+    {
+    	final World world = pl.getWorld();
+    	final Location loc = new Location(world, x + 0.5D, y + 0.6D, z + 0.5D);
 
-    			}, 1L, 20L);
-    
-      Bukkit.getScheduler().runTaskLaterAsynchronously(AuthMe.authme, new Runnable()
-      {
+    	if (!world.getChunkAt(loc).isLoaded())
+    	{
+    		world.getChunkAt(loc).load();
+    	}
+    	pl.teleport(loc);
+    	
+    	id = Bukkit.getScheduler().runTaskTimerAsynchronously(AuthMe.authme, new Runnable()
+    	{
+    		@Override
+    		public void run() {
+    			int current = (int)pl.getLocation().getY();
+    			
+    			if (current != y) {
+    				//ConsoleLogger.showError("Problems on SpawnLocation: " + pl.getLocation());
+    				pl.teleport(loc);
+    			}
+    		}
+    		
+    	}, 1L, 20L);
+    	
+    	Bukkit.getScheduler().runTaskLaterAsynchronously(AuthMe.authme, new Runnable()
+    	{
 
 		@Override
 		public void run() {

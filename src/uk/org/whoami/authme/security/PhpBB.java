@@ -17,6 +17,7 @@ public class PhpBB {
   private String itoa64 = 
 "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
+
   public String phpbb_hash(String password) {
     String random_state = unique_id();
     String random = "";
@@ -51,6 +52,7 @@ public class PhpBB {
     // TODO Generate something random here.
     return "1234567890abcdef";
   }
+
 
   private String _hash_gensalt_private(String input, String itoa64) {
     return _hash_gensalt_private(input, itoa64, 6);

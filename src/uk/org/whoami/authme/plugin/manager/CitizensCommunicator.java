@@ -16,8 +16,8 @@
 
 package uk.org.whoami.authme.plugin.manager;
 
-import net.citizensnpcs.api.CitizensManager;
 import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.CitizensManager;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
@@ -31,12 +31,12 @@ public class CitizensCommunicator {
          
         if(plugin != null) {
 
-            String ver = plugin.getDescription().getVersion();
-            String[] args = ver.split("\\.");
-            
-            if(args[0].equals("1")) 
-                return CitizensManager.isNPC(player);
-            else return CitizensAPI.getNPCRegistry().isNPC(player);
+                String ver = plugin.getDescription().getVersion();
+                String[] args = ver.split("\\.");
+                
+                if(args[0].contains("1")) 
+                    return CitizensManager.isNPC(player);
+                else return CitizensAPI.getNPCRegistry().isNPC(player);
 
         }
         return false;

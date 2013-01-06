@@ -169,6 +169,7 @@ public class PasswordSecurity {
         return phpBBhash;
     }
 
+
     private static String getPlainText(String password) {
         return password;
     }

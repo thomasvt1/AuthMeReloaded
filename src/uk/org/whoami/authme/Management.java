@@ -91,7 +91,7 @@ public class Management {
                                 {
                         if ((Settings.isSaveQuitLocationEnabled.booleanValue()) && (this.database.getAuth(name).getQuitLocY() != 0))
                                   {
-                          this.utils.packCoords(player.getWorld(), this.database.getAuth(name).getQuitLocX(), this.database.getAuth(name).getQuitLocY(), this.database.getAuth(name).getQuitLocZ(), player);
+                          this.utils.packCoords(this.database.getAuth(name).getQuitLocX(), this.database.getAuth(name).getQuitLocY(), this.database.getAuth(name).getQuitLocZ(), player);
                                   }
                                   else {
                           if (!world.getChunkAt(limbo.getLoc()).isLoaded()) {
@@ -106,7 +106,7 @@ public class Management {
                                 }
                       else if ((Settings.isSaveQuitLocationEnabled.booleanValue()) && (this.database.getAuth(name).getQuitLocY() != 0))
                                 {
-                        this.utils.packCoords(player.getWorld(), this.database.getAuth(name).getQuitLocX(), this.database.getAuth(name).getQuitLocY(), this.database.getAuth(name).getQuitLocZ(), player);
+                        this.utils.packCoords(this.database.getAuth(name).getQuitLocX(), this.database.getAuth(name).getQuitLocY(), this.database.getAuth(name).getQuitLocZ(), player);
                                 }
                                 else {
                         if (!world.getChunkAt(limbo.getLoc()).isLoaded())

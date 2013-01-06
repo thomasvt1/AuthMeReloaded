@@ -112,7 +112,7 @@ public class AuthMe extends JavaPlugin {
                 } catch (IOException ex) {
                     ConsoleLogger.showError(ex.getMessage());
                     if (Settings.isStopEnabled) {
-                    	ConsoleLogger.info("Can't use flat file... shutdown...");
+                    	ConsoleLogger.showError("Can't use FLAT FILE... SHUTDOWN...");
                     	server.shutdown();
                     } 
                     if (!Settings.isStopEnabled)
@@ -126,7 +126,7 @@ public class AuthMe extends JavaPlugin {
                 } catch (ClassNotFoundException ex) {
                     ConsoleLogger.showError(ex.getMessage());
                     if (Settings.isStopEnabled) {
-                    	ConsoleLogger.info("Can't use MySQL... shutdown...");
+                    	ConsoleLogger.showError("Can't use MySQL... Please input correct MySQL informations ! SHUTDOWN...");
                     	server.shutdown();
                     } 
                     if (!Settings.isStopEnabled)
@@ -135,7 +135,7 @@ public class AuthMe extends JavaPlugin {
                 } catch (SQLException ex) {
                     ConsoleLogger.showError(ex.getMessage());
                     if (Settings.isStopEnabled) {
-                    	ConsoleLogger.info("Can't use MySQL... shutdown...");
+                    	ConsoleLogger.showError("Can't use MySQL... Please input correct MySQL informations ! SHUTDOWN...");
                     	server.shutdown();
                     }
                     if (!Settings.isStopEnabled)
@@ -144,7 +144,7 @@ public class AuthMe extends JavaPlugin {
                 } catch(TimeoutException ex) {
                     ConsoleLogger.showError(ex.getMessage());
                     if (Settings.isStopEnabled) {
-                    	ConsoleLogger.info("Can't use MySQL... shutdown...");
+                    	ConsoleLogger.showError("Can't use MySQL... Please input correct MySQL informations ! SHUTDOWN...");
                     	server.shutdown();
                     }
                     if (!Settings.isStopEnabled)
@@ -158,7 +158,7 @@ public class AuthMe extends JavaPlugin {
                 } catch (ClassNotFoundException ex) {
                     ConsoleLogger.showError(ex.getMessage());
                     if (Settings.isStopEnabled) {
-                    	ConsoleLogger.info("Can't use sqlite... shutdown...");
+                    	ConsoleLogger.showError("Can't use SQLITE... ! SHUTDOWN...");
                     	server.shutdown();
                     }
                     if (!Settings.isStopEnabled)
@@ -167,7 +167,7 @@ public class AuthMe extends JavaPlugin {
                 } catch (SQLException ex) {
                     ConsoleLogger.showError(ex.getMessage());
                     if (Settings.isStopEnabled) {
-                    	ConsoleLogger.info("Can't use sqlite... shutdown...");
+                    	ConsoleLogger.showError("Can't use SQLITE... ! SHUTDOWN...");
                     	server.shutdown();
                     }
                     if (!Settings.isStopEnabled)
