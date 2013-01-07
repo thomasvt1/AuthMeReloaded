@@ -129,7 +129,6 @@ public class AuthMePlayerListener implements Listener {
             return;
         }
         
-        
         final Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
 
@@ -160,7 +159,7 @@ public class AuthMePlayerListener implements Listener {
         	}
         } else {
         	if (data.isAuthAvailable(name)) {
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+        		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -172,14 +171,14 @@ public class AuthMePlayerListener implements Listener {
         		if (!Settings.isForcedRegistrationEnabled) {
         			return;
         		}
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+        		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
         				player.sendMessage(m._("reg_msg"));
         			}
         		});
-        		
+        			
         	}
         }
 
@@ -223,7 +222,7 @@ public class AuthMePlayerListener implements Listener {
         	}
         } else {
         	if (data.isAuthAvailable(name)) {
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+        		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -235,7 +234,7 @@ public class AuthMePlayerListener implements Listener {
         		if (!Settings.isForcedRegistrationEnabled) {
         			return;
         		}
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+        		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -286,7 +285,7 @@ public class AuthMePlayerListener implements Listener {
         	}
         } else {
         	if (data.isAuthAvailable(name)) {
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+        		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -298,7 +297,7 @@ public class AuthMePlayerListener implements Listener {
         		if (!Settings.isForcedRegistrationEnabled) {
         			return;
         		}
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+        		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -349,7 +348,7 @@ public class AuthMePlayerListener implements Listener {
         	}
         } else {
         	if (data.isAuthAvailable(name)) {
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+        		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -361,7 +360,7 @@ public class AuthMePlayerListener implements Listener {
         		if (!Settings.isForcedRegistrationEnabled) {
         			return;
         		}
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+        		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -413,7 +412,7 @@ public class AuthMePlayerListener implements Listener {
         	}
         } else {
         	if (data.isAuthAvailable(name)) {
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+        		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -425,7 +424,7 @@ public class AuthMePlayerListener implements Listener {
         		if (!Settings.isForcedRegistrationEnabled) {
         			return;
         		}
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+        		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -476,7 +475,7 @@ public class AuthMePlayerListener implements Listener {
         	}
         } else {
         	if (data.isAuthAvailable(name)) {
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+        		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -488,7 +487,7 @@ public class AuthMePlayerListener implements Listener {
         		if (!Settings.isForcedRegistrationEnabled) {
         			return;
         		}
-        		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+        		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
@@ -557,6 +556,9 @@ public class AuthMePlayerListener implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
+    	if (event.getResult() != Result.ALLOWED) {
+    		return;
+    	}
     	
         final Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
@@ -564,7 +566,7 @@ public class AuthMePlayerListener implements Listener {
         if (CitizensCommunicator.isNPC(player) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
             return;
         }
-        
+
         //
         // If this check will fail mean that some permissions bypass kick, so player has to be
         // Switched on nonloggedIn group and try another time this kick!!
