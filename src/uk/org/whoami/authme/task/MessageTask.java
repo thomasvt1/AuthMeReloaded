@@ -47,7 +47,7 @@ public class MessageTask implements Runnable {
                 player.sendMessage(msg);
 
                 BukkitScheduler sched = plugin.getServer().getScheduler();
-                sched.scheduleSyncDelayedTask(plugin, this, interval * 20);
+                sched.runTaskLater(plugin, this, interval * 20);
             }
         }
     }

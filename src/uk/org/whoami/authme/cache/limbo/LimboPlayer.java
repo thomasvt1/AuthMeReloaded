@@ -70,14 +70,6 @@ public class LimboPlayer {
         return inventory;
     }
 
-    public int getTimeoutTaskId() {
-        return timeoutTaskId;
-    }
-
-    public void setTimeoutTaskId(int timeoutTaskId) {
-        this.timeoutTaskId = timeoutTaskId;
-    }
-
     public int getGameMode() {
         return gameMode;
     }
@@ -88,5 +80,13 @@ public class LimboPlayer {
     
     public String getGroup() {
         return group;
-    }    
+    }
+
+	public void setTimeoutTaskId(int i) {
+		this.timeoutTaskId = i;
+	}
+
+	public int getTimeoutTaskId() {
+		return timeoutTaskId;
+	}    
 }

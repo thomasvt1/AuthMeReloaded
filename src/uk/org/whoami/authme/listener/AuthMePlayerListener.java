@@ -37,6 +37,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -56,6 +57,7 @@ import uk.org.whoami.authme.plugin.manager.CitizensCommunicator;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.events.ProtectInventoryEvent;
 import uk.org.whoami.authme.events.RestoreInventoryEvent;
+import uk.org.whoami.authme.events.SessionEvent;
 import uk.org.whoami.authme.plugin.manager.CombatTagComunicator;
 import uk.org.whoami.authme.settings.Messages;
 import uk.org.whoami.authme.settings.PlayersLogs;
@@ -665,9 +667,13 @@ public class AuthMePlayerListener implements Listener {
 
              if((cur - lastLogin < timeout || timeout == 0) && !auth.getIp().equals("198.18.0.1") ) {
                 if (auth.getNickname().equalsIgnoreCase(name) && auth.getIp().equals(ip) ) {
-                    PlayerCache.getInstance().addPlayer(auth);
-                    player.sendMessage(m._("valid_session"));
-                    return;
+                	SessionEvent sessionevent = new SessionEvent(auth, true);
+                	Bukkit.getServer().getPluginManager().callEvent(sessionevent);
+                	if (!sessionevent.isCancelled() && sessionevent.isLogin()) {
+                        PlayerCache.getInstance().addPlayer(auth);
+                        player.sendMessage(m._("valid_session"));
+                        return;
+                	}
                 } else {
                     int gM = gameMode.get(name);
                 	player.setGameMode(GameMode.getByValue(gM));
@@ -723,16 +729,17 @@ public class AuthMePlayerListener implements Listener {
         int time = Settings.getRegistrationTimeout * 20;
         int msgInterval = Settings.getWarnMessageInterval;
         if (time != 0) {
-            int id = sched.scheduleSyncDelayedTask(plugin, new TimeoutTask(plugin, name), time);
+
+            BukkitTask id = sched.runTaskLater(plugin, new TimeoutTask(plugin, name), time);
             if(!LimboCache.getInstance().hasLimboPlayer(name))
                  LimboCache.getInstance().addLimboPlayer(player);
             
-            LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id);
+            LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id.getTaskId());
         }
-        sched.scheduleSyncDelayedTask(plugin, new MessageTask(plugin, name, msg, msgInterval));
+        sched.runTask(plugin, new MessageTask(plugin, name, msg, msgInterval));
         
         if (Settings.isForceSurvivalModeEnabled)
-        	sched.scheduleSyncDelayedTask(plugin, new Runnable() {
+        	sched.runTask(plugin, new Runnable() {
         		public void run() {
         			e.getPlayer().setGameMode(GameMode.SURVIVAL);
         		}
@@ -776,7 +783,7 @@ public class AuthMePlayerListener implements Listener {
             utils.addNormal(player, limbo.getGroup());
             player.setOp(limbo.getOperator());
             //System.out.println("debug quit group reset "+limbo.getGroup());
-            plugin.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
+            this.plugin.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
             LimboCache.getInstance().deleteLimboPlayer(name);
             if(playerBackup.doesCacheExist(name)) {
                         playerBackup.removeCache(name);

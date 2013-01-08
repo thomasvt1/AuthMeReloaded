@@ -17,6 +17,7 @@ import uk.org.whoami.authme.cache.backup.FileCache;
 import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.cache.limbo.LimboPlayer;
 import uk.org.whoami.authme.datasource.DataSource;
+import uk.org.whoami.authme.events.LoginEvent;
 import uk.org.whoami.authme.events.RestoreInventoryEvent;
 import uk.org.whoami.authme.listener.AuthMePlayerListener;
 import uk.org.whoami.authme.security.PasswordSecurity;
@@ -140,6 +141,8 @@ public class Management {
                 } catch (NullPointerException ex) {
                 	
                 }
+                LoginEvent loginevent = new LoginEvent(player, true);
+                Bukkit.getServer().getPluginManager().callEvent(loginevent);
                 player.sendMessage(m._("login"));
                 if (!Settings.noConsoleSpam)
                 ConsoleLogger.info(player.getDisplayName() + " logged in!");
@@ -239,6 +242,8 @@ public class Management {
                     pllog.save();
                 } catch (NullPointerException ex) { }
                 
+                LoginEvent loginevent = new LoginEvent(player, true);
+                Bukkit.getServer().getPluginManager().callEvent(loginevent);
                 player.sendMessage(m._("login"));
                 if(!Settings.noConsoleSpam)
                 ConsoleLogger.info(player.getDisplayName() + " logged in!");

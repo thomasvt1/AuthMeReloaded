@@ -23,6 +23,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 
 import uk.org.whoami.authme.Utils;
 import uk.org.whoami.authme.ConsoleLogger;
@@ -96,8 +97,8 @@ public class LogoutCommand implements CommandExecutor {
         int interval = Settings.getWarnMessageInterval;
         BukkitScheduler sched = sender.getServer().getScheduler();
         if (delay != 0) {
-            int id = sched.scheduleSyncDelayedTask(plugin, new TimeoutTask(plugin, name), delay);
-            LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id);
+            BukkitTask id = sched.runTaskLater(plugin, new TimeoutTask(plugin, name), delay);
+            LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id.getTaskId());
         }
         sched.scheduleSyncDelayedTask(plugin, new MessageTask(plugin, name, m._("login_msg"), interval));
 
