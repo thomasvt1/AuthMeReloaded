@@ -74,13 +74,7 @@ public class Management {
                 PlayerCache.getInstance().addPlayer(auth);
                 LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
                 if (limbo != null) {
-                    if (Settings.protectInventoryBeforeLogInEnabled.booleanValue()) {
-                    	RestoreInventoryEvent event = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
-                    	Bukkit.getServer().getPluginManager().callEvent(event);
-                    	if (!event.isCancelled()) {
-                    		API.setPlayerInventory(player, limbo.getInventory(), limbo.getArmour());
-                    	}
-                      }
+
                       player.setGameMode(GameMode.getByValue(limbo.getGameMode()));
                       player.setOp(limbo.getOperator());
                     
@@ -116,6 +110,14 @@ public class Management {
                                   }
                         player.teleport(limbo.getLoc());
                                 }
+                      
+                      if (Settings.protectInventoryBeforeLogInEnabled.booleanValue()) {
+                      	RestoreInventoryEvent event = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
+                      	Bukkit.getServer().getPluginManager().callEvent(event);
+                      	if (!event.isCancelled()) {
+                      		API.setPlayerInventory(player, limbo.getInventory(), limbo.getArmour());
+                      	}
+                        }
                     
                       player.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
                       LimboCache.getInstance().deleteLimboPlayer(name);
@@ -166,13 +168,7 @@ public class Management {
                 PlayerCache.getInstance().addPlayer(auth);
                 LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
                 if (limbo != null) {
-                    if (Settings.protectInventoryBeforeLogInEnabled.booleanValue()) {
-                    	RestoreInventoryEvent event = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
-                    	Bukkit.getServer().getPluginManager().callEvent(event);
-                    	if (!event.isCancelled()) {
-                    		API.setPlayerInventory(player, limbo.getInventory(), limbo.getArmour());
-                    	}
-                                }
+
                       player.setGameMode(GameMode.getByValue(limbo.getGameMode()));
                       player.setOp(limbo.getOperator());
                       
@@ -219,6 +215,13 @@ public class Management {
                         player.teleport(limbo.getLoc());
                                 }
                       
+                      if (Settings.protectInventoryBeforeLogInEnabled.booleanValue()) {
+                      	RestoreInventoryEvent event = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
+                      	Bukkit.getServer().getPluginManager().callEvent(event);
+                      	if (!event.isCancelled()) {
+                      		API.setPlayerInventory(player, limbo.getInventory(), limbo.getArmour());
+                      	}
+                                  }
                       player.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
                       LimboCache.getInstance().deleteLimboPlayer(name);
                       if (this.playerCache.doesCacheExist(name)) {

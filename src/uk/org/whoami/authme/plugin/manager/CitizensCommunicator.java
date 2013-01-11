@@ -16,20 +16,29 @@
 
 package uk.org.whoami.authme.plugin.manager;
 
+import net.citizensnpcs.Citizens;
+
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.CitizensManager;
 
 import org.bukkit.entity.Entity;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
+import uk.org.whoami.authme.AuthMe;
+
 public class CitizensCommunicator {
+	
+    static AuthMe instance;
+    
+    public CitizensCommunicator(AuthMe instance) {
+    	CitizensCommunicator.instance = instance;
+    }
 
     public static boolean isNPC(Entity player) {
-        PluginManager pm = player.getServer().getPluginManager();
-        Plugin plugin = pm.getPlugin("Citizens");
-         
-        if(plugin != null) {
+        PluginManager pm = instance.getServer().getPluginManager();
+        if (pm.getPlugin("Citizens") != null) {
+        	try {
+            	Citizens plugin = (Citizens) pm.getPlugin("Citizens");
 
                 String ver = plugin.getDescription().getVersion();
                 String[] args = ver.split("\\.");
@@ -37,6 +46,13 @@ public class CitizensCommunicator {
                 if(args[0].contains("1")) 
                     return CitizensManager.isNPC(player);
                 else return CitizensAPI.getNPCRegistry().isNPC(player);
+        	} catch (NullPointerException npe) {
+        		return false;
+        	} catch (ClassCastException cce) {
+        		return false;
+        	} catch (IllegalStateException ise) {
+        		return false;
+        	}
 
         }
         return false;

@@ -77,6 +77,7 @@ public class AuthMe extends JavaPlugin {
     private Utils utils = Utils.getInstance();
     private JavaPlugin plugin;
     private FileCache playerBackup = new FileCache();
+	private CitizensCommunicator citizens;
 
     
     @Override
@@ -84,6 +85,7 @@ public class AuthMe extends JavaPlugin {
     	instance = this;
     	authme = instance;
     	API.setPlugin(this);
+    	citizens = new CitizensCommunicator(this);
 
         settings = new Settings(this);
         settings.loadConfigOptions();
@@ -328,5 +330,13 @@ public class AuthMe extends JavaPlugin {
 	        player.saveData();
 	      } catch (Exception ex) {
 	      }
+	}
+
+	public void setCitizensCommunicator(CitizensCommunicator citizens) {
+		this.citizens = citizens;
+	}
+
+	public CitizensCommunicator getCitizensCommunicator() {
+		return citizens;
 	}
 }
