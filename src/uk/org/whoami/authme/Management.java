@@ -3,7 +3,6 @@ package uk.org.whoami.authme;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -111,13 +110,13 @@ public class Management {
                         player.teleport(limbo.getLoc());
                                 }
                       
-                      if (Settings.protectInventoryBeforeLogInEnabled.booleanValue()) {
-                      	RestoreInventoryEvent event = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
-                      	Bukkit.getServer().getPluginManager().callEvent(event);
-                      	if (!event.isCancelled()) {
-                      		API.setPlayerInventory(player, limbo.getInventory(), limbo.getArmour());
-                      	}
-                        }
+                      if (Settings.protectInventoryBeforeLogInEnabled.booleanValue() && player.hasPlayedBefore()) {
+                      		RestoreInventoryEvent event = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
+                      		Bukkit.getServer().getPluginManager().callEvent(event);
+                      		if (!event.isCancelled()) {
+                      			API.setPlayerInventory(player, limbo.getInventory(), limbo.getArmour());
+                      		}
+                      }
                     
                       player.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
                       LimboCache.getInstance().deleteLimboPlayer(name);
@@ -215,7 +214,7 @@ public class Management {
                         player.teleport(limbo.getLoc());
                                 }
                       
-                      if (Settings.protectInventoryBeforeLogInEnabled.booleanValue()) {
+                      if (Settings.protectInventoryBeforeLogInEnabled.booleanValue() && player.hasPlayedBefore()) {
                       	RestoreInventoryEvent event = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
                       	Bukkit.getServer().getPluginManager().callEvent(event);
                       	if (!event.isCancelled()) {
