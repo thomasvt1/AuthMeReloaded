@@ -113,7 +113,7 @@ public class Management {
                       
                       player.setGameMode(GameMode.getByValue(limbo.getGameMode()));
                       
-                      if (Settings.protectInventoryBeforeLogInEnabled.booleanValue() && player.hasPlayedBefore() && !Settings.isForceSurvivalModeEnabled) {
+                      if (Settings.protectInventoryBeforeLogInEnabled.booleanValue() && player.hasPlayedBefore()) {
                       		RestoreInventoryEvent event = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
                       		Bukkit.getServer().getPluginManager().callEvent(event);
                       		if (!event.isCancelled()) {
@@ -221,7 +221,7 @@ public class Management {
                       
                       player.setGameMode(GameMode.getByValue(limbo.getGameMode()));
                       
-                      if (Settings.protectInventoryBeforeLogInEnabled.booleanValue() && player.hasPlayedBefore() && !Settings.isForceSurvivalModeEnabled) {
+                      if (Settings.protectInventoryBeforeLogInEnabled.booleanValue() && player.hasPlayedBefore()) {
                       	RestoreInventoryEvent event = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
                       	Bukkit.getServer().getPluginManager().callEvent(event);
                       	if (!event.isCancelled()) {

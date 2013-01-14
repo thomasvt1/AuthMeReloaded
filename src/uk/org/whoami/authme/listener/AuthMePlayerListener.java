@@ -772,7 +772,7 @@ public class AuthMePlayerListener implements Listener {
         if (LimboCache.getInstance().hasLimboPlayer(name)) {
             //System.out.println("e' nel quit");
             LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
-            if(Settings.protectInventoryBeforeLogInEnabled && player.hasPlayedBefore() && !Settings.isForceSurvivalModeEnabled) {
+            if(Settings.protectInventoryBeforeLogInEnabled && player.hasPlayedBefore()) {
             	RestoreInventoryEvent ev = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
             	Bukkit.getServer().getPluginManager().callEvent(ev);
             	if (!ev.isCancelled()) {
