@@ -167,8 +167,10 @@ public class AdminCommand implements CommandExecutor {
                     Date d = new Date(lastLogin);
                     final long diff = System.currentTimeMillis() - lastLogin;
                     final String msg = (int)(diff / 86400000) + " days " + (int)(diff / 3600000 % 24) + " hours " + (int)(diff / 60000 % 60) + " mins " + (int)(diff / 1000 % 60) + " secs.";
+                    String lastIP = player.getIp();
                     sender.sendMessage("[AuthMe] " + args[1].toLowerCase() + " lastlogin : " + d.toString());
                     sender.sendMessage("[AuthMe] The player : " + player.getNickname() + " is unlogged since " + msg);
+                    sender.sendMessage("[AuthMe] LastPlayer IP : " + lastIP);
         		}	
         	} catch (NullPointerException e) {
         		sender.sendMessage("This player does not exist");

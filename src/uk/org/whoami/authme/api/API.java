@@ -4,12 +4,14 @@ import java.lang.reflect.Array;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import uk.org.whoami.authme.AuthMe;
 import uk.org.whoami.authme.Utils;
+import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
 import uk.org.whoami.authme.datasource.DataSource.DataSourceType;
 import uk.org.whoami.authme.plugin.manager.CitizensCommunicator;
@@ -121,6 +123,23 @@ public class API {
     	Array.set(columns, 1, Settings.getMySQLlastlocY);
     	Array.set(columns, 2, Settings.getMySQLlastlocZ);
     	return columns;
+    }
+    
+    public static Location getLastLocation(Player player) {
+    	try {
+    		PlayerAuth auth = PlayerCache.getInstance().getAuth(player.getName());
+        	
+        	if (auth != null) {
+        		Location loc = new Location(player.getWorld(), auth.getQuitLocX(), auth.getQuitLocY() , auth.getQuitLocZ());
+        		return loc;
+        	} else {
+        		return null;
+        	}
+        	
+    	} catch (NullPointerException ex) {
+    		return null;
+    	}
+    	
     }
     
     public static String getNickRegex() {

@@ -580,7 +580,7 @@ public class AuthMePlayerListener implements Listener {
         }
         
         if(data.isAuthAvailable(name) && !LimboCache.getInstance().hasLimboPlayer(name)) {
-            if(!Settings.isSessionsEnabled) { 
+            if(!Settings.isSessionsEnabled) {
             LimboCache.getInstance().addLimboPlayer(player , utils.removeAll(player));
             } else if(PlayerCache.getInstance().isAuthenticated(name)) {
                 if(LimboCache.getInstance().hasLimboPlayer(player.getName().toLowerCase())) {
@@ -709,12 +709,11 @@ public class AuthMePlayerListener implements Listener {
             	Bukkit.getServer().getPluginManager().callEvent(ev);
             	if (ev.isCancelled()) {
             		if (!Settings.noConsoleSpam)
-            		ConsoleLogger.showError("ProtectInventoryEvent has been cancelled...");
+            		ConsoleLogger.showError("ProtectInventoryEvent has been cancelled for " + player.getName() + " ...");
             	}
             		
         	} catch (NullPointerException ex) {
-        		//if (player.hasPlayedBefore())
-        		//ConsoleLogger.showError("Problem while try to protectInventory, the player " + event.getPlayer().getName() + " doesn't exist for AuthMe");
+
         	}
 
         }
@@ -725,6 +724,7 @@ public class AuthMePlayerListener implements Listener {
         if (Settings.isTeleportToSpawnEnabled || Settings.isForceSpawnLocOnJoinEnabled) {
             player.teleport(player.getWorld().getSpawnLocation());  
         }
+        
 
         String msg = data.isAuthAvailable(name) ? m._("login_msg") : m._("reg_msg");
         int time = Settings.getRegistrationTimeout * 20;
@@ -748,7 +748,7 @@ public class AuthMePlayerListener implements Listener {
     }
     
 
-    @EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
         if (event.getPlayer() == null) {
             return;
@@ -757,8 +757,6 @@ public class AuthMePlayerListener implements Listener {
         
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
-
-    // Fix for Quit location when player where kicked for timeout
         
         if (CitizensCommunicator.isNPC(player) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
             return;
@@ -774,7 +772,7 @@ public class AuthMePlayerListener implements Listener {
         if (LimboCache.getInstance().hasLimboPlayer(name)) {
             //System.out.println("e' nel quit");
             LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
-            if(Settings.protectInventoryBeforeLogInEnabled) {
+            if(Settings.protectInventoryBeforeLogInEnabled && player.hasPlayedBefore() && !Settings.isForceSurvivalModeEnabled) {
             	RestoreInventoryEvent ev = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
             	Bukkit.getServer().getPluginManager().callEvent(ev);
             	if (!ev.isCancelled()) {

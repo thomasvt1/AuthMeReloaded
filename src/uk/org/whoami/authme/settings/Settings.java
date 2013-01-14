@@ -131,7 +131,7 @@ public void loadConfigOptions() {
         isForceSpawnLocOnJoinEnabled = configFile.getBoolean("settings.restrictions.ForceSpawnLocOnJoinEnabled",false);
         isSaveQuitLocationEnabled = configFile.getBoolean("settings.restrictions.SaveQuitLocation", false);
         isForceSurvivalModeEnabled = configFile.getBoolean("settings.GameMode.ForceSurvivalMode", false);
-        isResetInventoryIfCreative = configFile.getBoolean("settings.GameMode.ResetInventotyIfCreative",false);
+        isResetInventoryIfCreative = configFile.getBoolean("settings.GameMode.ResetInventoryIfCreative",false);
         getmaxRegPerIp = configFile.getInt("settings.restrictions.maxRegPerIp",1);
         getPasswordHash = getPasswordHash();
         getUnloggedinGroup = configFile.getString("settings.security.unLoggedinGroup","unLoggedInGroup");
@@ -222,7 +222,7 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         isForceSpawnLocOnJoinEnabled = configFile.getBoolean("settings.restrictions.ForceSpawnLocOnJoinEnabled",false);     
         isSaveQuitLocationEnabled = configFile.getBoolean("settings.restrictions.SaveQuitLocation",false);
         isForceSurvivalModeEnabled = configFile.getBoolean("settings.GameMode.ForceSurvivalMode",false);
-        isResetInventoryIfCreative = configFile.getBoolean("settings.GameMode.ResetInventotyIfCreative",false);
+        isResetInventoryIfCreative = configFile.getBoolean("settings.GameMode.ResetInventoryIfCreative",false);
         getmaxRegPerIp = configFile.getInt("settings.restrictions.maxRegPerIp",1);
         getPasswordHash = getPasswordHash();
         getUnloggedinGroup = configFile.getString("settings.security.unLoggedinGroup","unLoggedInGroup");
@@ -341,6 +341,11 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
        
        if(!contains("settings.restrictions.allowCommands")) {
     	   set("settings.restrictions.allowCommands", new ArrayList<String>());
+       }
+       
+       if (contains("settings.GameMode.ResetInventotyIfCreative")) {
+       	set("settings.GameMode.ResetInventoryIfCreative", getBoolean("settings.GameMode.ResetInventotyIfCreative"));
+       	set("settings.GameMode.ResetInventotyIfCreative", null);
        }
 
        plugin.getLogger().info("Merge new Config Options if needed..");

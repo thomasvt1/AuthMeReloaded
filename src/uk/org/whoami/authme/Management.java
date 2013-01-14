@@ -74,7 +74,7 @@ public class Management {
                 LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
                 if (limbo != null) {
 
-                      player.setGameMode(GameMode.getByValue(limbo.getGameMode()));
+                	
                       player.setOp(limbo.getOperator());
                     
                       this.utils.addNormal(player, limbo.getGroup());
@@ -110,13 +110,17 @@ public class Management {
                         player.teleport(limbo.getLoc());
                                 }
                       
-                      if (Settings.protectInventoryBeforeLogInEnabled.booleanValue() && player.hasPlayedBefore()) {
+                      
+                      player.setGameMode(GameMode.getByValue(limbo.getGameMode()));
+                      
+                      if (Settings.protectInventoryBeforeLogInEnabled.booleanValue() && player.hasPlayedBefore() && !Settings.isForceSurvivalModeEnabled) {
                       		RestoreInventoryEvent event = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
                       		Bukkit.getServer().getPluginManager().callEvent(event);
                       		if (!event.isCancelled()) {
                       			API.setPlayerInventory(player, limbo.getInventory(), limbo.getArmour());
                       		}
                       }
+
                     
                       player.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
                       LimboCache.getInstance().deleteLimboPlayer(name);
@@ -168,7 +172,7 @@ public class Management {
                 LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
                 if (limbo != null) {
 
-                      player.setGameMode(GameMode.getByValue(limbo.getGameMode()));
+                      
                       player.setOp(limbo.getOperator());
                       
                       this.utils.addNormal(player, limbo.getGroup());
@@ -214,19 +218,23 @@ public class Management {
                         player.teleport(limbo.getLoc());
                                 }
                       
-                      if (Settings.protectInventoryBeforeLogInEnabled.booleanValue() && player.hasPlayedBefore()) {
+                      
+                      player.setGameMode(GameMode.getByValue(limbo.getGameMode()));
+                      
+                      if (Settings.protectInventoryBeforeLogInEnabled.booleanValue() && player.hasPlayedBefore() && !Settings.isForceSurvivalModeEnabled) {
                       	RestoreInventoryEvent event = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
                       	Bukkit.getServer().getPluginManager().callEvent(event);
                       	if (!event.isCancelled()) {
                       		API.setPlayerInventory(player, limbo.getInventory(), limbo.getArmour());
                       	}
-                                  }
+                      }
+                      
+                      
                       player.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
                       LimboCache.getInstance().deleteLimboPlayer(name);
                       if (this.playerCache.doesCacheExist(name)) {
                         this.playerCache.removeCache(name);
                                 }
-                      
                               }
                 
                /*
