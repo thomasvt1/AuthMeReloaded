@@ -57,7 +57,7 @@ public final class Settings extends YamlConfiguration {
             isForceSpawnLocOnJoinEnabled, isForceExactSpawnEnabled, isSaveQuitLocationEnabled,
             isForceSurvivalModeEnabled, isResetInventoryIfCreative, isCachingEnabled, isKickOnWrongPasswordEnabled,
             getEnablePasswordVerifier, protectInventoryBeforeLogInEnabled, isBackupActivated, isBackupOnStart,
-            isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport, rakamakUseIp, noConsoleSpam;
+            isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport, rakamakUseIp, noConsoleSpam, allowPluginTeleport;
             
             
     public static String getNickRegex, getUnloggedinGroup, getMySQLHost, getMySQLPort, 
@@ -187,6 +187,7 @@ public void loadConfigOptions() {
         rakamakHash = getRakamakHash();
         
         noConsoleSpam = configFile.getBoolean("Security.console.noConsoleSpam", false);
+        allowPluginTeleport = configFile.getBoolean("settings.restrictions.allowedPluginTeleportHandler", false);
 
         saveDefaults();
    }
@@ -278,6 +279,7 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         rakamakHash = getRakamakHash();
         
         noConsoleSpam = configFile.getBoolean("Security.console.noConsoleSpam", false);
+        allowPluginTeleport = configFile.getBoolean("settings.restrictions.allowedPluginTeleportHandler", false);
          
    }
    
@@ -346,6 +348,10 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
        if (contains("settings.GameMode.ResetInventotyIfCreative")) {
        	set("settings.GameMode.ResetInventoryIfCreative", getBoolean("settings.GameMode.ResetInventotyIfCreative"));
        	set("settings.GameMode.ResetInventotyIfCreative", null);
+       }
+       
+       if (contains("settings.restrictions.allowedPluginTeleportHandler")) {
+    	   set("settings.restrictions.allowedPluginTeleportHandler", false);
        }
 
        plugin.getLogger().info("Merge new Config Options if needed..");

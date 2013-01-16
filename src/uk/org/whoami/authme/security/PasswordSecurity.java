@@ -78,6 +78,10 @@ public class PasswordSecurity {
         return "$MD5vb$" + salt + "$" + getMD5(getMD5(message) + salt);
     }
     
+    private static String getSaltedMyBB(String message, String salt) throws NoSuchAlgorithmException {
+    	return getMD5(getMD5(salt)+ message);
+    }
+    
     private static String getXAuth(String message, String salt) {
         String hash = getWhirlpool(salt + message).toLowerCase();
         int saltPos = (message.length() >= hash.length() ? hash.length() - 1 : message.length());
@@ -115,6 +119,9 @@ public class PasswordSecurity {
                 return getPhpBB(password);
             case PLAINTEXT:
                 return getPlainText(password);
+            case MYBB:
+            	String salt3 = createSalt(8);
+            	return getSaltedMyBB(password, salt3);
             default:
                 throw new NoSuchAlgorithmException("Unknown hash algorithm");
         }
@@ -176,6 +183,6 @@ public class PasswordSecurity {
 
     public enum HashAlgorithm {
 
-        MD5, SHA1, SHA256, WHIRLPOOL, XAUTH, MD5VB, PHPBB, PLAINTEXT
+        MD5, SHA1, SHA256, WHIRLPOOL, XAUTH, MD5VB, PHPBB, PLAINTEXT, MYBB
     }
 }

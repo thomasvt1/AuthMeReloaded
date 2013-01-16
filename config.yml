@@ -48,9 +48,10 @@ settings:
         allowedMovementRadius: 100
         enablePasswordVerifier: true
         ProtectInventoryBeforeLogIn: true
+        allowedPluginTeleportHandler: false
     GameMode:
         ForceSurvivalMode: false
-        ResetInventotyIfCreative: false
+        ResetInventoryIfCreative: false
     security:
         minPasswordLength: 4
         unLoggedinGroup: unLoggedinGroup

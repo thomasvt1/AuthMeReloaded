@@ -36,6 +36,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
@@ -981,12 +982,17 @@ public class AuthMePlayerListener implements Listener {
         event.setCancelled(true);
     }
     
-    @EventHandler (priority = EventPriority.HIGH)
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onPlayerTeleport (PlayerTeleportEvent event) {
     	if (event.isCancelled()) {
     		return;
     	}
 
+    	if (Settings.allowPluginTeleport && event.getCause().equals(TeleportCause.PLUGIN)) {
+    		return;
+    	}
+    	
+    	
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
         
