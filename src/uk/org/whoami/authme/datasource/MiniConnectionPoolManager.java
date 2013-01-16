@@ -37,7 +37,7 @@ public class MiniConnectionPoolManager {
 
 private ConnectionPoolDataSource       dataSource;
 private int                            maxConnections;
-private long                           timeoutMs;
+private long                           timeoutMs = 70 * 1000L;
 private PrintWriter                    logWriter;
 private Semaphore                      semaphore;
 private LinkedList<PooledConnection>   recycledConnections;
@@ -66,7 +66,7 @@ public static class TimeoutException extends RuntimeException {
 *    the maximum number of connections.
 */
 public MiniConnectionPoolManager (ConnectionPoolDataSource dataSource, int maxConnections) {
-   this(dataSource, maxConnections, 60); }
+   this(dataSource, maxConnections, 70); }
 
 /**
 * Constructs a MiniConnectionPoolManager object.
@@ -189,12 +189,17 @@ public Connection getValidConnection() {
       if (triesWithoutDelay <= 0) {
          triesWithoutDelay = 0;
          try {
-            Thread.sleep(250); }
-          catch (InterruptedException e) {
-            throw new RuntimeException("Interrupted while waiting for a valid database connection.", e); }}
+            Thread.sleep(250); 
+         } catch (InterruptedException e) {
+            throw new RuntimeException("Interrupted while waiting for a valid database connection.", e); 
+         }
+      }
       time = System.currentTimeMillis();
       if (time >= timeoutTime) {
-         throw new TimeoutException("Timeout while waiting for a valid database connection."); }}}
+         throw new TimeoutException("Timeout while waiting for a valid database connection."); 
+      }
+   }
+}
 
 private Connection getValidConnection2 (long time, long timeoutTime) {
    long rtime = Math.max(1, timeoutTime - time);

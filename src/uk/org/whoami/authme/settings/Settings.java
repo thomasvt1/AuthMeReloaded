@@ -350,7 +350,7 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
        	set("settings.GameMode.ResetInventotyIfCreative", null);
        }
        
-       if (contains("settings.restrictions.allowedPluginTeleportHandler")) {
+       if (!contains("settings.restrictions.allowedPluginTeleportHandler")) {
     	   set("settings.restrictions.allowedPluginTeleportHandler", false);
        }
 
