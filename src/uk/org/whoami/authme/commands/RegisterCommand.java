@@ -135,6 +135,9 @@ public class RegisterCommand implements CommandExecutor {
                // player.getInventory().setArmorContents(limbo.getArmour());
                 player.setGameMode(GameMode.getByValue(limbo.getGameMode()));      
                 if (Settings.isTeleportToSpawnEnabled) {
+                	if (!limbo.getLoc().getChunk().isLoaded()) {
+                		limbo.getLoc().getChunk().load();
+                	}
                     player.teleport(limbo.getLoc());
                 }
                 

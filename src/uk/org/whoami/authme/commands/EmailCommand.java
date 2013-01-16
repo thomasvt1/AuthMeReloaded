@@ -27,13 +27,13 @@ import uk.org.whoami.authme.settings.Messages;
  *
  * @author darkwarriors
  */
-public class EmailCommnad implements CommandExecutor {
+public class EmailCommand implements CommandExecutor {
 
     @SuppressWarnings("unused")
 	private AuthMe plugin;
     private Messages m = Messages.getInstance();
     
-    public EmailCommnad(Plugin plugin) {
+    public EmailCommand(Plugin plugin) {
         this.plugin = (AuthMe) plugin;
     }
     

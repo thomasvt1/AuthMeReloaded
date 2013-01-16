@@ -17,7 +17,6 @@
 package uk.org.whoami.authme.plugin.manager;
 
 import net.citizensnpcs.Citizens;
-
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.CitizensManager;
 
@@ -28,33 +27,51 @@ import uk.org.whoami.authme.AuthMe;
 
 public class CitizensCommunicator {
 	
-    static AuthMe instance;
+    public AuthMe instance;
     
     public CitizensCommunicator(AuthMe instance) {
-    	CitizensCommunicator.instance = instance;
+    	this.instance = instance;
     }
 
-    public static boolean isNPC(Entity player) {
+    public boolean isNPC(Entity player, AuthMe instance) {
+    	boolean isnpc = false;
         PluginManager pm = instance.getServer().getPluginManager();
         if (pm.getPlugin("Citizens") != null) {
         	try {
             	Citizens plugin = (Citizens) pm.getPlugin("Citizens");
-
-                String ver = plugin.getDescription().getVersion();
-                String[] args = ver.split("\\.");
-                
-                if(args[0].contains("1")) 
-                    return CitizensManager.isNPC(player);
-                else return CitizensAPI.getNPCRegistry().isNPC(player);
+            	if (plugin != null) {
+                    String ver = plugin.getDescription().getVersion();
+                    String[] args = ver.split("\\.");
+                    
+                    	if(args[0].contains("1")) {
+                    		try {
+                    			isnpc = CitizensManager.isNPC(player);
+                    		} catch (NullPointerException NPE) {
+                    			return false;
+                    		}
+                    	}
+                        else {
+                        	try {
+                        		isnpc = CitizensAPI.getNPCRegistry().isNPC(player);
+                        	} catch (NullPointerException NPE) {
+                        		return false;
+                        	}
+                        }
+            	}
+            	return isnpc;
         	} catch (NullPointerException npe) {
         		return false;
         	} catch (ClassCastException cce) {
         		return false;
         	} catch (IllegalStateException ise) {
         		return false;
+        	} catch (NoClassDefFoundError ncdfe) {
+        		return false;
+        	} catch (Exception ex) {
+        		return false;
         	}
 
         }
-        return false;
+        return isnpc;
     }
 }

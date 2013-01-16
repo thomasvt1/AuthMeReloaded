@@ -14,7 +14,6 @@ import uk.org.whoami.authme.Utils;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
 import uk.org.whoami.authme.datasource.DataSource.DataSourceType;
-import uk.org.whoami.authme.plugin.manager.CitizensCommunicator;
 import uk.org.whoami.authme.security.PasswordSecurity.HashAlgorithm;
 import uk.org.whoami.authme.settings.Settings;
 
@@ -57,7 +56,7 @@ public class API {
      * @return true if player is a npc
      */
     public static boolean isaNPC(Player player) {
-    	return CitizensCommunicator.isNPC(player);
+    	return instance.getCitizensCommunicator().isNPC(player, instance);
     }
     
     /**

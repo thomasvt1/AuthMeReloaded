@@ -77,7 +77,7 @@ public class AuthMe extends JavaPlugin {
     private Utils utils = Utils.getInstance();
     private JavaPlugin plugin;
     private FileCache playerBackup = new FileCache();
-	private CitizensCommunicator citizens;
+	public CitizensCommunicator citizens;
 
     
     @Override
@@ -187,8 +187,8 @@ public class AuthMe extends JavaPlugin {
         
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new AuthMePlayerListener(this,database),this);
-        pm.registerEvents(new AuthMeBlockListener(database),this);
-        pm.registerEvents(new AuthMeEntityListener(database),this);
+        pm.registerEvents(new AuthMeBlockListener(database, this),this);
+        pm.registerEvents(new AuthMeEntityListener(database, this),this);
         if (pm.isPluginEnabled("Spout")) 
         	pm.registerEvents(new AuthMeSpoutListener(database),this);
         
@@ -295,7 +295,7 @@ public class AuthMe extends JavaPlugin {
 	
 	public void savePlayer(Player player) throws IllegalStateException, NullPointerException {
 		try {
-	      if ((CitizensCommunicator.isNPC(player)) || (Utils.getInstance().isUnrestricted(player)) || (CombatTagComunicator.isNPC(player))) {
+	      if ((citizens.isNPC(player, this)) || (Utils.getInstance().isUnrestricted(player)) || (CombatTagComunicator.isNPC(player))) {
 	          return;
 	        }
 		} catch (Exception e) { }
@@ -314,6 +314,9 @@ public class AuthMe extends JavaPlugin {
 	          if (Settings.protectInventoryBeforeLogInEnabled.booleanValue()) {
 	            player.getInventory().setArmorContents(limbo.getArmour());
 	            player.getInventory().setContents(limbo.getInventory());
+	          }
+	          if (!limbo.getLoc().getChunk().isLoaded()) {
+	        	  limbo.getLoc().getChunk().load();
 	          }
 	          player.teleport(limbo.getLoc());
 	          this.utils.addNormal(player, limbo.getGroup());

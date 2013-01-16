@@ -26,9 +26,9 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 
+import uk.org.whoami.authme.AuthMe;
 import uk.org.whoami.authme.Utils;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
-import uk.org.whoami.authme.plugin.manager.CitizensCommunicator;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.plugin.manager.CombatTagComunicator;
 import uk.org.whoami.authme.settings.Settings;
@@ -36,10 +36,12 @@ import uk.org.whoami.authme.settings.Settings;
 public class AuthMeEntityListener implements Listener{
 
     private DataSource data;
+    public AuthMe instance;
     //private Settings settings = Settings.getInstance();
 
-    public AuthMeEntityListener(DataSource data) {
+    public AuthMeEntityListener(DataSource data, AuthMe instance) {
         this.data = data;
+        this.instance = instance;
     }
 
    @EventHandler
@@ -60,7 +62,7 @@ public class AuthMeEntityListener implements Listener{
             return;
         }
         */
-        if(CitizensCommunicator.isNPC(entity) || Utils.getInstance().isUnrestricted((Player)entity) || CombatTagComunicator.isNPC(entity)) {
+        if(instance.getCitizensCommunicator().isNPC(entity, instance) || Utils.getInstance().isUnrestricted((Player)entity) || CombatTagComunicator.isNPC(entity)) {
             return;
         }
 

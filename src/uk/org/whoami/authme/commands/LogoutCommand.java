@@ -90,6 +90,9 @@ public class LogoutCommand implements CommandExecutor {
             playerBackup.createCache(name, playerData, LimboCache.getInstance().getLimboPlayer(name).getGroup(),LimboCache.getInstance().getLimboPlayer(name).getOperator());            
         }
         if (Settings.isTeleportToSpawnEnabled) {
+        	if (!player.getWorld().getSpawnLocation().getChunk().isLoaded()) {
+        		player.getWorld().getSpawnLocation().getChunk().load();
+        	}
             player.teleport(player.getWorld().getSpawnLocation());
         }
 

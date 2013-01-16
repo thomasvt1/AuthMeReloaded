@@ -96,6 +96,9 @@ public class Management {
                     
                                 }
                       else if (Settings.isForceSpawnLocOnJoinEnabled.booleanValue()) {
+                          if (!world.getChunkAt(world.getSpawnLocation()).isLoaded()) {
+                              world.getChunkAt(world.getSpawnLocation()).load();
+                                      }
                         player.teleport(player.getWorld().getSpawnLocation());
                                 }
                       else if ((Settings.isSaveQuitLocationEnabled.booleanValue()) && (this.database.getAuth(name).getQuitLocY() != 0))
@@ -198,6 +201,9 @@ public class Management {
                       
                                 }
                       else if (Settings.isForceSpawnLocOnJoinEnabled.booleanValue()) {
+                          if (!world.getChunkAt(world.getSpawnLocation()).isLoaded()) {
+                              world.getChunkAt(world.getSpawnLocation()).load();
+                                      }
                         player.teleport(player.getWorld().getSpawnLocation());
                                 }
                       else if ((Settings.isSaveQuitLocationEnabled.booleanValue()) && (this.database.getAuth(name).getQuitLocY() != 0)) {
