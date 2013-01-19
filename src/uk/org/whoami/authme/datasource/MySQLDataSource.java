@@ -116,7 +116,7 @@ public class MySQLDataSource implements DataSource {
             rs.close();
             rs = con.getMetaData().getColumns(null, null, tableName, lastlocX);
             if (!rs.next()) {
-                st.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + lastlocY + " smallint(6) NOT NULL DEFAULT '0' AFTER "
+                st.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + lastlocX + " smallint(6) NOT NULL DEFAULT '0' AFTER "
                         + columnLastLogin +" , ADD " + lastlocY + " smallint(6) NOT NULL DEFAULT '0' AFTER " + lastlocX + " , ADD " + lastlocZ + " smallint(6) NOT NULL DEFAULT '0' AFTER " + lastlocY + ";");
             }            
         } finally {

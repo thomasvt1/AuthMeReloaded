@@ -72,14 +72,12 @@ public class FlatToSql {
             while ((line = br.readLine()) != null) {
             	sql.newLine();
                 String[] args = line.split(":");
-                if (!Settings.isSaveQuitLocationEnabled && args.length <= 4)
+                if (args.length == 4)
                 	newline = "INSERT INTO " + tableName + " VALUES (" + i + ", '" + args[0] + "', '" + args[1] + "', '" + args[2] + "', " + args[3] + ", 0, 0, 0);";
-                else if (args.length >= 5)
+                else if (args.length == 7)
                 	newline = "INSERT INTO " + tableName + " VALUES (" + i + ", '" + args[0] + "', '" + args[1] + "', '" + args[2] + "', " + args[3] + ", " + args[4] + ", " + args[5] + ", " + args[6] + ");";
-                else if (args.length <= 3)
-                	newline = "";
                 else
-                	newline = "INSERT INTO " + tableName + " VALUES (" + i + ", '" + args[0] + "', '" + args[1] + "', '" + args[2] + "', " + args[3] + ", 0, 0, 0);";
+                	newline = "";
                 if (newline != "")
                 sql.write(newline);
                 i = i + 1;

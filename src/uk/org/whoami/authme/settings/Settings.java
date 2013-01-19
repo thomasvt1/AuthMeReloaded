@@ -57,7 +57,7 @@ public final class Settings extends YamlConfiguration {
             isForceSpawnLocOnJoinEnabled, isForceExactSpawnEnabled, isSaveQuitLocationEnabled,
             isForceSurvivalModeEnabled, isResetInventoryIfCreative, isCachingEnabled, isKickOnWrongPasswordEnabled,
             getEnablePasswordVerifier, protectInventoryBeforeLogInEnabled, isBackupActivated, isBackupOnStart,
-            isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport, rakamakUseIp, noConsoleSpam, allowPluginTeleport;
+            isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport, rakamakUseIp, noConsoleSpam;
             
             
     public static String getNickRegex, getUnloggedinGroup, getMySQLHost, getMySQLPort, 
@@ -187,7 +187,6 @@ public void loadConfigOptions() {
         rakamakHash = getRakamakHash();
         
         noConsoleSpam = configFile.getBoolean("Security.console.noConsoleSpam", false);
-        allowPluginTeleport = configFile.getBoolean("settings.restrictions.allowedPluginTeleportHandler", false);
 
         saveDefaults();
    }
@@ -279,7 +278,6 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         rakamakHash = getRakamakHash();
         
         noConsoleSpam = configFile.getBoolean("Security.console.noConsoleSpam", false);
-        allowPluginTeleport = configFile.getBoolean("settings.restrictions.allowedPluginTeleportHandler", false);
          
    }
    
@@ -350,8 +348,8 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
        	set("settings.GameMode.ResetInventotyIfCreative", null);
        }
        
-       if (!contains("settings.restrictions.allowedPluginTeleportHandler")) {
-    	   set("settings.restrictions.allowedPluginTeleportHandler", false);
+       if (contains("settings.restrictions.allowedPluginTeleportHandler")) {
+    	   set("settings.restrictions.allowedPluginTeleportHandler", null);
        }
 
        plugin.getLogger().info("Merge new Config Options if needed..");

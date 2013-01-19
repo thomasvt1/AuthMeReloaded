@@ -35,8 +35,6 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -979,44 +977,6 @@ public class AuthMePlayerListener implements Listener {
             return;
         }
 
-        if (!data.isAuthAvailable(name)) {
-            if (!Settings.isForcedRegistrationEnabled) {
-                return;
-            }
-        }
-        event.setCancelled(true);
-    }
-    
-    @EventHandler (priority = EventPriority.HIGHEST)
-    public void onPlayerTeleport (PlayerTeleportEvent event) {
-    	if (event.isCancelled()) {
-    		return;
-    	}
-
-    	if (Settings.allowPluginTeleport && event.getCause().equals(TeleportCause.PLUGIN)) {
-    		return;
-    	}
-    	
-    	
-        Player player = event.getPlayer();
-        String name = player.getName().toLowerCase();
-        
-        if (!player.hasPlayedBefore()) {
-        	return;
-        }
-        
-        if ((Settings.isForceSpawnLocOnJoinEnabled || Settings.isTeleportToSpawnEnabled) && (event.getTo().equals(player.getWorld().getSpawnLocation()))) {
-        	return;
-        }
-
-        if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
-            return;
-        }
-
-        if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
-            return;
-        }
-        
         if (!data.isAuthAvailable(name)) {
             if (!Settings.isForcedRegistrationEnabled) {
                 return;

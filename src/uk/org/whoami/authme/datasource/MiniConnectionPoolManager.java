@@ -35,16 +35,16 @@ import javax.sql.PooledConnection;
 */
 public class MiniConnectionPoolManager {
 
-private ConnectionPoolDataSource       dataSource;
-private int                            maxConnections;
-private long                           timeoutMs = 70 * 1000L;
-private PrintWriter                    logWriter;
-private Semaphore                      semaphore;
-private LinkedList<PooledConnection>   recycledConnections;
-private int                            activeConnections;
-private PoolConnectionEventListener    poolConnectionEventListener;
-private boolean                        isDisposed;
-private boolean                        doPurgeConnection;
+public ConnectionPoolDataSource       dataSource;
+public int                            maxConnections;
+public long                           timeoutMs = 70 * 1000L;
+public PrintWriter                    logWriter;
+public Semaphore                      semaphore;
+public LinkedList<PooledConnection>   recycledConnections;
+public int                            activeConnections;
+public PoolConnectionEventListener    poolConnectionEventListener;
+public boolean                        isDisposed;
+public boolean                        doPurgeConnection;
 
 /**
 * Thrown in {@link #getConnection()} or {@link #getValidConnection()} when no free connection becomes
@@ -58,7 +58,7 @@ public static class TimeoutException extends RuntimeException {
       super(msg); }}
 
 /**
-* Constructs a MiniConnectionPoolManager object with a timeout of 60 seconds.
+* Constructs a MiniConnectionPoolManager object with a timeout of 70 seconds.
 *
 * @param dataSource
 *    the data source for the connections.
