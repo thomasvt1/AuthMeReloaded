@@ -14,6 +14,7 @@ DataSource:
     mySQLlastlocX: x
     mySQLlastlocY : y
     mySQLlastlocZ : z
+    mySQLColumnEmail: email
 GroupOptions:
     UnregisteredPlayerGroup: ''
     RegisteredPlayerGroup: ''
@@ -31,6 +32,7 @@ settings:
         - /l
         - /reg
         - /passpartu
+        - /email
         maxRegPerIp: 1
         maxNicknameLength: 20
         ForceSingleSession: true
@@ -83,6 +85,7 @@ Security:
         useReloadCommandSupport: true
     Console:
         noConsoleSpam: false
+        removePassword: true
 Converter:
     Rakamak:
         fileName: users.rak

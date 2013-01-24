@@ -23,6 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -131,7 +132,7 @@ public class AuthMePlayerListener implements Listener {
         }
         
         final Player player = event.getPlayer();
-        String name = player.getName().toLowerCase();
+        final String name = player.getName().toLowerCase();
 
         if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
             return;
@@ -159,31 +160,20 @@ public class AuthMePlayerListener implements Listener {
         		player.sendMessage(m._("reg_msg"));
         	}
         } else {
-        	if (data.isAuthAvailable(name)) {
+        	
         		Bukkit.getScheduler().runTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
+        				if (data.isAuthAvailable(name)) {
         				player.sendMessage(m._("login_msg"));
-        			}
-        		});
-        		
-        	} else {
-        		if (!Settings.isForcedRegistrationEnabled) {
-        			return;
-        		}
-        		Bukkit.getScheduler().runTask(plugin, new Runnable()
-        		{
-        			@Override
-        			public void run() {
-        				player.sendMessage(m._("reg_msg"));
-        			}
-        		});
-        			
-        	}
-        }
-
-                
+        				} else {
+        					if (Settings.isForcedRegistrationEnabled) {
+        						player.sendMessage(m._("reg_msg"));
+        					}
+        				}
+        		}});
+        }        
     }
     
     @EventHandler( priority = EventPriority.HIGH)
@@ -194,7 +184,7 @@ public class AuthMePlayerListener implements Listener {
         
         
         final Player player = event.getPlayer();
-        String name = player.getName().toLowerCase();
+        final String name = player.getName().toLowerCase();
 
         if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
             return;
@@ -222,31 +212,20 @@ public class AuthMePlayerListener implements Listener {
         		player.sendMessage(m._("reg_msg"));
         	}
         } else {
-        	if (data.isAuthAvailable(name)) {
+        	
         		Bukkit.getScheduler().runTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
+        				if (data.isAuthAvailable(name)) {
         				player.sendMessage(m._("login_msg"));
-        			}
-        		});
-        		
-        	} else {
-        		if (!Settings.isForcedRegistrationEnabled) {
-        			return;
-        		}
-        		Bukkit.getScheduler().runTask(plugin, new Runnable()
-        		{
-        			@Override
-        			public void run() {
-        				player.sendMessage(m._("reg_msg"));
-        			}
-        		});
-        		
-        	}
-        }
-
-                
+        				} else {
+        					if (Settings.isForcedRegistrationEnabled) {
+        						player.sendMessage(m._("reg_msg"));
+        					}
+        				}
+        		}});
+        }        
     }
     
     @EventHandler( priority = EventPriority.MONITOR)
@@ -257,7 +236,7 @@ public class AuthMePlayerListener implements Listener {
         
         
         final Player player = event.getPlayer();
-        String name = player.getName().toLowerCase();
+        final String name = player.getName().toLowerCase();
 
         if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
             return;
@@ -285,31 +264,20 @@ public class AuthMePlayerListener implements Listener {
         		player.sendMessage(m._("reg_msg"));
         	}
         } else {
-        	if (data.isAuthAvailable(name)) {
+        	
         		Bukkit.getScheduler().runTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
+        				if (data.isAuthAvailable(name)) {
         				player.sendMessage(m._("login_msg"));
-        			}
-        		});
-        		
-        	} else {
-        		if (!Settings.isForcedRegistrationEnabled) {
-        			return;
-        		}
-        		Bukkit.getScheduler().runTask(plugin, new Runnable()
-        		{
-        			@Override
-        			public void run() {
-        				player.sendMessage(m._("reg_msg"));
-        			}
-        		});
-        		
-        	}
-        }
-
-                
+        				} else {
+        					if (Settings.isForcedRegistrationEnabled) {
+        						player.sendMessage(m._("reg_msg"));
+        					}
+        				}
+        		}});
+        }        
     }
     
     @EventHandler( priority = EventPriority.HIGHEST)
@@ -320,7 +288,7 @@ public class AuthMePlayerListener implements Listener {
         
         
         final Player player = event.getPlayer();
-        String name = player.getName().toLowerCase();
+        final String name = player.getName().toLowerCase();
 
         if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
             return;
@@ -348,31 +316,20 @@ public class AuthMePlayerListener implements Listener {
         		player.sendMessage(m._("reg_msg"));
         	}
         } else {
-        	if (data.isAuthAvailable(name)) {
+        	
         		Bukkit.getScheduler().runTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
+        				if (data.isAuthAvailable(name)) {
         				player.sendMessage(m._("login_msg"));
-        			}
-        		});
-        		
-        	} else {
-        		if (!Settings.isForcedRegistrationEnabled) {
-        			return;
-        		}
-        		Bukkit.getScheduler().runTask(plugin, new Runnable()
-        		{
-        			@Override
-        			public void run() {
-        				player.sendMessage(m._("reg_msg"));
-        			}
-        		});
-        		
-        	}
-        }
-
-                
+        				} else {
+        					if (Settings.isForcedRegistrationEnabled) {
+        						player.sendMessage(m._("reg_msg"));
+        					}
+        				}
+        		}});
+        }        
     }
     
     
@@ -384,7 +341,7 @@ public class AuthMePlayerListener implements Listener {
         
         
         final Player player = event.getPlayer();
-        String name = player.getName().toLowerCase();
+        final String name = player.getName().toLowerCase();
 
         if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
             return;
@@ -412,31 +369,20 @@ public class AuthMePlayerListener implements Listener {
         		player.sendMessage(m._("reg_msg"));
         	}
         } else {
-        	if (data.isAuthAvailable(name)) {
+        	
         		Bukkit.getScheduler().runTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
+        				if (data.isAuthAvailable(name)) {
         				player.sendMessage(m._("login_msg"));
-        			}
-        		});
-        		
-        	} else {
-        		if (!Settings.isForcedRegistrationEnabled) {
-        			return;
-        		}
-        		Bukkit.getScheduler().runTask(plugin, new Runnable()
-        		{
-        			@Override
-        			public void run() {
-        				player.sendMessage(m._("reg_msg"));
-        			}
-        		});
-        		
-        	}
-        }
-
-                
+        				} else {
+        					if (Settings.isForcedRegistrationEnabled) {
+        						player.sendMessage(m._("reg_msg"));
+        					}
+        				}
+        		}});
+        }        
     }
 
     @EventHandler( priority = EventPriority.LOW)
@@ -447,7 +393,7 @@ public class AuthMePlayerListener implements Listener {
         
         
         final Player player = event.getPlayer();
-        String name = player.getName().toLowerCase();
+        final String name = player.getName().toLowerCase();
 
         if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
             return;
@@ -475,31 +421,20 @@ public class AuthMePlayerListener implements Listener {
         		player.sendMessage(m._("reg_msg"));
         	}
         } else {
-        	if (data.isAuthAvailable(name)) {
+        	
         		Bukkit.getScheduler().runTask(plugin, new Runnable()
         		{
         			@Override
         			public void run() {
+        				if (data.isAuthAvailable(name)) {
         				player.sendMessage(m._("login_msg"));
-        			}
-        		});
-        		
-        	} else {
-        		if (!Settings.isForcedRegistrationEnabled) {
-        			return;
-        		}
-        		Bukkit.getScheduler().runTask(plugin, new Runnable()
-        		{
-        			@Override
-        			public void run() {
-        				player.sendMessage(m._("reg_msg"));
-        			}
-        		});
-        		
-        	}
-        }
-
-                
+        				} else {
+        					if (Settings.isForcedRegistrationEnabled) {
+        						player.sendMessage(m._("reg_msg"));
+        					}
+        				}
+        		}});
+        }        
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -555,12 +490,9 @@ public class AuthMePlayerListener implements Listener {
         } */
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
-    	if (event.getResult() != Result.ALLOWED) {
-    		return;
-    	}
-    	
+
         final Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
        
@@ -805,6 +737,9 @@ public class AuthMePlayerListener implements Listener {
       if (event.getPlayer() == null) {
         return;
       }
+      if (event.isCancelled()) {
+    	  return;
+      }
 
       Player player = event.getPlayer();
 
@@ -812,8 +747,8 @@ public class AuthMePlayerListener implements Listener {
         return;
       }
 
-      if ((Settings.isForceSingleSessionEnabled.booleanValue()) && 
-        (event.getReason().equals("You logged in from another location"))) {
+      if ((Settings.isForceSingleSessionEnabled) && 
+        (event.getReason().contains("You logged in from another location"))) {
         event.setCancelled(true);
         return;
       }
@@ -876,8 +811,8 @@ public class AuthMePlayerListener implements Listener {
         }
 
         if (!data.isAuthAvailable(name)) {
-            if (!Settings.isForcedRegistrationEnabled) {
-                return;
+        	if (!Settings.isForcedRegistrationEnabled) {
+        		return;
             }
         }
 
@@ -915,6 +850,8 @@ public class AuthMePlayerListener implements Listener {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
         }
+        
+        
 
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
@@ -983,6 +920,31 @@ public class AuthMePlayerListener implements Listener {
             }
         }
         event.setCancelled(true);
+    }
+    
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onSignChange(SignChangeEvent event) {
+        if (event.isCancelled() || event.getPlayer() == null) {
+            return;
+        }
+        Player player = event.getPlayer();
+        String name = player.getName().toLowerCase();
+
+        if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
+            return;
+        }
+
+        if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
+            return;
+        }
+
+        if (!data.isAuthAvailable(name)) {
+            if (!Settings.isForcedRegistrationEnabled) {
+                return;
+            }
+        }
+        event.setCancelled(true);
+        
     }
     
 }

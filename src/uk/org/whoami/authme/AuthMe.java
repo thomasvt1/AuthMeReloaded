@@ -35,6 +35,7 @@ import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.cache.limbo.LimboPlayer;
 import uk.org.whoami.authme.commands.AdminCommand;
 import uk.org.whoami.authme.commands.ChangePasswordCommand;
+import uk.org.whoami.authme.commands.EmailCommand;
 import uk.org.whoami.authme.commands.LoginCommand;
 import uk.org.whoami.authme.commands.LogoutCommand;
 import uk.org.whoami.authme.commands.RegisterCommand;
@@ -61,12 +62,12 @@ import org.bukkit.Server;
 
 import uk.org.whoami.authme.commands.PasspartuCommand;
 import uk.org.whoami.authme.datasource.SqliteDataSource;
+import uk.org.whoami.authme.filter.ConsoleFilter;
 
 public class AuthMe extends JavaPlugin {
 
     private DataSource database = null;
     private Settings settings;
-	@SuppressWarnings("unused")
 	private Messages m;
     private PlayersLogs pllog;
 	public Management management;
@@ -90,10 +91,14 @@ public class AuthMe extends JavaPlugin {
         settings = new Settings(this);
         settings.loadConfigOptions();
         
-        m = Messages.getInstance();
+        setMessages(Messages.getInstance());
         pllog = PlayersLogs.getInstance();
         
         server = getServer();
+        
+        //Set Console Filter
+        if (Settings.removePassword)
+        Bukkit.getLogger().setFilter(new ConsoleFilter());
         
         /*
          *  Back style on start if avaible
@@ -212,6 +217,7 @@ public class AuthMe extends JavaPlugin {
         this.getCommand("logout").setExecutor(new LogoutCommand(this,database));
         this.getCommand("unregister").setExecutor(new UnregisterCommand(this, database));
         this.getCommand("passpartu").setExecutor(new PasspartuCommand(database));
+        this.getCommand("email").setExecutor(new EmailCommand(this, database));
 
         
         if (!new File(getDataFolder() + File.separator + "players.yml").exists()) {
@@ -341,5 +347,13 @@ public class AuthMe extends JavaPlugin {
 
 	public CitizensCommunicator getCitizensCommunicator() {
 		return citizens;
+	}
+
+	public void setMessages(Messages m) {
+		this.m = m;
+	}
+
+	public Messages getMessages() {
+		return m;
 	}
 }

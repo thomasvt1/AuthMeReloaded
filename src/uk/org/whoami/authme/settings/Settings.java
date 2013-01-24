@@ -57,13 +57,13 @@ public final class Settings extends YamlConfiguration {
             isForceSpawnLocOnJoinEnabled, isForceExactSpawnEnabled, isSaveQuitLocationEnabled,
             isForceSurvivalModeEnabled, isResetInventoryIfCreative, isCachingEnabled, isKickOnWrongPasswordEnabled,
             getEnablePasswordVerifier, protectInventoryBeforeLogInEnabled, isBackupActivated, isBackupOnStart,
-            isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport, rakamakUseIp, noConsoleSpam;
+            isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport, rakamakUseIp, noConsoleSpam, removePassword;
             
             
     public static String getNickRegex, getUnloggedinGroup, getMySQLHost, getMySQLPort, 
             getMySQLUsername, getMySQLPassword, getMySQLDatabase, getMySQLTablename, 
             getMySQLColumnName, getMySQLColumnPassword, getMySQLColumnIp, getMySQLColumnLastLogin,
-            getMySQLColumnSalt, getMySQLColumnGroup, unRegisteredGroup, backupWindowsPath,
+            getMySQLColumnSalt, getMySQLColumnGroup, getMySQLColumnEmail, unRegisteredGroup, backupWindowsPath,
             getcUnrestrictedName, getRegisteredGroup, messagesLanguage, getMySQLlastlocX, getMySQLlastlocY, getMySQLlastlocZ,
             rakamakUsers, rakamakUsersIp;
             
@@ -143,6 +143,7 @@ public void loadConfigOptions() {
         getMySQLPassword = configFile.getString("DataSource.mySQLPassword","12345");
         getMySQLDatabase = configFile.getString("DataSource.mySQLDatabase","authme");
         getMySQLTablename = configFile.getString("DataSource.mySQLTablename","authme");
+        getMySQLColumnEmail = configFile.getString("DataSource.mySQLColumnEmail","email");
         getMySQLColumnName = configFile.getString("DataSource.mySQLColumnName","username");
         getMySQLColumnPassword = configFile.getString("DataSource.mySQLColumnPassword","password");
         getMySQLColumnIp = configFile.getString("DataSource.mySQLColumnIp","ip");
@@ -179,6 +180,8 @@ public void loadConfigOptions() {
             	allowCommands.add("/reg");
             if (!allowCommands.contains("/passpartu"))
             	allowCommands.add("/passpartu");
+            if (!allowCommands.contains("/email"))
+            	allowCommands.add("/email");
         }
         
         rakamakUsers = configFile.getString("Converter.Rakamak.fileName", "users.rak");
@@ -187,6 +190,7 @@ public void loadConfigOptions() {
         rakamakHash = getRakamakHash();
         
         noConsoleSpam = configFile.getBoolean("Security.console.noConsoleSpam", false);
+        removePassword = configFile.getBoolean("Security.console.removePassword", true);
 
         saveDefaults();
    }
@@ -234,6 +238,7 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         getMySQLPassword = configFile.getString("DataSource.mySQLPassword","12345");
         getMySQLDatabase = configFile.getString("DataSource.mySQLDatabase","authme");
         getMySQLTablename = configFile.getString("DataSource.mySQLTablename","authme");
+        getMySQLColumnEmail = configFile.getString("DataSource.mySQLColumnEmail","email");
         getMySQLColumnName = configFile.getString("DataSource.mySQLColumnName","username");
         getMySQLColumnPassword = configFile.getString("DataSource.mySQLColumnPassword","password");
         getMySQLColumnIp = configFile.getString("DataSource.mySQLColumnIp","ip");
@@ -270,6 +275,8 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
             	allowCommands.add("/reg");
             if (!allowCommands.contains("/passpartu"))
             	allowCommands.add("/passpartu");
+            if (!allowCommands.contains("/email"))
+            	allowCommands.add("/email");
         }
         
         rakamakUsers = configFile.getString("Converter.Rakamak.fileName", "users.rak");
@@ -278,10 +285,12 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         rakamakHash = getRakamakHash();
         
         noConsoleSpam = configFile.getBoolean("Security.console.noConsoleSpam", false);
+        removePassword = configFile.getBoolean("Security.console.removePassword", true);
          
    }
    
-   public void mergeConfig() {
+
+public void mergeConfig() {
       
        if(!contains("settings.restrictions.ProtectInventoryBeforeLogIn")) {
            set("settings.restrictions.enablePasswordVerifier", true);
@@ -339,6 +348,10 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
     	   set("Security.console.noConsoleSpam", false);
        }
        
+       if(!contains("Security.console.removePassword")) {
+    	   set("Security.console.removePassword", true);
+       }
+       
        if(!contains("settings.restrictions.allowCommands")) {
     	   set("settings.restrictions.allowCommands", new ArrayList<String>());
        }
@@ -350,6 +363,10 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
        
        if (contains("settings.restrictions.allowedPluginTeleportHandler")) {
     	   set("settings.restrictions.allowedPluginTeleportHandler", null);
+       }
+       
+       if(!contains("DataSource.mySQLColumnEmail")) {
+    	   set("DataSource.mySQLColumnEmail","email");
        }
 
        plugin.getLogger().info("Merge new Config Options if needed..");

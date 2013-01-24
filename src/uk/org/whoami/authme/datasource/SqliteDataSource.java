@@ -34,6 +34,7 @@ public class SqliteDataSource implements DataSource {
     private String lastlocX;
     private String lastlocY;
     private String lastlocZ;
+    private String columnEmail;
     private Connection con;
 
     public SqliteDataSource() throws ClassNotFoundException, SQLException {
@@ -55,6 +56,7 @@ public class SqliteDataSource implements DataSource {
         this.lastlocY = Settings.getMySQLlastlocY;
         this.lastlocZ = Settings.getMySQLlastlocZ;
         this.nonActivatedGroup = Settings.getNonActivatedGroup;
+        this.columnEmail = Settings.getMySQLColumnEmail;
 
         connect();
         setup();
@@ -83,6 +85,7 @@ public class SqliteDataSource implements DataSource {
                     + lastlocX + " smallint(6) DEFAULT '0',"
                     + lastlocY + " smallint(6) DEFAULT '0',"
                     + lastlocZ + " smallint(6) DEFAULT '0',"
+                    + columnEmail + " VARCHAR(255) NOT NULL,"
                     + "CONSTRAINT table_const_prim PRIMARY KEY (id));");
 
             rs = con.getMetaData().getColumns(null, null, tableName, columnIp);
@@ -101,7 +104,12 @@ public class SqliteDataSource implements DataSource {
             if (!rs.next()) {
                 st.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + lastlocX + " smallint(6) NOT NULL DEFAULT '0' AFTER "
                         + columnLastLogin +" , ADD " + lastlocY + " smallint(6) NOT NULL DEFAULT '0' AFTER " + lastlocX + " , ADD " + lastlocZ + " smallint(6) NOT NULL DEFAULT '0' AFTER " + lastlocY + ";");
-            }            
+            }
+            rs.close();
+            rs = con.getMetaData().getColumns(null, null, tableName, columnEmail);
+            if (!rs.next()) {
+            	st.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + columnEmail + "  VARCHAR(255) NOT NULL DEFAULT 'your@email.com' AFTER " + lastlocZ +";");
+            }
         } finally {
             close(rs);
             close(st);
@@ -146,14 +154,14 @@ public class SqliteDataSource implements DataSource {
             if (rs.next()) {
                 if (rs.getString(columnIp).isEmpty() ) {
                     //System.out.println("[Authme Debug] ColumnIp is empty");
-                    return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), "198.18.0.1", rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ));
+                    return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), "198.18.0.1", rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ), rs.getString(columnEmail));
                 } else {
                         if(!columnSalt.isEmpty()){
                             //System.out.println("[Authme Debug] column Salt is" + rs.getString(columnSalt));
-                            return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword),rs.getString(columnSalt), rs.getInt(columnGroup), rs.getString(columnIp), rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ));
+                            return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword),rs.getString(columnSalt), rs.getInt(columnGroup), rs.getString(columnIp), rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ), rs.getString(columnEmail));
                         } else {
                     //System.out.println("[Authme Debug] column Salt is empty");
-                            return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), rs.getString(columnIp), rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ));
+                            return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), rs.getString(columnIp), rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ), rs.getString(columnEmail));
                        
                         }
                  }
@@ -320,6 +328,25 @@ public class SqliteDataSource implements DataSource {
         }         
     }
     
+	@Override
+	public boolean updateEmail(PlayerAuth auth) {
+        //Connection con = null;
+        PreparedStatement pst = null;
+        try {
+            pst = con.prepareStatement("UPDATE " + tableName + " SET " + columnEmail + "=? WHERE " + columnName + "=?;");
+            pst.setString(1, auth.getEmail());
+            pst.setString(2, auth.getNickname());
+            pst.executeUpdate();
+        } catch (SQLException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } finally {
+            close(pst);
+            //close(con);
+        }
+        return true;
+    }
+    
     @Override
     public synchronized void close() {
         try {
@@ -362,4 +389,5 @@ public class SqliteDataSource implements DataSource {
             }
         }
     }
+    
 }

@@ -366,7 +366,7 @@ public class FileDataSource implements DataSource {
                         case 4:
                             return new PlayerAuth(args[0], args[1], args[2], Long.parseLong(args[3]));
                         case 7:
-                            return new PlayerAuth(args[0], args[1], args[2], Long.parseLong(args[3]), Integer.parseInt(args[5]), Integer.parseInt(args[5]), Integer.parseInt(args[6]));                            
+                            return new PlayerAuth(args[0], args[1], args[2], Long.parseLong(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]), Integer.parseInt(args[6]));                            
                     }
                 }
             }
@@ -394,4 +394,9 @@ public class FileDataSource implements DataSource {
     @Override
     public void reload() {
     }
+
+	@Override
+	public boolean updateEmail(PlayerAuth auth) {
+		return false;
+	}
 }

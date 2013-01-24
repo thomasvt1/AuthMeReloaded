@@ -62,12 +62,13 @@ public class Management {
                 return m._("user_unknown");
             
         String hash = pAuth.getHash();
+        String email = pAuth.getEmail();
         
 
         try {
             if(!passpartu) {
             if (PasswordSecurity.comparePasswordWithHash(password, hash)) {
-                PlayerAuth auth = new PlayerAuth(name, hash, ip, new Date().getTime());
+                PlayerAuth auth = new PlayerAuth(name, hash, ip, new Date().getTime(), email);
             
                 database.updateSession(auth);
                 PlayerCache.getInstance().addPlayer(auth);
@@ -169,7 +170,7 @@ public class Management {
             }
          } else {
             // need for bypass password check if passpartu command is enabled
-                PlayerAuth auth = new PlayerAuth(name, hash, ip, new Date().getTime());
+                PlayerAuth auth = new PlayerAuth(name, hash, ip, new Date().getTime(), email);
                 database.updateSession(auth);
                 PlayerCache.getInstance().addPlayer(auth);
                 LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);

@@ -212,6 +212,31 @@ public class AdminCommand implements CommandExecutor {
 					System.out.println(ex.getMessage());
 				}
         	
+        } else if (args[0].equalsIgnoreCase("getemail")) {
+            if (args.length != 2) {
+                sender.sendMessage("Usage: /authme getemail playername");
+                return true;
+            }
+    		String playername = args[1].toLowerCase();
+    		PlayerAuth getAuth = PlayerCache.getInstance().getAuth(playername);
+    		sender.sendMessage("[AuthMe] " + args[1] + " email : " + getAuth.getEmail());
+    		return true;
+    	
+        } else if (args[0].equalsIgnoreCase("chgemail")) {
+            if (args.length != 3) {
+                sender.sendMessage("Usage: /authme chgemail playername email");
+                return true;
+            }
+    		String playername = args[1].toLowerCase();
+    		PlayerAuth getAuth = PlayerCache.getInstance().getAuth(playername);
+    		getAuth.setEmail(args[2]);
+            if (!database.updateEmail(getAuth)) {
+                sender.sendMessage(m._("error"));
+                return true;
+            }
+            PlayerCache.getInstance().updatePlayer(getAuth);
+    		return true;
+    	
         } else if (args[0].equalsIgnoreCase("convertfromrakamak")) {
     		try {
     			RakamakConverter.RakamakConvert();

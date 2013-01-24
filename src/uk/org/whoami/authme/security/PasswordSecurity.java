@@ -121,7 +121,7 @@ public class PasswordSecurity {
                 return getPlainText(password);
             case MYBB:
             	String salt3 = createSalt(8);
-            	return getSaltedMyBB(password, salt3);  	
+            	return getSaltedMyBB(password, salt3);
             default:
                 throw new NoSuchAlgorithmException("Unknown hash algorithm");
         }

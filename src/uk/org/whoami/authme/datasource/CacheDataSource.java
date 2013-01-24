@@ -124,4 +124,13 @@ public class CacheDataSource implements DataSource {
     public void reload() {
         cache.clear();
     }
+
+	@Override
+	public boolean updateEmail(PlayerAuth auth) {
+		if(source.updateEmail(auth)) {
+			cache.get(auth.getNickname()).setEmail(auth.getEmail());
+			return true;
+		}
+		return false;
+	}
 }

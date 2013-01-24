@@ -27,13 +27,21 @@ public class PlayerAuth {
     private String salt = "";
     private String vBhash = null;
     private int groupId;
-
+    private String email = "your@email.com";
+    
     public PlayerAuth(String nickname, String hash, String ip, long lastLogin) {
         this.nickname = nickname;
         this.hash = hash;
         this.ip = ip;
         this.lastLogin = lastLogin;
-        
+    }
+    
+    public PlayerAuth(String nickname, String hash, String ip, long lastLogin, String email) {
+        this.nickname = nickname;
+        this.hash = hash;
+        this.ip = ip;
+        this.lastLogin = lastLogin;
+        this.email = email;
     }
     
     public PlayerAuth(String nickname, int x, int y, int z) {
@@ -43,20 +51,21 @@ public class PlayerAuth {
         this.z = z;
     }
     
-    public PlayerAuth(String nickname, String hash, String ip, long lastLogin, int x, int y, int z) {
+    public PlayerAuth(String nickname, String hash, String ip, long lastLogin, int x, int y, int z, String email) {
         this.nickname = nickname;
         this.hash = hash;
         this.ip = ip;
         this.lastLogin = lastLogin;
         this.x = x;
         this.y = y;
-        this.z = z;   
+        this.z = z;
+        this.email = email;
     }
     
     //
     // This constructor is needed for Vbulletin board Auth!
     //
-    public PlayerAuth(String nickname, String hash, String salt, int groupId, String ip, long lastLogin, int x, int y, int z) {
+    public PlayerAuth(String nickname, String hash, String salt, int groupId, String ip, long lastLogin, int x, int y, int z, String email) {
         this.nickname = nickname;
         this.hash = hash;
         this.ip = ip;
@@ -66,11 +75,25 @@ public class PlayerAuth {
         this.z = z;   
         this.salt = salt;
         this.groupId = groupId;
+        this.email = email;
         //System.out.println("[Authme Debug] password hashed from db"+hash);
         //System.out.println("[Authme Debug] salt from db"+salt);   
     }
+
     
-    public String getIp() {
+    public PlayerAuth(String nickname, String hash, String ip, long lastLogin, int x, int y, int z) {
+        this.nickname = nickname;
+        this.hash = hash;
+        this.ip = ip;
+        this.lastLogin = lastLogin;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.email = "your@email.com";
+    }
+
+
+	public String getIp() {
         return ip;
     }
 
@@ -105,6 +128,9 @@ public class PlayerAuth {
     public int getQuitLocZ() {
         return z;
     }
+    public String getEmail() {
+    	return email;
+    }
     public void setQuitLocX(int x) {
         this.x = x;
     }
@@ -128,6 +154,10 @@ public class PlayerAuth {
 
     public void setLastLogin(long lastLogin) {
         this.lastLogin = lastLogin;
+    }
+    
+    public void setEmail(String email) {
+    	this.email = email;
     }
 
     @Override

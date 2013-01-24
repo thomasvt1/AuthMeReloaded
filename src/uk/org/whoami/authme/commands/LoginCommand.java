@@ -38,19 +38,19 @@ public class LoginCommand implements CommandExecutor {
         if (!(sender instanceof Player)) {
             return true;
         }
-
-        if (!sender.hasPermission("authme." + label.toLowerCase())) {
-            sender.sendMessage(m._("no_perm"));
-            return true;
-        }
-
+        
         Player player = (Player) sender;
-
+        
         if (args.length == 0) {
             player.sendMessage(m._("usage_log"));
             return true;
         }
-        
+
+        if (!player.hasPermission("authme." + label.toLowerCase())) {
+            player.sendMessage(m._("no_perm"));
+            return true;
+        }
+            
         String result = plugin.management.performLogin(player, args[0]);
         if (result != "") sender.sendMessage(result);
 

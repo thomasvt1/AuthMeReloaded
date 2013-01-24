@@ -43,7 +43,10 @@ public interface DataSource {
     
     int getIps(String ip);
     
+    boolean updateEmail(PlayerAuth auth);
+    
     void close();
 
     void reload();
+    
 }
