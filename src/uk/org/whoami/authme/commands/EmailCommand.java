@@ -15,15 +15,21 @@
  */
 package uk.org.whoami.authme.commands;
 
+import java.security.NoSuchAlgorithmException;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import uk.org.whoami.authme.AuthMe;
+import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
 import uk.org.whoami.authme.datasource.DataSource;
+import uk.org.whoami.authme.security.PasswordSecurity;
+import uk.org.whoami.authme.security.RandomString;
 import uk.org.whoami.authme.settings.Messages;
+import uk.org.whoami.authme.settings.Settings;
 
 /**
  *
@@ -57,7 +63,7 @@ public class EmailCommand implements CommandExecutor {
         if (args.length == 0) {
             player.sendMessage("usage: /email add <Email> <confirmEmail> ");
             player.sendMessage("usage: /email change <old> <new> ");
-            //player.sendMessage("usage: /email recovery <Email>");
+            player.sendMessage("usage: /email recovery <Email>");
             return true;
         }
         
@@ -106,7 +112,7 @@ public class EmailCommand implements CommandExecutor {
                     return true;
                 }
                 PlayerCache.getInstance().updatePlayer(auth);
-                player.sendMessage("[AuthMe] Email Added !");
+                player.sendMessage("[AuthMe] Email Change !");
                 player.sendMessage("[AuthMe] Your Email : " + auth.getEmail());
             } else if (PlayerCache.getInstance().isAuthenticated(name)){
                 player.sendMessage("[AuthMe] Confirm your Email ! ");
@@ -118,24 +124,59 @@ public class EmailCommand implements CommandExecutor {
             	}
             }
         }
-       /* if(args[0].equalsIgnoreCase("recovery")) {
+        if(args[0].equalsIgnoreCase("recovery")) {
         	if (args.length != 2) {
         		player.sendMessage("usage: /email recovery <Email>");
         		return true;
         	}
+        	if (plugin.mail == null) {
+        		player.sendMessage(m._("error"));
+        		ConsoleLogger.info("Missed mail.jar in lib folder");
+        		return true;
+        	}
         	if (data.isAuthAvailable(name)) {
-        		PlayerAuth auth = PlayerCache.getInstance().getAuth(name);
-        		if (args[1].equals(auth.getEmail())) {
-        			
-        		} else {
-        			player.sendMessage("[AuthMe] Invalid Email !");
+        		if (PlayerCache.getInstance().isAuthenticated(name)) {
+        			player.sendMessage(m._("logged_in"));
+        			return true;
         		}
-        	} else {
+
+        			try {
+            			RandomString rand = new RandomString(Settings.getRecoveryPassLength);
+            			String thePass = rand.nextString();
+						String hashnew = PasswordSecurity.getHash(Settings.getPasswordHash, thePass);
+		                PlayerAuth auth = null;
+		                if (PlayerCache.getInstance().isAuthenticated(name)) {
+		                    auth = PlayerCache.getInstance().getAuth(name);
+		                } else if (data.isAuthAvailable(name)) {
+		                    auth = data.getAuth(name);
+		                } else {
+		                    sender.sendMessage(m._("unknown_user"));
+		                    return true;
+		                }
+		        		if (Settings.gmailAccount == "" || Settings.gmailAccount.isEmpty()) {
+		        			player.sendMessage(m._("error"));
+		        			return true;
+		        		}
+		        		
+		        		if (!args[1].equalsIgnoreCase(auth.getEmail())) { 
+		        			player.sendMessage("[AuthMe] Invalid Email");
+		        			return true;
+		        		}
+		        			
+		                auth.setHash(hashnew);
+
+		                plugin.mail.main(auth, thePass);
+		                player.sendMessage("[AuthMe] Recovery Email Send !");
+					} catch (NoSuchAlgorithmException ex) {
+			            ConsoleLogger.showError(ex.getMessage());
+			            sender.sendMessage(m._("error"));
+					} catch (NoClassDefFoundError ncdfe) {
+						ConsoleLogger.showError(ncdfe.getMessage());
+			            sender.sendMessage(m._("error"));
+					}
+        		} else {
         		player.sendMessage(m._("reg_msg"));
         	}
-        } */
-        else {
-        	
         }
          
         return true;

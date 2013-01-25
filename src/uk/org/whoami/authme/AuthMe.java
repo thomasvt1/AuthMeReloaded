@@ -79,6 +79,7 @@ public class AuthMe extends JavaPlugin {
     private JavaPlugin plugin;
     private FileCache playerBackup = new FileCache();
 	public CitizensCommunicator citizens;
+	public SendMailSSL mail = null;
 
     
     @Override
@@ -99,6 +100,17 @@ public class AuthMe extends JavaPlugin {
         //Set Console Filter
         if (Settings.removePassword)
         Bukkit.getLogger().setFilter(new ConsoleFilter());
+        
+        
+        //Load MailApi
+		File mailFile = new File("lib", "mail.jar");
+		if (mailFile.exists()) {
+	        //Set SMTP
+			mail = new SendMailSSL(this);
+		} else {
+			mail = null;
+		}
+		
         
         /*
          *  Back style on start if avaible

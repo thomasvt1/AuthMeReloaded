@@ -65,12 +65,12 @@ public final class Settings extends YamlConfiguration {
             getMySQLColumnName, getMySQLColumnPassword, getMySQLColumnIp, getMySQLColumnLastLogin,
             getMySQLColumnSalt, getMySQLColumnGroup, getMySQLColumnEmail, unRegisteredGroup, backupWindowsPath,
             getcUnrestrictedName, getRegisteredGroup, messagesLanguage, getMySQLlastlocX, getMySQLlastlocY, getMySQLlastlocZ,
-            rakamakUsers, rakamakUsersIp;
+            rakamakUsers, rakamakUsersIp, gmailAccount, gmailPassword;
             
     
     public static int getWarnMessageInterval, getSessionTimeout, getRegistrationTimeout, getMaxNickLength,
             getMinNickLength, getPasswordMinLen, getMovementRadius, getmaxRegPerIp, getNonActivatedGroup,
-            passwordMaxLength;
+            passwordMaxLength, getRecoveryPassLength;
                     
     protected static YamlConfiguration configFile;
     
@@ -192,6 +192,10 @@ public void loadConfigOptions() {
         noConsoleSpam = configFile.getBoolean("Security.console.noConsoleSpam", false);
         removePassword = configFile.getBoolean("Security.console.removePassword", true);
 
+        gmailAccount = configFile.getString("Email.GmailAccount", "");
+        gmailPassword = configFile.getString("Email.GmailPassword", "");
+        getRecoveryPassLength = configFile.getInt("Email.RecoveryPasswordLength", 8);
+
         saveDefaults();
    }
    
@@ -286,6 +290,10 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         
         noConsoleSpam = configFile.getBoolean("Security.console.noConsoleSpam", false);
         removePassword = configFile.getBoolean("Security.console.removePassword", true);
+        
+        gmailAccount = configFile.getString("Email.GmailAccount", "");
+        gmailPassword = configFile.getString("Email.GmailPassword", "");
+        getRecoveryPassLength = configFile.getInt("Email.RecoveryPasswordLength", 8);
          
    }
    
@@ -368,6 +376,20 @@ public void mergeConfig() {
        if(!contains("DataSource.mySQLColumnEmail")) {
     	   set("DataSource.mySQLColumnEmail","email");
        }
+       
+       if(!contains("Email.GmailAccount")) {
+    	   set("Email.GmailAccount", "");
+       }
+       
+       if(!contains("Email.GmailPassword")) {
+    	   set("Email.GmailPassword", "");
+       }
+       
+       if(!contains("Email.RecoveryPasswordLength")) {
+    	   set("Email.RecoveryPasswordLength", 8);
+       }
+       
+       
 
        plugin.getLogger().info("Merge new Config Options if needed..");
        plugin.saveConfig();

@@ -92,3 +92,7 @@ Converter:
         useIP: false
         ipFileName: UsersIp.rak
         newPasswordHash: SHA256
+Email:
+    GmailAccount: ''
+    GmailPassword: ''
+    RecoveryPasswordLength: 8
