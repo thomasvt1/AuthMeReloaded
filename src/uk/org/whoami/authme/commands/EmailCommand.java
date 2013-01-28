@@ -17,6 +17,7 @@ package uk.org.whoami.authme.commands;
 
 import java.security.NoSuchAlgorithmException;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -69,18 +70,18 @@ public class EmailCommand implements CommandExecutor {
         
         if(args[0].equalsIgnoreCase("add")) {
         	if (args.length != 3) {
-        		player.sendMessage("[AuthMe] Usage : /email add <Email> <confirmEmail>");
+        		player.sendMessage("[AuthMe] /email add <Email> <confirmEmail>");
         		return true;
         	}
             if(args[1].equals(args[2]) && PlayerCache.getInstance().isAuthenticated(name)) {
                 PlayerAuth auth = PlayerCache.getInstance().getAuth(name);
-                if (auth.getEmail() != null && auth.getEmail() != "your@email.com") {
-                	player.sendMessage("[AuthMe] Please use : /email change <old> <new>");
+                if (auth.getEmail() == null || !auth.getEmail().contains("your@email.com")) {
+                	player.sendMessage("[AuthMe] /email change <old> <new>");
                 	return true;
                 }
                 auth.setEmail(args[1]);
                 if (!data.updateEmail(auth)) {
-                    player.sendMessage("[AuthMe] /email command only available with MySQL and SQLite");
+                    player.sendMessage(m._("error"));
                     return true;
                 }
                 PlayerCache.getInstance().updatePlayer(auth);
@@ -162,9 +163,20 @@ public class EmailCommand implements CommandExecutor {
 		        			player.sendMessage("[AuthMe] Invalid Email");
 		        			return true;
 		        		}
-		        			
-		                auth.setHash(hashnew);
+		        		
+		        		final String finalhashnew = hashnew;
+		        		final PlayerAuth finalauth = auth;
+		        		
+		        		Bukkit.getScheduler().runTask(plugin, new Runnable() {
 
+							@Override
+							public void run() {
+								finalauth.setHash(finalhashnew);
+								data.updatePassword(finalauth);
+								
+							}
+		        			
+		        		});
 		                plugin.mail.main(auth, thePass);
 		                player.sendMessage("[AuthMe] Recovery Email Send !");
 					} catch (NoSuchAlgorithmException ex) {

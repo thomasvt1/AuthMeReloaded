@@ -150,8 +150,8 @@ public class Management {
                 } catch (NullPointerException ex) {
                 	
                 }
-                LoginEvent loginevent = new LoginEvent(player, true);
-                Bukkit.getServer().getPluginManager().callEvent(loginevent);
+                
+                Bukkit.getServer().getPluginManager().callEvent(new LoginEvent(player, true));
                 player.sendMessage(m._("login"));
                 if (!Settings.noConsoleSpam)
                 ConsoleLogger.info(player.getDisplayName() + " logged in!");
@@ -259,8 +259,7 @@ public class Management {
                     pllog.save();
                 } catch (NullPointerException ex) { }
                 
-                LoginEvent loginevent = new LoginEvent(player, true);
-                Bukkit.getServer().getPluginManager().callEvent(loginevent);
+                Bukkit.getServer().getPluginManager().callEvent(new LoginEvent(player, true));
                 player.sendMessage(m._("login"));
                 if(!Settings.noConsoleSpam)
                 ConsoleLogger.info(player.getDisplayName() + " logged in!");

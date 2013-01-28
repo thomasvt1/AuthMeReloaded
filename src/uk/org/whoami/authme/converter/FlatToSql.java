@@ -32,7 +32,8 @@ public class FlatToSql {
     private static String columnLastLogin;
     private static String lastlocX;
     private static String lastlocY;
-    private static String lastlocZ;	
+    private static String lastlocZ;
+    private static String columnEmail;
 	
 	private static File source;
 	private static File output;
@@ -46,6 +47,7 @@ public class FlatToSql {
 	    lastlocX = Settings.getMySQLlastlocX;
 	    lastlocY = Settings.getMySQLlastlocY;
 	    lastlocZ = Settings.getMySQLlastlocZ;
+	    columnEmail = Settings.getMySQLColumnEmail;
 
         try {
             source = new File(AuthMe.getInstance().getDataFolder() + File.separator + "auths.db");
@@ -64,6 +66,7 @@ public class FlatToSql {
                     + lastlocX + " smallint(6) DEFAULT '0',"
                     + lastlocY + " smallint(6) DEFAULT '0',"
                     + lastlocZ + " smallint(6) DEFAULT '0',"
+                    + columnEmail + " VARCHAR(255) NOT NULL,"
                     + "CONSTRAINT table_const_prim PRIMARY KEY (id));";
             sql.write(createDB);
             String line;
@@ -73,9 +76,9 @@ public class FlatToSql {
             	sql.newLine();
                 String[] args = line.split(":");
                 if (args.length == 4)
-                	newline = "INSERT INTO " + tableName + " VALUES (" + i + ", '" + args[0] + "', '" + args[1] + "', '" + args[2] + "', " + args[3] + ", 0, 0, 0);";
+                	newline = "INSERT INTO " + tableName + " VALUES (" + i + ", '" + args[0] + "', '" + args[1] + "', '" + args[2] + "', " + args[3] + ", 0, 0, 0, " + "your@email.com" + ");";
                 else if (args.length == 7)
-                	newline = "INSERT INTO " + tableName + " VALUES (" + i + ", '" + args[0] + "', '" + args[1] + "', '" + args[2] + "', " + args[3] + ", " + args[4] + ", " + args[5] + ", " + args[6] + ");";
+                	newline = "INSERT INTO " + tableName + " VALUES (" + i + ", '" + args[0] + "', '" + args[1] + "', '" + args[2] + "', " + args[3] + ", " + args[4] + ", " + args[5] + ", " + args[6] + ", " + "your@email.com" + ");";
                 else
                 	newline = "";
                 if (newline != "")

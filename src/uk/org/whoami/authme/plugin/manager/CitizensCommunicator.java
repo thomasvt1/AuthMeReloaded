@@ -28,50 +28,52 @@ import uk.org.whoami.authme.AuthMe;
 public class CitizensCommunicator {
 	
     public AuthMe instance;
+	private boolean isnpc;
     
     public CitizensCommunicator(AuthMe instance) {
     	this.instance = instance;
     }
 
-    public boolean isNPC(Entity player, AuthMe instance) {
-    	boolean isnpc = false;
-        PluginManager pm = instance.getServer().getPluginManager();
-        if (pm.getPlugin("Citizens") != null) {
-        	try {
-            	Citizens plugin = (Citizens) pm.getPlugin("Citizens");
-            	if (plugin != null) {
-                    String ver = plugin.getDescription().getVersion();
-                    String[] args = ver.split("\\.");
-                    
-                    	if(args[0].contains("1")) {
-                    		try {
-                    			isnpc = CitizensManager.isNPC(player);
-                    		} catch (NullPointerException NPE) {
-                    			return false;
-                    		}
-                    	}
-                        else {
-                        	try {
-                        		isnpc = CitizensAPI.getNPCRegistry().isNPC(player);
-                        	} catch (NullPointerException NPE) {
-                        		return false;
-                        	}
-                        }
-            	}
-            	return isnpc;
-        	} catch (NullPointerException npe) {
-        		return false;
-        	} catch (ClassCastException cce) {
-        		return false;
-        	} catch (IllegalStateException ise) {
-        		return false;
-        	} catch (NoClassDefFoundError ncdfe) {
-        		return false;
-        	} catch (Exception ex) {
-        		return false;
-        	}
+    public boolean isNPC(final Entity player, AuthMe instance) {
+		        PluginManager pm = instance.getServer().getPluginManager();
+		        if (pm.getPlugin("Citizens") != null) {
+		        	try {
+		            	Citizens plugin = (Citizens) pm.getPlugin("Citizens");
+		            	if (plugin != null) {
+		                    String ver = plugin.getDescription().getVersion();
+		                    String[] args = ver.split("\\.");
+		                    
+		                    	if(args[0].contains("1")) {
+		                    		try {
+		                    			isnpc = CitizensManager.isNPC(player);
+		                    		} catch (NullPointerException NPE) {
+		                    			isnpc = false;
+		                    		}
+		                    	}
+		                        else {
+		                        	try {
+		                        		isnpc = CitizensAPI.getNPCRegistry().isNPC(player);
+		                        	} catch (NullPointerException NPE) {
+		                        		isnpc = false;
+		                        	}
+		                        }
+		            	}
+		            	
+		        	} catch (NullPointerException npe) {
+		        		isnpc = false;
+		        	} catch (ClassCastException cce) {
+		        		isnpc = false;
+		        	} catch (IllegalStateException ise) {
+		        		isnpc = false;
+		        	} catch (NoClassDefFoundError ncdfe) {
+		        		isnpc = false;
+		        	} catch (Exception ex) {
+		        		isnpc = false;
+		        	}
 
-        }
-        return isnpc;
+		        } else {
+		        	isnpc = false;
+		        }
+		return isnpc;
     }
 }
