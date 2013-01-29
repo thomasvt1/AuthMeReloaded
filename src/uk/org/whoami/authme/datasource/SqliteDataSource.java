@@ -183,13 +183,22 @@ public class SqliteDataSource implements DataSource {
         //Connection con = null;
         PreparedStatement pst = null;
         try {
-            
-            pst = con.prepareStatement("INSERT INTO " + tableName + "(" + columnName + "," + columnPassword + "," + columnIp + "," + columnLastLogin + ") VALUES (?,?,?,?);");
-            pst.setString(1, auth.getNickname());
-            pst.setString(2, auth.getHash());
-            pst.setString(3, auth.getIp());
-            pst.setLong(4, auth.getLastLogin());
-            pst.executeUpdate();
+            if (columnSalt.isEmpty() && auth.getSalt().isEmpty()) {
+                pst = con.prepareStatement("INSERT INTO " + tableName + "(" + columnName + "," + columnPassword + "," + columnIp + "," + columnLastLogin + ") VALUES (?,?,?,?);");
+                pst.setString(1, auth.getNickname());
+                pst.setString(2, auth.getHash());
+                pst.setString(3, auth.getIp());
+                pst.setLong(4, auth.getLastLogin());
+                pst.executeUpdate();
+            } else {
+                pst = con.prepareStatement("INSERT INTO " + tableName + "(" + columnName + "," + columnPassword + "," + columnIp + "," + columnLastLogin + "," + columnSalt + ") VALUES (?,?,?,?,?);");
+                pst.setString(1, auth.getNickname());
+                pst.setString(2, auth.getHash());
+                pst.setString(3, auth.getIp());
+                pst.setLong(4, auth.getLastLogin());
+                pst.setString(5, auth.getSalt());
+                pst.executeUpdate();
+            }
         } catch (SQLException ex) {
             ConsoleLogger.showError(ex.getMessage());
             return false;
@@ -335,6 +344,28 @@ public class SqliteDataSource implements DataSource {
         try {
             pst = con.prepareStatement("UPDATE " + tableName + " SET " + columnEmail + "=? WHERE " + columnName + "=?;");
             pst.setString(1, auth.getEmail());
+            pst.setString(2, auth.getNickname());
+            pst.executeUpdate();
+        } catch (SQLException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } finally {
+            close(pst);
+            //close(con);
+        }
+        return true;
+    }
+	
+	@Override
+	public boolean updateSalt(PlayerAuth auth) {
+		if(columnSalt.isEmpty()) {
+			return false;
+		}
+        //Connection con = null;
+        PreparedStatement pst = null;
+        try {
+            pst = con.prepareStatement("UPDATE " + tableName + " SET " + columnSalt + "=? WHERE " + columnName + "=?;");
+            pst.setString(1, auth.getSalt());
             pst.setString(2, auth.getNickname());
             pst.executeUpdate();
         } catch (SQLException ex) {

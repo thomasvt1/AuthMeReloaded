@@ -66,7 +66,7 @@ import uk.org.whoami.authme.filter.ConsoleFilter;
 
 public class AuthMe extends JavaPlugin {
 
-    private DataSource database = null;
+    public DataSource database = null;
     private Settings settings;
 	private Messages m;
     private PlayersLogs pllog;

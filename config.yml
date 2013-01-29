@@ -50,7 +50,6 @@ settings:
         allowedMovementRadius: 100
         enablePasswordVerifier: true
         ProtectInventoryBeforeLogIn: true
-        allowedPluginTeleportHandler: false
     GameMode:
         ForceSurvivalMode: false
         ResetInventoryIfCreative: false
@@ -93,6 +92,8 @@ Converter:
         ipFileName: UsersIp.rak
         newPasswordHash: SHA256
 Email:
-    GmailAccount: ''
-    GmailPassword: ''
+    mailSMTP: smtp.gmail.com
+    mailPort: 465
+    mailAccount: ''
+    mailPassword: ''
     RecoveryPasswordLength: 8

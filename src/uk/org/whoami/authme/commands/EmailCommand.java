@@ -79,6 +79,10 @@ public class EmailCommand implements CommandExecutor {
                 	player.sendMessage("[AuthMe] /email change <old> <new>");
                 	return true;
                 }
+                if (!args[1].contains("@")) {
+                	player.sendMessage("[AuthMe] Invalid Email !");
+                	return true;
+                }
                 auth.setEmail(args[1]);
                 if (!data.updateEmail(auth)) {
                     player.sendMessage(m._("error"));
@@ -105,6 +109,10 @@ public class EmailCommand implements CommandExecutor {
                 }
                 if (args[1] != auth.getEmail()) {
                 	player.sendMessage("[AuthMe] Invalid Email !");
+                	return true;
+                }
+                if (!args[2].contains("@")) {
+                	player.sendMessage("[AuthMe] New Email is Invalid !");
                 	return true;
                 }
                 auth.setEmail(args[2]);
@@ -144,7 +152,7 @@ public class EmailCommand implements CommandExecutor {
         			try {
             			RandomString rand = new RandomString(Settings.getRecoveryPassLength);
             			String thePass = rand.nextString();
-						String hashnew = PasswordSecurity.getHash(Settings.getPasswordHash, thePass);
+						String hashnew = PasswordSecurity.getHash(Settings.getPasswordHash, thePass, name);
 		                PlayerAuth auth = null;
 		                if (PlayerCache.getInstance().isAuthenticated(name)) {
 		                    auth = PlayerCache.getInstance().getAuth(name);
@@ -154,7 +162,7 @@ public class EmailCommand implements CommandExecutor {
 		                    sender.sendMessage(m._("unknown_user"));
 		                    return true;
 		                }
-		        		if (Settings.gmailAccount == "" || Settings.gmailAccount.isEmpty()) {
+		        		if (Settings.getmailAccount == "" || Settings.getmailAccount.isEmpty()) {
 		        			player.sendMessage(m._("error"));
 		        			return true;
 		        		}

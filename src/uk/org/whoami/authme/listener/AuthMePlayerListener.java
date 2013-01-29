@@ -494,7 +494,7 @@ public class AuthMePlayerListener implements Listener {
     public void onPlayerLogin(PlayerLoginEvent event) {
 
         final Player player = event.getPlayer();
-        String name = player.getName().toLowerCase();
+        final String name = player.getName().toLowerCase();
        
         if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
             return;
@@ -509,15 +509,37 @@ public class AuthMePlayerListener implements Listener {
             return;
         }
         
-        if(data.isAuthAvailable(name) && !LimboCache.getInstance().hasLimboPlayer(name)) {
-            if(!Settings.isSessionsEnabled) {
-            LimboCache.getInstance().addLimboPlayer(player , utils.removeAll(player));
-            } else if(PlayerCache.getInstance().isAuthenticated(name)) {
-                if(LimboCache.getInstance().hasLimboPlayer(player.getName().toLowerCase())) {
-                        LimboCache.getInstance().deleteLimboPlayer(name);  
-                    }
+
+        if(!event.isAsynchronous()) {
+            if(data.isAuthAvailable(name) && !LimboCache.getInstance().hasLimboPlayer(name)) {
+                if(!Settings.isSessionsEnabled) {
                 LimboCache.getInstance().addLimboPlayer(player , utils.removeAll(player));
+                } else if(PlayerCache.getInstance().isAuthenticated(name)) {
+                    if(LimboCache.getInstance().hasLimboPlayer(player.getName().toLowerCase())) {
+                            LimboCache.getInstance().deleteLimboPlayer(name);  
+                        }
+                    LimboCache.getInstance().addLimboPlayer(player , utils.removeAll(player));
+                }
             }
+        } else {
+        	Bukkit.getScheduler().runTask(plugin, new Runnable() {
+
+				@Override
+				public void run() {
+			        if(data.isAuthAvailable(name) && !LimboCache.getInstance().hasLimboPlayer(name)) {
+			            if(!Settings.isSessionsEnabled) {
+			            LimboCache.getInstance().addLimboPlayer(player , utils.removeAll(player));
+			            } else if(PlayerCache.getInstance().isAuthenticated(name)) {
+			                if(LimboCache.getInstance().hasLimboPlayer(player.getName().toLowerCase())) {
+			                        LimboCache.getInstance().deleteLimboPlayer(name);  
+			                    }
+			                LimboCache.getInstance().addLimboPlayer(player , utils.removeAll(player));
+			            }
+			        }
+					
+				}
+        		
+        	});
         }
         
         //Check if forceSingleSession is set to true, so kick player that has joined with same nick of online player

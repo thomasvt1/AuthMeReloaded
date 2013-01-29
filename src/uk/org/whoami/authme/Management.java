@@ -67,7 +67,7 @@ public class Management {
 
         try {
             if(!passpartu) {
-            if (PasswordSecurity.comparePasswordWithHash(password, hash)) {
+            if (PasswordSecurity.comparePasswordWithHash(password, hash, name)) {
                 PlayerAuth auth = new PlayerAuth(name, hash, ip, new Date().getTime(), email);
             
                 database.updateSession(auth);

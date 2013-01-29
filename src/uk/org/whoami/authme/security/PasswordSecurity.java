@@ -20,10 +20,15 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.HashMap;
+
+import uk.org.whoami.authme.AuthMe;
+import uk.org.whoami.authme.settings.Settings;
 
 public class PasswordSecurity {
-
+	
     private static SecureRandom rnd = new SecureRandom();
+    public static HashMap<String, String> userSalt = new HashMap<String, String>();
 
     private static String getMD5(String message) throws NoSuchAlgorithmException {
         MessageDigest md5 = MessageDigest.getInstance("MD5");
@@ -87,6 +92,12 @@ public class PasswordSecurity {
         int saltPos = (message.length() >= hash.length() ? hash.length() - 1 : message.length());
         return hash.substring(0, saltPos) + salt + hash.substring(saltPos);
     }
+    
+    private static String getSaltedIPB3(String message, String salt) throws NoSuchAlgorithmException {
+
+		return getMD5(getMD5(salt) + getMD5(message));
+    	
+    }
 
     private static String createSalt(int length) throws NoSuchAlgorithmException {
         byte[] msg = new byte[40];
@@ -98,7 +109,7 @@ public class PasswordSecurity {
         return String.format("%0" + (digest.length << 1) + "x", new BigInteger(1,digest)).substring(0, length);
     }
 
-    public static String getHash(HashAlgorithm alg, String password) throws NoSuchAlgorithmException {
+    public static String getHash(HashAlgorithm alg, String password, String name) throws NoSuchAlgorithmException {
         switch (alg) {
             case MD5:
                 return getMD5(password);
@@ -122,16 +133,31 @@ public class PasswordSecurity {
             case MYBB:
             	String salt3 = createSalt(8);
             	return getSaltedMyBB(password, salt3);
+            case IPB3:
+            	String salt4 = "";
+            	try {
+            		salt4 = AuthMe.getInstance().database.getAuth(name).getSalt();
+            		} catch (NullPointerException npe) {
+            		}
+            	if (salt4.isEmpty() || salt4 == null) {
+            		salt4 = createSalt(5);
+            		userSalt.put(name, salt4);
+            	}
+            	return getSaltedIPB3(password, salt4);
             default:
                 throw new NoSuchAlgorithmException("Unknown hash algorithm");
         }
     }
 
-    public static boolean comparePasswordWithHash(String password, String hash) throws NoSuchAlgorithmException {
+    public static boolean comparePasswordWithHash(String password, String hash, String playername) throws NoSuchAlgorithmException {
         //System.out.println("[Authme Debug] debug hashString"+hash);
         if(hash.contains("$H$")) {
            PhpBB checkHash = new PhpBB();
             return checkHash.phpbb_check_hash(password, hash);
+        }
+        if(!Settings.getMySQLColumnSalt.isEmpty() && Settings.getPasswordHash == HashAlgorithm.IPB3) {
+        	String saltipb = AuthMe.getInstance().database.getAuth(playername).getSalt();
+        	return hash.equals(getSaltedIPB3(password, saltipb));
         }
         // PlainText Password
         if(hash.length() < 32 ) {
@@ -183,6 +209,6 @@ public class PasswordSecurity {
 
     public enum HashAlgorithm {
 
-        MD5, SHA1, SHA256, WHIRLPOOL, XAUTH, MD5VB, PHPBB, PLAINTEXT, MYBB
+        MD5, SHA1, SHA256, WHIRLPOOL, XAUTH, MD5VB, PHPBB, PLAINTEXT, MYBB, IPB3
     }
 }

@@ -65,12 +65,12 @@ public final class Settings extends YamlConfiguration {
             getMySQLColumnName, getMySQLColumnPassword, getMySQLColumnIp, getMySQLColumnLastLogin,
             getMySQLColumnSalt, getMySQLColumnGroup, getMySQLColumnEmail, unRegisteredGroup, backupWindowsPath,
             getcUnrestrictedName, getRegisteredGroup, messagesLanguage, getMySQLlastlocX, getMySQLlastlocY, getMySQLlastlocZ,
-            rakamakUsers, rakamakUsersIp, gmailAccount, gmailPassword;
+            rakamakUsers, rakamakUsersIp, getmailAccount, getmailPassword, getmailSMTP;
             
     
     public static int getWarnMessageInterval, getSessionTimeout, getRegistrationTimeout, getMaxNickLength,
             getMinNickLength, getPasswordMinLen, getMovementRadius, getmaxRegPerIp, getNonActivatedGroup,
-            passwordMaxLength, getRecoveryPassLength;
+            passwordMaxLength, getRecoveryPassLength, getMailPort;
                     
     protected static YamlConfiguration configFile;
     
@@ -192,8 +192,10 @@ public void loadConfigOptions() {
         noConsoleSpam = configFile.getBoolean("Security.console.noConsoleSpam", false);
         removePassword = configFile.getBoolean("Security.console.removePassword", true);
 
-        gmailAccount = configFile.getString("Email.GmailAccount", "");
-        gmailPassword = configFile.getString("Email.GmailPassword", "");
+        getmailAccount = configFile.getString("Email.mailAccount", "");
+        getmailPassword = configFile.getString("Email.mailPassword", "");
+        getmailSMTP = configFile.getString("Email.mailSMTP", "smtp.gmail.com");
+        getMailPort = configFile.getInt("Email.mailPort", 465);
         getRecoveryPassLength = configFile.getInt("Email.RecoveryPasswordLength", 8);
 
         saveDefaults();
@@ -291,8 +293,10 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         noConsoleSpam = configFile.getBoolean("Security.console.noConsoleSpam", false);
         removePassword = configFile.getBoolean("Security.console.removePassword", true);
         
-        gmailAccount = configFile.getString("Email.GmailAccount", "");
-        gmailPassword = configFile.getString("Email.GmailPassword", "");
+        getmailAccount = configFile.getString("Email.mailAccount", "");
+        getmailPassword = configFile.getString("Email.mailPassword", "");
+        getmailSMTP = configFile.getString("Email.mailSMTP", "smtp.gmail.com");
+        getMailPort = configFile.getInt("Email.mailPort", 465);
         getRecoveryPassLength = configFile.getInt("Email.RecoveryPasswordLength", 8);
          
    }
@@ -377,17 +381,36 @@ public void mergeConfig() {
     	   set("DataSource.mySQLColumnEmail","email");
        }
        
-       if(!contains("Email.GmailAccount")) {
-    	   set("Email.GmailAccount", "");
+       if(contains("Email.GmailAccount")) {
+    	   set("Email.mailAccount", getString("Email.GmailAccount"));
+    	   set("Email.GmailAccount", null);
        }
        
-       if(!contains("Email.GmailPassword")) {
-    	   set("Email.GmailPassword", "");
+       if(contains("Email.GmailPassword")) {
+    	   set("Email.mailPassword", getString("Email.GmailPassword"));
+    	   set("Email.GmailPassword", null);
        }
        
        if(!contains("Email.RecoveryPasswordLength")) {
     	   set("Email.RecoveryPasswordLength", 8);
        }
+       
+       if(!contains("Email.mailPort")) {
+    	   set("Email.mailPort", 465);
+       }
+       
+       if(!contains("Email.mailSMTP")) {
+    	   set("Email.mailSMTP", "smtp.gmail.com");
+       }
+       
+       if(!contains("Email.mailAccount")) {
+    	   set("Email.mailAccount", "");
+       }
+       
+       if(!contains("Email.mailPassword")) {
+    	   set("Email.mailPassword", "");
+       }
+       
        
        
 

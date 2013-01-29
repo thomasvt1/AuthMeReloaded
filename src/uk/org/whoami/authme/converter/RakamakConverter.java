@@ -80,7 +80,7 @@ public class RakamakConverter {
             	if (line.contains("=")) {
                 	String[] arguments = line.split("=");
             		try {
-            			playerPSW.put(arguments[0],PasswordSecurity.getHash(hash, arguments[1]));
+            			playerPSW.put(arguments[0],PasswordSecurity.getHash(hash, arguments[1], arguments[0].toLowerCase()));
 					} catch (NoSuchAlgorithmException e) {
 						ConsoleLogger.showError(e.getMessage());
 					}

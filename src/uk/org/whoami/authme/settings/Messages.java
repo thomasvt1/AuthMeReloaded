@@ -67,6 +67,9 @@ public class Messages extends CustomConfiguration {
         this.set("usage_changepassword", "&fUsage: /changepassword oldPassword newPassword");
         this.set("name_len", "&cYour nickname is too Short or too long");
         this.set("regex", "&cYour nickname contains illegal characters. Allowed chars: REG_EX");
+        this.set("add_email","&cPlease add your email with : /email add yourEmail confirmEmail");
+        this.set("bad_database_email", "[AuthMe] This /email command only available with MySQL and SQLite, contact an Admin");
+        this.set("recovery_email", "&cForgot your password? Please use /email recovery <yourEmail>");
         
     }
 

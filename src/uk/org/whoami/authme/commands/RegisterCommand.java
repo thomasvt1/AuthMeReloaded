@@ -44,6 +44,7 @@ public class RegisterCommand implements CommandExecutor {
     //private Settings settings = Settings.getInstance();
     private DataSource database;
     public boolean isFirstTimeJoin;
+	public PlayerAuth auth;
 
     public RegisterCommand(DataSource database) {
         this.database = database;
@@ -114,15 +115,20 @@ public class RegisterCommand implements CommandExecutor {
             String hash;
             if(Settings.getEnablePasswordVerifier) {
                 if (args[0].equals(args[1])) {
-                    hash = PasswordSecurity.getHash(Settings.getPasswordHash, args[0]);
+                    hash = PasswordSecurity.getHash(Settings.getPasswordHash, args[0], name);
                  } else {
                     player.sendMessage(m._("password_error"));
                     return true;
                   }
             } else
-                hash = PasswordSecurity.getHash(Settings.getPasswordHash, args[0]);
+                hash = PasswordSecurity.getHash(Settings.getPasswordHash, args[0], name);
             
-            PlayerAuth auth = new PlayerAuth(name, hash, ip, new Date().getTime());
+            if (Settings.getMySQLColumnSalt.isEmpty())
+            {
+            	auth = new PlayerAuth(name, hash, ip, new Date().getTime());
+            } else {
+            	auth = new PlayerAuth(name, hash, PasswordSecurity.userSalt.get(name), ip, new Date().getTime());
+            }
             if (!database.saveAuth(auth)) {
                 player.sendMessage(m._("error"));
                 return true;
@@ -150,6 +156,7 @@ public class RegisterCommand implements CommandExecutor {
                 Utils.getInstance().setGroup(player, Utils.groupType.REGISTERED);
             }
             player.sendMessage(m._("registered"));
+            player.sendMessage(m._("add_email"));
             this.isFirstTimeJoin = true;
             player.saveData();
             if (!Settings.noConsoleSpam)

@@ -399,4 +399,9 @@ public class FileDataSource implements DataSource {
 	public boolean updateEmail(PlayerAuth auth) {
 		return false;
 	}
+	
+	@Override
+	public boolean updateSalt(PlayerAuth auth) {
+		return false;
+	}
 }

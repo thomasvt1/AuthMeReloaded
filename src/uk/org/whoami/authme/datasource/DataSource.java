@@ -45,6 +45,8 @@ public interface DataSource {
     
     boolean updateEmail(PlayerAuth auth);
     
+    boolean updateSalt(PlayerAuth auth);
+    
     void close();
 
     void reload();

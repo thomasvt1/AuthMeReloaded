@@ -183,7 +183,7 @@ public class AdminCommand implements CommandExecutor {
 
             try {
                 String name = args[1].toLowerCase();
-                String hash = PasswordSecurity.getHash(Settings.getPasswordHash, args[2]);
+                String hash = PasswordSecurity.getHash(Settings.getPasswordHash, args[2], name);
 
                 if (database.isAuthAvailable(name)) {
                     sender.sendMessage(m._("user_regged"));
@@ -256,7 +256,7 @@ public class AdminCommand implements CommandExecutor {
 
             try {
                 String name = args[1].toLowerCase();
-                String hash = PasswordSecurity.getHash(Settings.getPasswordHash, args[2]);
+                String hash = PasswordSecurity.getHash(Settings.getPasswordHash, args[2], name);
 
                 PlayerAuth auth = null;
                 if (PlayerCache.getInstance().isAuthenticated(name)) {

@@ -16,6 +16,9 @@
 
 package uk.org.whoami.authme.cache.auth;
 
+import uk.org.whoami.authme.security.PasswordSecurity;
+import uk.org.whoami.authme.settings.Settings;
+
 
 public class PlayerAuth {
 
@@ -79,6 +82,15 @@ public class PlayerAuth {
         //System.out.println("[Authme Debug] password hashed from db"+hash);
         //System.out.println("[Authme Debug] salt from db"+salt);   
     }
+    
+    // IPB Constructor
+    public PlayerAuth(String nickname, String hash, String salt, String ip, long lastLogin) {
+        this.nickname = nickname;
+        this.hash = hash;
+        this.ip = ip;
+        this.lastLogin = lastLogin;  
+        this.salt = salt; 
+    }
 
     
     public PlayerAuth(String nickname, String hash, String ip, long lastLogin, int x, int y, int z) {
@@ -102,7 +114,7 @@ public class PlayerAuth {
     }
 
     public String getHash() {
-        if(!salt.isEmpty()) {
+        if(!salt.isEmpty() && Settings.getPasswordHash == PasswordSecurity.HashAlgorithm.MD5VB) {
         	vBhash = "$MD5vb$"+salt+"$"+hash;
             // Compose Vbullettin Hash System!
             return vBhash;
@@ -110,6 +122,11 @@ public class PlayerAuth {
         else {
         	return hash;
         } 
+    }
+    
+    //Get Salt
+    public String getSalt() {
+    	return this.salt;
     }
     
     //
@@ -158,6 +175,10 @@ public class PlayerAuth {
     
     public void setEmail(String email) {
     	this.email = email;
+    }
+    
+    public void setSalt(String salt) {
+    	this.salt = salt;
     }
 
     @Override

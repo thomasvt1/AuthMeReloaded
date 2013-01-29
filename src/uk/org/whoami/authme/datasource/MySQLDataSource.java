@@ -209,12 +209,22 @@ public class MySQLDataSource implements DataSource {
         PreparedStatement pst = null;
         try {
             con = conPool.getValidConnection();
-            pst = con.prepareStatement("INSERT INTO " + tableName + "(" + columnName + "," + columnPassword + "," + columnIp + "," + columnLastLogin + ") VALUES (?,?,?,?);");
-            pst.setString(1, auth.getNickname());
-            pst.setString(2, auth.getHash());
-            pst.setString(3, auth.getIp());
-            pst.setLong(4, auth.getLastLogin());
-            pst.executeUpdate();
+            if ((columnSalt.isEmpty() || columnSalt == null) && (auth.getSalt().isEmpty() || auth.getSalt() == null)) {
+                pst = con.prepareStatement("INSERT INTO " + tableName + "(" + columnName + "," + columnPassword + "," + columnIp + "," + columnLastLogin + ") VALUES (?,?,?,?);");
+                pst.setString(1, auth.getNickname());
+                pst.setString(2, auth.getHash());
+                pst.setString(3, auth.getIp());
+                pst.setLong(4, auth.getLastLogin());
+                pst.executeUpdate();
+            } else {
+                pst = con.prepareStatement("INSERT INTO " + tableName + "(" + columnName + "," + columnPassword + "," + columnIp + "," + columnLastLogin + "," + columnSalt + ") VALUES (?,?,?,?,?);");
+                pst.setString(1, auth.getNickname());
+                pst.setString(2, auth.getHash());
+                pst.setString(3, auth.getIp());
+                pst.setLong(4, auth.getLastLogin());
+                pst.setString(5, auth.getSalt());
+                pst.executeUpdate();
+            }
         } catch (SQLException ex) {
             ConsoleLogger.showError(ex.getMessage());
             return false;
@@ -399,6 +409,32 @@ public class MySQLDataSource implements DataSource {
         return true;
     }
     
+	@Override
+	public boolean updateSalt(PlayerAuth auth) {
+		if (columnSalt.isEmpty()) {
+			return false;
+		}
+        Connection con = null;
+        PreparedStatement pst = null;
+        try {
+            con = conPool.getValidConnection();
+            pst = con.prepareStatement("UPDATE " + tableName + " SET "+ columnSalt + " =? WHERE " + columnName + "=?;");
+            pst.setString(1, auth.getSalt());
+            pst.setString(2, auth.getNickname());
+            pst.executeUpdate();
+        } catch (SQLException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } catch (TimeoutException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return false;
+        } finally {
+            close(pst);
+            close(con);
+        }
+        return true;
+    }
+    
     @Override
     public synchronized void close() {
         try {
@@ -441,5 +477,6 @@ public class MySQLDataSource implements DataSource {
             }
         }
     }
+
 
 }

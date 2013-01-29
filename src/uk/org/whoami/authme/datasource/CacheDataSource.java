@@ -133,4 +133,13 @@ public class CacheDataSource implements DataSource {
 		}
 		return false;
 	}
+	
+	@Override
+	public boolean updateSalt(PlayerAuth auth) {
+		if(source.updateSalt(auth)) {
+			cache.get(auth.getNickname()).setSalt(auth.getSalt());
+			return true;
+		}
+		return false;
+	}
 }
