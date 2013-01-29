@@ -156,6 +156,7 @@ public class RegisterCommand implements CommandExecutor {
                 Utils.getInstance().setGroup(player, Utils.groupType.REGISTERED);
             }
             player.sendMessage(m._("registered"));
+            if (!Settings.getmailAccount.isEmpty())
             player.sendMessage(m._("add_email"));
             this.isFirstTimeJoin = true;
             player.saveData();
