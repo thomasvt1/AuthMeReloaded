@@ -68,6 +68,7 @@ ExternalBoardOptions:
     mySQLColumnSalt: ''
     mySQLColumnGroup: ''
     nonActivedUserGroup: -1
+    mySQLOtherUsernameColumns: []
 permission:
     EnablePermissionCheck: false
 BackupSystem:

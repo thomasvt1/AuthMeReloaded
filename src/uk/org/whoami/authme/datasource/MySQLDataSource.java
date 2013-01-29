@@ -225,6 +225,14 @@ public class MySQLDataSource implements DataSource {
                 pst.setString(5, auth.getSalt());
                 pst.executeUpdate();
             }
+            if (!Settings.getMySQLOtherUsernameColumn.isEmpty()) {
+            	for(String column : Settings.getMySQLOtherUsernameColumn) {
+            		pst = con.prepareStatement("UPDATE " + tableName + " SET " + column + "=? WHERE " + columnName + "=?;");
+                    pst.setString(1, auth.getNickname());
+                    pst.setString(2, auth.getNickname());
+                    pst.executeUpdate();
+            	}
+            }
         } catch (SQLException ex) {
             ConsoleLogger.showError(ex.getMessage());
             return false;

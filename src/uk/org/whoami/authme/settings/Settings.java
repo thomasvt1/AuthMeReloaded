@@ -43,6 +43,7 @@ public final class Settings extends YamlConfiguration {
     public static List<String> getJoinPermissions = null;
     public static List<String> getUnrestrictedName = null;
     private static List<String> getRestrictedIp;
+    public static List<String> getMySQLOtherUsernameColumn = null;
    
     public final Plugin plugin;
     private final File file;    
@@ -197,6 +198,8 @@ public void loadConfigOptions() {
         getmailSMTP = configFile.getString("Email.mailSMTP", "smtp.gmail.com");
         getMailPort = configFile.getInt("Email.mailPort", 465);
         getRecoveryPassLength = configFile.getInt("Email.RecoveryPasswordLength", 8);
+        
+        getMySQLOtherUsernameColumn = (List<String>) configFile.getList("ExternalBoardOptions.mySQLOtherUsernameColumns");
 
         saveDefaults();
    }
@@ -298,6 +301,8 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         getmailSMTP = configFile.getString("Email.mailSMTP", "smtp.gmail.com");
         getMailPort = configFile.getInt("Email.mailPort", 465);
         getRecoveryPassLength = configFile.getInt("Email.RecoveryPasswordLength", 8);
+        
+        getMySQLOtherUsernameColumn = (List<String>) configFile.getList("ExternalBoardOptions.mySQLOtherUsernameColumns");
          
    }
    
@@ -409,6 +414,10 @@ public void mergeConfig() {
        
        if(!contains("Email.mailPassword")) {
     	   set("Email.mailPassword", "");
+       }
+       
+       if(!contains("ExternalBoardOptions.mySQLOtherUsernameColumns")) {
+    	   set("ExternalBoardOptions.mySQLOtherUsernameColumns", new ArrayList<String>());
        }
        
        
