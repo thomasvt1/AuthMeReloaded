@@ -79,6 +79,7 @@ public class AuthMeEntityListener implements Listener{
             }
         }
 
+        player.setFireTicks(0);
         event.setCancelled(true);
     }
 

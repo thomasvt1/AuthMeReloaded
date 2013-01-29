@@ -25,7 +25,7 @@ public class SendMailSSL {
 		
 				Properties props = new Properties();
 				props.put("mail.smtp.host", Settings.getmailSMTP);
-				props.put("mail.smtp.socketFactory.port", 465);
+				props.put("mail.smtp.socketFactory.port", String.valueOf(Settings.getMailPort));
 				props.put("mail.smtp.socketFactory.class",
 						"javax.net.ssl.SSLSocketFactory");
 				props.put("mail.smtp.auth", "true");
