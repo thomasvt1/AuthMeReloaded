@@ -15,6 +15,7 @@ DataSource:
     mySQLlastlocY : y
     mySQLlastlocZ : z
     mySQLColumnEmail: email
+    mySQLColumnId: id
 GroupOptions:
     UnregisteredPlayerGroup: ''
     RegisteredPlayerGroup: ''
@@ -50,6 +51,7 @@ settings:
         allowedMovementRadius: 100
         enablePasswordVerifier: true
         ProtectInventoryBeforeLogIn: true
+        displayOtherAccounts: true
     GameMode:
         ForceSurvivalMode: false
         ResetInventoryIfCreative: false
@@ -69,6 +71,8 @@ ExternalBoardOptions:
     mySQLColumnGroup: ''
     nonActivedUserGroup: -1
     mySQLOtherUsernameColumns: []
+Xenoforo:
+    predefinedSalt: ''
 permission:
     EnablePermissionCheck: false
 BackupSystem:
@@ -83,7 +87,7 @@ Security:
         stopServer: true
     ReloadCommand:
         useReloadCommandSupport: true
-    Console:
+    console:
         noConsoleSpam: false
         removePassword: true
 Converter:
@@ -97,4 +101,5 @@ Email:
     mailPort: 465
     mailAccount: ''
     mailPassword: ''
+    mailSenderName: ''
     RecoveryPasswordLength: 8

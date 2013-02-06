@@ -133,8 +133,20 @@ public class AuthMePlayerListener implements Listener {
         
         final Player player = event.getPlayer();
         final String name = player.getName().toLowerCase();
+        
+        if(plugin.CitizensVersion != 0) {
+        	if (plugin.getCitizensCommunicator().isNPC(player, plugin)) {
+        		return;
+        	}
+        }
+        
+        if(plugin.CombatTag != 0) {
+        	if (CombatTagComunicator.isNPC(player)) {
+        		return;
+        	}
+        }
 
-        if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
+        if (Utils.getInstance().isUnrestricted(player)) {
             return;
         }
 
@@ -186,7 +198,19 @@ public class AuthMePlayerListener implements Listener {
         final Player player = event.getPlayer();
         final String name = player.getName().toLowerCase();
 
-        if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
+        if(plugin.CitizensVersion != 0) {
+        	if (plugin.getCitizensCommunicator().isNPC(player, plugin)) {
+        		return;
+        	}
+        }
+
+        if(plugin.CombatTag != 0) {
+        	if (CombatTagComunicator.isNPC(player)) {
+        		return;
+        	}
+        }
+
+        if (Utils.getInstance().isUnrestricted(player)) {
             return;
         }
 
@@ -238,7 +262,19 @@ public class AuthMePlayerListener implements Listener {
         final Player player = event.getPlayer();
         final String name = player.getName().toLowerCase();
 
-        if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
+        if(plugin.CitizensVersion != 0) {
+        	if (plugin.getCitizensCommunicator().isNPC(player, plugin)) {
+        		return;
+        	}
+        }
+
+        if(plugin.CombatTag != 0) {
+        	if (CombatTagComunicator.isNPC(player)) {
+        		return;
+        	}
+        }
+
+        if (Utils.getInstance().isUnrestricted(player)) {
             return;
         }
 
@@ -290,7 +326,19 @@ public class AuthMePlayerListener implements Listener {
         final Player player = event.getPlayer();
         final String name = player.getName().toLowerCase();
 
-        if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
+        if(plugin.CitizensVersion != 0) {
+        	if (plugin.getCitizensCommunicator().isNPC(player, plugin)) {
+        		return;
+        	}
+        }
+
+        if(plugin.CombatTag != 0) {
+        	if (CombatTagComunicator.isNPC(player)) {
+        		return;
+        	}
+        }
+
+        if (Utils.getInstance().isUnrestricted(player)) {
             return;
         }
 
@@ -343,7 +391,19 @@ public class AuthMePlayerListener implements Listener {
         final Player player = event.getPlayer();
         final String name = player.getName().toLowerCase();
 
-        if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
+        if(plugin.CitizensVersion != 0) {
+        	if (plugin.getCitizensCommunicator().isNPC(player, plugin)) {
+        		return;
+        	}
+        }
+
+        if(plugin.CombatTag != 0) {
+        	if (CombatTagComunicator.isNPC(player)) {
+        		return;
+        	}
+        }
+
+        if (Utils.getInstance().isUnrestricted(player)) {
             return;
         }
 
@@ -395,7 +455,19 @@ public class AuthMePlayerListener implements Listener {
         final Player player = event.getPlayer();
         final String name = player.getName().toLowerCase();
 
-        if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
+        if(plugin.CitizensVersion != 0) {
+        	if (plugin.getCitizensCommunicator().isNPC(player, plugin)) {
+        		return;
+        	}
+        }
+
+        if(plugin.CombatTag != 0) {
+        	if (CombatTagComunicator.isNPC(player)) {
+        		return;
+        	}
+        }
+
+        if (Utils.getInstance().isUnrestricted(player)) {
             return;
         }
 
@@ -743,7 +815,11 @@ public class AuthMePlayerListener implements Listener {
                         playerBackup.removeCache(name);
             }
         }
-        PlayerCache.getInstance().removePlayer(name);
+        try {
+        	PlayerCache.getInstance().removePlayer(name);
+        } catch (NullPointerException npe) {
+        	
+        }
         try {
         	PlayersLogs.players.remove(player.getName());
         	PlayersLogs.getInstance().save();

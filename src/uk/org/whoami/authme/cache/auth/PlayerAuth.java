@@ -78,9 +78,7 @@ public class PlayerAuth {
         this.z = z;   
         this.salt = salt;
         this.groupId = groupId;
-        this.email = email;
-        //System.out.println("[Authme Debug] password hashed from db"+hash);
-        //System.out.println("[Authme Debug] salt from db"+salt);   
+        this.email = email; 
     }
     
     // IPB Constructor
@@ -90,6 +88,18 @@ public class PlayerAuth {
         this.ip = ip;
         this.lastLogin = lastLogin;  
         this.salt = salt; 
+    }
+    
+    public PlayerAuth(String nickname, String hash, String salt, String ip, long lastLogin, int x, int y, int z, String email) {
+        this.nickname = nickname;
+        this.hash = hash;
+        this.ip = ip;
+        this.lastLogin = lastLogin;
+        this.x = x;
+        this.y = y;
+        this.z = z;   
+        this.salt = salt;
+        this.email = email; 
     }
 
     

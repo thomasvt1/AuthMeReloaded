@@ -105,10 +105,15 @@ public class LogoutCommand implements CommandExecutor {
         }
         sched.scheduleSyncDelayedTask(plugin, new MessageTask(plugin, name, m._("login_msg"), interval));
 
-         if (PlayersLogs.players.contains(player.getName())) {
-        	 PlayersLogs.players.remove(player.getName());
-        	 pllog.save();
-         }
+        try {
+        	         if (PlayersLogs.players.contains(player.getName())) {
+        	        	 	PlayersLogs.players.remove(player.getName());
+        	        	 	pllog.save();
+        	         }
+        } catch (NullPointerException npe) {
+        	
+        }
+
         player.sendMessage(m._("logout"));
         ConsoleLogger.info(player.getDisplayName() + " logged out");
 

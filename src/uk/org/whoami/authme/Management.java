@@ -2,6 +2,7 @@ package uk.org.whoami.authme;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -153,7 +154,8 @@ public class Management {
                 
                 Bukkit.getServer().getPluginManager().callEvent(new LoginEvent(player, true));
                 player.sendMessage(m._("login"));
-                if (!Settings.noConsoleSpam)
+                displayOtherAccounts(auth);
+                if(!Settings.noConsoleSpam)
                 ConsoleLogger.info(player.getDisplayName() + " logged in!");
                 player.saveData();
                 
@@ -261,6 +263,7 @@ public class Management {
                 
                 Bukkit.getServer().getPluginManager().callEvent(new LoginEvent(player, true));
                 player.sendMessage(m._("login"));
+                displayOtherAccounts(auth);
                 if(!Settings.noConsoleSpam)
                 ConsoleLogger.info(player.getDisplayName() + " logged in!");
                 player.saveData(); 
@@ -273,6 +276,40 @@ public class Management {
         }
         return "";
 	}
+    
+    private void displayOtherAccounts(PlayerAuth auth) {
+    	if (!Settings.displayOtherAccounts) {
+    		return;
+    	}
+    	if (auth == null) {
+    		return;
+    	}
+    	if (this.database.getAllAuthsByName(auth).isEmpty() || this.database.getAllAuthsByName(auth) == null) {
+    		return;
+    	}
+    	if(this.database.getAllAuthsByName(auth).size() == 1) {
+    		return;
+    	}
+    	List<String> accountList = this.database.getAllAuthsByName(auth);
+    	String message = "[AuthMe] ";
+    	int i = 0;
+    	for (String account : accountList) {
+    		i++;
+    		message = message + account;
+    		if (i != accountList.size()) {
+    			message = message + ", ";
+    		} else {
+    			message = message + ".";
+    		}
+    		
+    	}
+    	for (Player player : AuthMe.getInstance().getServer().getOnlinePlayers()) {
+    		if (player.hasPermission("authme.seeOtherAccounts")) {
+    			player.sendMessage("[AuthMe] The player " + auth.getNickname() + " has " + String.valueOf(accountList.size()) + " accounts");
+    			player.sendMessage(message);
+    		}
+    	}
+    }
     
     
 }

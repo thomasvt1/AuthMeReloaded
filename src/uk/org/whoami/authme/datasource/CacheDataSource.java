@@ -17,6 +17,7 @@
 package uk.org.whoami.authme.datasource;
 
 import java.util.HashMap;
+import java.util.List;
 
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 
@@ -141,5 +142,15 @@ public class CacheDataSource implements DataSource {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public List<String> getAllAuthsByName(PlayerAuth auth) {
+		return source.getAllAuthsByName(auth);
+	}
+
+	@Override
+	public List<String> getAllAuthsByIp(String ip) {
+		return source.getAllAuthsByIp(ip);
 	}
 }

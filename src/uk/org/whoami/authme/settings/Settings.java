@@ -58,7 +58,7 @@ public final class Settings extends YamlConfiguration {
             isForceSpawnLocOnJoinEnabled, isForceExactSpawnEnabled, isSaveQuitLocationEnabled,
             isForceSurvivalModeEnabled, isResetInventoryIfCreative, isCachingEnabled, isKickOnWrongPasswordEnabled,
             getEnablePasswordVerifier, protectInventoryBeforeLogInEnabled, isBackupActivated, isBackupOnStart,
-            isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport, rakamakUseIp, noConsoleSpam, removePassword;
+            isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport, rakamakUseIp, noConsoleSpam, removePassword, displayOtherAccounts;
             
             
     public static String getNickRegex, getUnloggedinGroup, getMySQLHost, getMySQLPort, 
@@ -66,7 +66,7 @@ public final class Settings extends YamlConfiguration {
             getMySQLColumnName, getMySQLColumnPassword, getMySQLColumnIp, getMySQLColumnLastLogin,
             getMySQLColumnSalt, getMySQLColumnGroup, getMySQLColumnEmail, unRegisteredGroup, backupWindowsPath,
             getcUnrestrictedName, getRegisteredGroup, messagesLanguage, getMySQLlastlocX, getMySQLlastlocY, getMySQLlastlocZ,
-            rakamakUsers, rakamakUsersIp, getmailAccount, getmailPassword, getmailSMTP;
+            rakamakUsers, rakamakUsersIp, getmailAccount, getmailPassword, getmailSMTP, getMySQLColumnId, getmailSenderName, getPredefinedSalt;
             
     
     public static int getWarnMessageInterval, getSessionTimeout, getRegistrationTimeout, getMaxNickLength,
@@ -169,7 +169,6 @@ public void loadConfigOptions() {
         isStopEnabled = configFile.getBoolean("Security.SQLProblem.stopServer", true);
         reloadSupport = configFile.getBoolean("Security.ReloadCommand.useReloadCommandSupport", true);
         allowCommands = (List<String>) configFile.getList("settings.restrictions.allowCommands");        
-
         if (configFile.contains("allowCommands")) {
             if (!allowCommands.contains("/login"))
             	allowCommands.add("/login");
@@ -184,22 +183,22 @@ public void loadConfigOptions() {
             if (!allowCommands.contains("/email"))
             	allowCommands.add("/email");
         }
-        
         rakamakUsers = configFile.getString("Converter.Rakamak.fileName", "users.rak");
         rakamakUsersIp = configFile.getString("Converter.Rakamak.ipFileName", "UsersIp.rak");
         rakamakUseIp = configFile.getBoolean("Converter.Rakamak.useIp", false);
         rakamakHash = getRakamakHash();
-        
         noConsoleSpam = configFile.getBoolean("Security.console.noConsoleSpam", false);
         removePassword = configFile.getBoolean("Security.console.removePassword", true);
-
         getmailAccount = configFile.getString("Email.mailAccount", "");
         getmailPassword = configFile.getString("Email.mailPassword", "");
         getmailSMTP = configFile.getString("Email.mailSMTP", "smtp.gmail.com");
         getMailPort = configFile.getInt("Email.mailPort", 465);
         getRecoveryPassLength = configFile.getInt("Email.RecoveryPasswordLength", 8);
-        
-        getMySQLOtherUsernameColumn = (List<String>) configFile.getList("ExternalBoardOptions.mySQLOtherUsernameColumns");
+        getMySQLOtherUsernameColumn = (List<String>) configFile.getList("ExternalBoardOptions.mySQLOtherUsernameColumns", new ArrayList<String>());
+        displayOtherAccounts = configFile.getBoolean("settings.restrictions.displayOtherAccounts", true);
+        getMySQLColumnId = configFile.getString("DataSource.mySQLColumnId", "id");
+        getmailSenderName = configFile.getString("Email.mailSenderName", "");
+        getPredefinedSalt = configFile.getString("Xenoforo.predefinedSalt", "");
 
         saveDefaults();
    }
@@ -272,7 +271,6 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         isStopEnabled = configFile.getBoolean("Security.SQLProblem.stopServer", true);
         reloadSupport = configFile.getBoolean("Security.ReloadCommand.useReloadCommandSupport", true);
         allowCommands = (List<String>) configFile.getList("settings.restrictions.allowCommands");
-        
         if (configFile.contains("allowCommands")) {
             if (!allowCommands.contains("/login"))
             	allowCommands.add("/login");
@@ -287,22 +285,22 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
             if (!allowCommands.contains("/email"))
             	allowCommands.add("/email");
         }
-        
         rakamakUsers = configFile.getString("Converter.Rakamak.fileName", "users.rak");
         rakamakUsersIp = configFile.getString("Converter.Rakamak.ipFileName", "UsersIp.rak");
         rakamakUseIp = configFile.getBoolean("Converter.Rakamak.useIp", false);
         rakamakHash = getRakamakHash();
-        
         noConsoleSpam = configFile.getBoolean("Security.console.noConsoleSpam", false);
         removePassword = configFile.getBoolean("Security.console.removePassword", true);
-        
         getmailAccount = configFile.getString("Email.mailAccount", "");
         getmailPassword = configFile.getString("Email.mailPassword", "");
         getmailSMTP = configFile.getString("Email.mailSMTP", "smtp.gmail.com");
         getMailPort = configFile.getInt("Email.mailPort", 465);
         getRecoveryPassLength = configFile.getInt("Email.RecoveryPasswordLength", 8);
-        
-        getMySQLOtherUsernameColumn = (List<String>) configFile.getList("ExternalBoardOptions.mySQLOtherUsernameColumns");
+        getMySQLOtherUsernameColumn = (List<String>) configFile.getList("ExternalBoardOptions.mySQLOtherUsernameColumns", new ArrayList<String>());
+        displayOtherAccounts = configFile.getBoolean("settings.restrictions.displayOtherAccounts", true);
+        getMySQLColumnId = configFile.getString("DataSource.mySQLColumnId", "id");
+        getmailSenderName = configFile.getString("Email.mailSenderName", "");
+        getPredefinedSalt = configFile.getString("Xenoforo.predefinedSalt", "");
          
    }
    
@@ -420,8 +418,21 @@ public void mergeConfig() {
     	   set("ExternalBoardOptions.mySQLOtherUsernameColumns", new ArrayList<String>());
        }
        
+       if(!contains("settings.restrictions.displayOtherAccounts")) {
+    	   set("settings.restrictions.displayOtherAccounts", true);
+       }
        
+       if(!contains("DataSource.mySQLColumnId")) {
+    	   set("DataSource.mySQLColumnId", "id");
+       }
        
+       if(!contains("Email.mailSenderName")) {
+    	   set("Email.mailSenderName", "");
+       }
+       
+       if(!contains("Xenoforo.predefinedSalt")) {
+    	   set("Xenoforo.predefinedSalt", "");
+       }
 
        plugin.getLogger().info("Merge new Config Options if needed..");
        plugin.saveConfig();
@@ -603,6 +614,6 @@ public void mergeConfig() {
     }
     
     public enum messagesLang {
-        en, de, br, cz, pl, fr, ru, hu
+        en, de, br, cz, pl, fr, ru, hu, sk
     } 
 }

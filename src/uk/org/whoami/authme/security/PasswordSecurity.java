@@ -16,11 +16,16 @@
 
 package uk.org.whoami.authme.security;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.HashMap;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 import uk.org.whoami.authme.AuthMe;
 import uk.org.whoami.authme.settings.Settings;
@@ -144,6 +149,23 @@ public class PasswordSecurity {
             		userSalt.put(name, salt4);
             	}
             	return getSaltedIPB3(password, salt4);
+            case PHPFUSION:
+            	String salt5 = "";
+            	try {
+            		salt5 = AuthMe.getInstance().database.getAuth(name).getSalt();
+            		} catch (NullPointerException npe) {
+            		}
+            	if (salt5.isEmpty() || salt5 == null) {
+            		salt5 = createSalt(12);
+            		userSalt.put(name, getSHA1(salt5));
+            	}
+            	return getPhPFusion(password, getSHA1(salt5));
+            case SMF:
+            	return getSHA1(name.toLowerCase() + password);
+            case XFSHA1:
+            	return getSHA1(getSHA1(password) + Settings.getPredefinedSalt);
+            case XFSHA256:
+            	return getSHA256(getSHA256(password) + Settings.getPredefinedSalt);
             default:
                 throw new NoSuchAlgorithmException("Unknown hash algorithm");
         }
@@ -158,6 +180,23 @@ public class PasswordSecurity {
         if(!Settings.getMySQLColumnSalt.isEmpty() && Settings.getPasswordHash == HashAlgorithm.IPB3) {
         	String saltipb = AuthMe.getInstance().database.getAuth(playername).getSalt();
         	return hash.equals(getSaltedIPB3(password, saltipb));
+        }
+        if(!Settings.getMySQLColumnSalt.isEmpty() && Settings.getPasswordHash == HashAlgorithm.PHPFUSION) {
+        	String saltfusion = AuthMe.getInstance().database.getAuth(playername).getSalt();
+        	return hash.equals(getPhPFusion(password, saltfusion));
+        }
+        if(!Settings.getMySQLColumnSalt.isEmpty() && Settings.getPasswordHash == HashAlgorithm.MYBB) {
+        	String saltmybb = AuthMe.getInstance().database.getAuth(playername).getSalt();
+        	return hash.equals(getSaltedMyBB(password, saltmybb));
+        }
+        if(Settings.getPasswordHash == HashAlgorithm.SMF) {
+        	return hash.equals(getSHA1(playername.toLowerCase() + password));
+        }
+        if(Settings.getPasswordHash == HashAlgorithm.XFSHA1) {
+        	return hash.equals(getSHA1(getSHA1(password) + Settings.getPredefinedSalt));
+        }
+        if(Settings.getPasswordHash == HashAlgorithm.XFSHA256) {
+        	return hash.equals(getSHA256(getSHA256(password)+ Settings.getPredefinedSalt));
         }
         // PlainText Password
         if(hash.length() < 32 ) {
@@ -206,9 +245,35 @@ public class PasswordSecurity {
     private static String getPlainText(String password) {
         return password;
     }
+    
+    public static String getPhPFusion(String msg, String keyString) {
+        String digest = null;
+        String algo = "HmacSHA256";
+        try {
+          SecretKeySpec key = new SecretKeySpec((keyString).getBytes("UTF-8"), algo);
+          Mac mac = Mac.getInstance(algo);
+          mac.init(key);
+
+          byte[] bytes = mac.doFinal(msg.getBytes("ASCII"));
+
+          StringBuffer hash = new StringBuffer();
+          for (int i = 0; i < bytes.length; i++) {
+            String hex = Integer.toHexString(0xFF & bytes[i]);
+            if (hex.length() == 1) {
+              hash.append('0');
+            }
+            hash.append(hex);
+          }
+          digest = hash.toString();
+        } catch (UnsupportedEncodingException e) {
+        } catch (InvalidKeyException e) {
+        } catch (NoSuchAlgorithmException e) {
+        }
+        return digest;
+      }
 
     public enum HashAlgorithm {
 
-        MD5, SHA1, SHA256, WHIRLPOOL, XAUTH, MD5VB, PHPBB, PLAINTEXT, MYBB, IPB3
+        MD5, SHA1, SHA256, WHIRLPOOL, XAUTH, MD5VB, PHPBB, PLAINTEXT, MYBB, IPB3, PHPFUSION, SMF, XFSHA1, XFSHA256
     }
 }

@@ -3,7 +3,7 @@ author: darkwarriros,Xephi
 website: http://www.multiplayer-italia.com/
 description: AuthMe prevents people, which aren't logged in, from doing stuff like placing blocks, moving, typing commands or seeing the inventory of the current player.
 main: uk.org.whoami.authme.AuthMe
-version: 2.7.6
+version: 2.7.7
 softdepend: [Vault]
 commands:
     register:
@@ -53,6 +53,10 @@ permissions:
              authme.admin.changepassword: true
              authme.admin.unregister: true
              authme.admin.purge: true
+             authme.seeOtherAccounts: true
+             authme.admin.lastlogin: true
+             authme.admin.getemail: true
+             authme.admin.chgemail: true
     authme.register:
         description: Register an account
         default: true
@@ -73,6 +77,9 @@ permissions:
         default: true        
     authme.allow2accounts:
         description: allow more accounts for same ip
+        default: false
+    authme.seeOtherAccounts:
+        description: display other accounts about a player when he logs in
         default: false
     authme.unregister:
         description: unregister your account
@@ -106,4 +113,7 @@ permissions:
         default: op
     authme.admin.chgemail:
         description: Change a player email
+        default: op
+    authme.admin.accounts:
+        description: Display Players Accounts
         default: op

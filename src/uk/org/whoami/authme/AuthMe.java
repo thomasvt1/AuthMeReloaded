@@ -55,6 +55,7 @@ import uk.org.whoami.authme.settings.Messages;
 import uk.org.whoami.authme.settings.PlayersLogs;
 import uk.org.whoami.authme.settings.Settings;
 
+import net.citizensnpcs.Citizens;
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.Bukkit;
@@ -80,6 +81,8 @@ public class AuthMe extends JavaPlugin {
     private FileCache playerBackup = new FileCache();
 	public CitizensCommunicator citizens;
 	public SendMailSSL mail = null;
+	public int CitizensVersion = 0;
+	public int CombatTag = 0;
 
     
     @Override
@@ -111,7 +114,11 @@ public class AuthMe extends JavaPlugin {
 			mail = null;
 		}
 		
+		//Check Citizens Version
+		citizensVersion();
         
+		//Check Combat Tag Version
+		combatTag();
         /*
          *  Back style on start if avaible
          */
@@ -222,7 +229,7 @@ public class AuthMe extends JavaPlugin {
             }
         }
    
-        this.getCommand("authme").setExecutor(new AdminCommand(database));
+        this.getCommand("authme").setExecutor(new AdminCommand(this, database));
         this.getCommand("register").setExecutor(new RegisterCommand(database));
         this.getCommand("login").setExecutor(new LoginCommand());
         this.getCommand("changepassword").setExecutor(new ChangePasswordCommand(database));
@@ -259,7 +266,30 @@ public class AuthMe extends JavaPlugin {
         ConsoleLogger.info("Authme " + this.getDescription().getVersion() + " enabled");
     }
 
-    @Override
+    private void combatTag() {
+		if (this.getServer().getPluginManager().getPlugin("CombatTag") != null) {
+			this.CombatTag = 1;
+		} else {
+			this.CombatTag = 0;
+		}
+	}
+
+	private void citizensVersion() {
+		if (this.getServer().getPluginManager().getPlugin("Citizens") != null) {
+			Citizens cit = (Citizens) this.getServer().getPluginManager().getPlugin("Citizens");
+            String ver = cit.getDescription().getVersion();
+            String[] args = ver.split("\\.");
+            if (args[0].contains("1")) {
+            	this.CitizensVersion = 1;
+            } else {
+            	this.CitizensVersion = 2;
+            }
+		} else {
+			this.CitizensVersion = 0;
+		}
+	}
+
+	@Override
     public void onDisable() {
         if (Bukkit.getOnlinePlayers() != null)
         for(Player player : Bukkit.getOnlinePlayers()) {

@@ -24,6 +24,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
@@ -403,5 +404,66 @@ public class FileDataSource implements DataSource {
 	@Override
 	public boolean updateSalt(PlayerAuth auth) {
 		return false;
+	}
+
+	@Override
+	public List<String> getAllAuthsByName(PlayerAuth auth) {
+        BufferedReader br = null;
+        List<String> countIp = new ArrayList<String>();
+        try {
+            br = new BufferedReader(new FileReader(source));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] args = line.split(":");
+                //System.out.println(ip+" match? "+args[2]);
+                if (args.length > 3 && args[2].equals(auth.getIp())) {
+                    countIp.add(args[0]);
+                }
+            }
+            return countIp;
+        } catch (FileNotFoundException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return new ArrayList<String>();
+        } catch (IOException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return new ArrayList<String>();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                }
+            }
+        } 
+	}
+
+	@Override
+	public List<String> getAllAuthsByIp(String ip) {
+        BufferedReader br = null;
+        List<String> countIp = new ArrayList<String>();
+        try {
+            br = new BufferedReader(new FileReader(source));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] args = line.split(":");
+                if (args.length > 3 && args[2].equals(ip)) {
+                    countIp.add(args[0]);
+                }
+            }
+            return countIp;
+        } catch (FileNotFoundException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return new ArrayList<String>();
+        } catch (IOException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return new ArrayList<String>();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                }
+            }
+        } 
 	}
 }

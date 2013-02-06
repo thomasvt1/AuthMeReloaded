@@ -1,5 +1,6 @@
 package uk.org.whoami.authme;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -22,6 +23,14 @@ public class SendMailSSL {
 		this.instance = instance;
 	}
 	public void main(final PlayerAuth auth, final String newPass) {
+				
+				String sendername;
+				
+				if (Settings.getmailSenderName.isEmpty() || Settings.getmailSenderName == null) {
+					sendername = Settings.getmailAccount;
+				} else {
+					sendername = Settings.getmailSenderName;
+				}
 		
 				Properties props = new Properties();
 				props.put("mail.smtp.host", Settings.getmailSMTP);
@@ -41,7 +50,11 @@ public class SendMailSSL {
 				try {
 		 
 					final Message message = new MimeMessage(session);
-					message.setFrom(new InternetAddress(Settings.getmailAccount));
+					try {
+						message.setFrom(new InternetAddress(Settings.getmailAccount, sendername));
+					} catch (UnsupportedEncodingException uee) {
+						message.setFrom(new InternetAddress(Settings.getmailAccount));
+					}
 					message.setRecipients(Message.RecipientType.TO,
 							InternetAddress.parse(auth.getEmail()));
 					message.setSubject("Your New AuthMe Password");

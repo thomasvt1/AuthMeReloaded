@@ -23,6 +23,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
@@ -47,10 +49,11 @@ public class MySQLDataSource implements DataSource {
     private String lastlocY;
     private String lastlocZ;
     private String columnEmail;
+    private String columnID;
+    private List<String> columnOthers;
     private MiniConnectionPoolManager conPool;
 
     public MySQLDataSource() throws ClassNotFoundException, SQLException {
-        //Settings s = Settings.getInstance();
         this.host = Settings.getMySQLHost;
         this.port = Settings.getMySQLPort;
         this.username = Settings.getMySQLUsername;
@@ -68,6 +71,8 @@ public class MySQLDataSource implements DataSource {
         this.columnSalt = Settings.getMySQLColumnSalt;
         this.columnGroup = Settings.getMySQLColumnGroup;
         this.columnEmail = Settings.getMySQLColumnEmail;
+        this.columnOthers = Settings.getMySQLOtherUsernameColumn;
+        this.columnID = Settings.getMySQLColumnId;
         
         connect();
         setup();
@@ -95,7 +100,7 @@ public class MySQLDataSource implements DataSource {
             con = conPool.getValidConnection();
             st = con.createStatement();
             st.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + " ("
-                    + "id INTEGER AUTO_INCREMENT,"
+                    + columnID + " INTEGER AUTO_INCREMENT,"
                     + columnName + " VARCHAR(255) NOT NULL UNIQUE,"
                     + columnPassword + " VARCHAR(255) NOT NULL,"
                     + columnIp + " VARCHAR(40) NOT NULL,"
@@ -104,7 +109,7 @@ public class MySQLDataSource implements DataSource {
                     + lastlocY + " smallint(6) DEFAULT '0',"
                     + lastlocZ + " smallint(6) DEFAULT '0',"
                     + columnEmail + " VARCHAR(255) NOT NULL,"
-                    + "CONSTRAINT table_const_prim PRIMARY KEY (id));");
+                    + "CONSTRAINT table_const_prim PRIMARY KEY (" + columnID + "));");
 
             rs = con.getMetaData().getColumns(null, null, tableName, columnIp);
             if (!rs.next()) {
@@ -175,16 +180,14 @@ public class MySQLDataSource implements DataSource {
             rs = pst.executeQuery();
             if (rs.next()) {
                 if (rs.getString(columnIp).isEmpty() ) {
-                    //System.out.println("[Authme Debug] ColumnIp is empty");
                     return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), "198.18.0.1", rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ), rs.getString(columnEmail));
                 } else {
                         if(!columnSalt.isEmpty()){
-                            //System.out.println("[Authme Debug] column Salt is" + rs.getString(columnSalt));
+                            if(!columnGroup.isEmpty())
                             return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword),rs.getString(columnSalt), rs.getInt(columnGroup), rs.getString(columnIp), rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ), rs.getString(columnEmail));
+                            else return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword),rs.getString(columnSalt), rs.getString(columnIp), rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ), rs.getString(columnEmail));
                         } else {
-                    //System.out.println("[Authme Debug] column Salt is empty");
                             return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), rs.getString(columnIp), rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ), rs.getString(columnEmail));
-                       
                         }
                  }
             } else {
@@ -225,9 +228,9 @@ public class MySQLDataSource implements DataSource {
                 pst.setString(5, auth.getSalt());
                 pst.executeUpdate();
             }
-            if (!Settings.getMySQLOtherUsernameColumn.isEmpty()) {
-            	for(String column : Settings.getMySQLOtherUsernameColumn) {
-            		pst = con.prepareStatement("UPDATE " + tableName + " SET " + column + "=? WHERE " + columnName + "=?;");
+            if (!columnOthers.isEmpty()) {
+            	for(String column : columnOthers) {
+            		pst = con.prepareStatement("UPDATE " + tableName + " SET " + tableName + "." + column + "=? WHERE " + columnName + "=?;");
                     pst.setString(1, auth.getNickname());
                     pst.setString(2, auth.getNickname());
                     pst.executeUpdate();
@@ -485,6 +488,64 @@ public class MySQLDataSource implements DataSource {
             }
         }
     }
+
+	@Override
+	public List<String> getAllAuthsByName(PlayerAuth auth) {
+        Connection con = null;
+        PreparedStatement pst = null;
+        ResultSet rs = null;
+        List<String> countIp = new ArrayList<String>();
+        try {
+            con = conPool.getValidConnection();
+            pst = con.prepareStatement("SELECT * FROM " + tableName + " WHERE "
+                    + columnIp + "=?;");
+            pst.setString(1, auth.getIp());
+            rs = pst.executeQuery();
+            while(rs.next()) {
+                countIp.add(rs.getString(columnName));    
+            } 
+             return countIp;
+        } catch (SQLException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return new ArrayList<String>();
+        } catch (TimeoutException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return new ArrayList<String>();
+        } finally {
+            close(rs);
+            close(pst);
+            close(con);
+        }     
+	}
+
+	@Override
+	public List<String> getAllAuthsByIp(String ip) {
+        Connection con = null;
+        PreparedStatement pst = null;
+        ResultSet rs = null;
+        List<String> countIp = new ArrayList<String>();
+        try {
+            con = conPool.getValidConnection();
+            pst = con.prepareStatement("SELECT * FROM " + tableName + " WHERE "
+                    + columnIp + "=?;");
+            pst.setString(1, ip);
+            rs = pst.executeQuery();
+            while(rs.next()) {
+                countIp.add(rs.getString(columnName));    
+            } 
+             return countIp;
+        } catch (SQLException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return new ArrayList<String>();
+        } catch (TimeoutException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return new ArrayList<String>();
+        } finally {
+            close(rs);
+            close(pst);
+            close(con);
+        }    
+	}
 
 
 }

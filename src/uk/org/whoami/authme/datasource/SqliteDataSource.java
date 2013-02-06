@@ -6,9 +6,13 @@ package uk.org.whoami.authme.datasource;
 
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.sqlite.*;
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
+import uk.org.whoami.authme.datasource.MiniConnectionPoolManager.TimeoutException;
 import uk.org.whoami.authme.settings.Settings;
 
 /**
@@ -35,6 +39,7 @@ public class SqliteDataSource implements DataSource {
     private String lastlocY;
     private String lastlocZ;
     private String columnEmail;
+    private String columnID;
     private Connection con;
 
     public SqliteDataSource() throws ClassNotFoundException, SQLException {
@@ -57,7 +62,8 @@ public class SqliteDataSource implements DataSource {
         this.lastlocZ = Settings.getMySQLlastlocZ;
         this.nonActivatedGroup = Settings.getNonActivatedGroup;
         this.columnEmail = Settings.getMySQLColumnEmail;
-
+        this.columnID = Settings.getMySQLColumnId;
+        
         connect();
         setup();
     }
@@ -77,7 +83,7 @@ public class SqliteDataSource implements DataSource {
         try {
             st = con.createStatement();
             st.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + " ("
-                    + "id INTEGER AUTO_INCREMENT,"
+                    + columnID + " INTEGER AUTO_INCREMENT,"
                     + columnName + " VARCHAR(255) NOT NULL UNIQUE,"
                     + columnPassword + " VARCHAR(255) NOT NULL,"
                     + columnIp + " VARCHAR(40) NOT NULL,"
@@ -86,7 +92,7 @@ public class SqliteDataSource implements DataSource {
                     + lastlocY + " smallint(6) DEFAULT '0',"
                     + lastlocZ + " smallint(6) DEFAULT '0',"
                     + columnEmail + " VARCHAR(255) NOT NULL,"
-                    + "CONSTRAINT table_const_prim PRIMARY KEY (id));");
+                    + "CONSTRAINT table_const_prim PRIMARY KEY (" + columnID + "));");
 
             rs = con.getMetaData().getColumns(null, null, tableName, columnIp);
             if (!rs.next()) {
@@ -421,5 +427,59 @@ public class SqliteDataSource implements DataSource {
             }
         }
     }
+
+	@Override
+	public List<String> getAllAuthsByName(PlayerAuth auth) {
+        PreparedStatement pst = null;
+        ResultSet rs = null;
+        List<String> countIp = new ArrayList<String>();
+        try {
+            pst = con.prepareStatement("SELECT * FROM " + tableName + " WHERE "
+                    + columnIp + "=?;");
+            pst.setString(1, auth.getIp());
+            rs = pst.executeQuery();
+            while(rs.next()) {
+                countIp.add(rs.getString(columnName));    
+            } 
+             return countIp;
+        } catch (SQLException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return new ArrayList<String>();
+        } catch (TimeoutException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return new ArrayList<String>();
+        } finally {
+            close(rs);
+            close(pst);
+            close(con);
+        } 
+	}
+
+	@Override
+	public List<String> getAllAuthsByIp(String ip) {
+        PreparedStatement pst = null;
+        ResultSet rs = null;
+        List<String> countIp = new ArrayList<String>();
+        try {
+            pst = con.prepareStatement("SELECT * FROM " + tableName + " WHERE "
+                    + columnIp + "=?;");
+            pst.setString(1, ip);
+            rs = pst.executeQuery();
+            while(rs.next()) {
+                countIp.add(rs.getString(columnName));    
+            } 
+             return countIp;
+        } catch (SQLException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return new ArrayList<String>();
+        } catch (TimeoutException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return new ArrayList<String>();
+        } finally {
+            close(rs);
+            close(pst);
+            close(con);
+        } 
+	}
     
 }

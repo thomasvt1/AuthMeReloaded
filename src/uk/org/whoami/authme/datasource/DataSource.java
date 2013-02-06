@@ -16,6 +16,8 @@
 
 package uk.org.whoami.authme.datasource;
 
+import java.util.List;
+
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 
 public interface DataSource {
@@ -42,6 +44,10 @@ public interface DataSource {
     boolean updateQuitLoc(PlayerAuth auth);
     
     int getIps(String ip);
+    
+    List<String> getAllAuthsByName(PlayerAuth auth);
+    
+    List<String> getAllAuthsByIp(String ip);
     
     boolean updateEmail(PlayerAuth auth);
     
