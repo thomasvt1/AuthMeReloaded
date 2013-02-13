@@ -9,11 +9,11 @@ public class ConsoleFilter implements Filter {
     
     @Override
     public boolean isLoggable(LogRecord record) {
-        String logM = record.getMessage();
+        String logM = record.getMessage().toLowerCase();
         if (!logM.contains("issued server command:")) return true;
         if (!logM.contains("/login") && !logM.contains("/l") && !logM.contains("/reg") && !logM.contains("/changepassword") && !logM.contains("/unregister")
         		&& !logM.contains("/authme register") && !logM.contains("/authme changepassword")&& !logM.contains("/authme reg")&& !logM.contains("/authme cp")) return true;
-        String playername = logM.split(" ")[0];
+        String playername = record.getMessage().split(" ")[0];
         record.setMessage(playername + " issued an AuthMe command!");
         return true;
     }

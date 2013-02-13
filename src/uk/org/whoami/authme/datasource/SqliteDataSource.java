@@ -91,7 +91,7 @@ public class SqliteDataSource implements DataSource {
                     + lastlocX + " smallint(6) DEFAULT '0',"
                     + lastlocY + " smallint(6) DEFAULT '0',"
                     + lastlocZ + " smallint(6) DEFAULT '0',"
-                    + columnEmail + " VARCHAR(255) NOT NULL,"
+                    + columnEmail + " VARCHAR(255) DEFAULT 'your@email.com',"
                     + "CONSTRAINT table_const_prim PRIMARY KEY (" + columnID + "));");
 
             rs = con.getMetaData().getColumns(null, null, tableName, columnIp);
@@ -115,7 +115,7 @@ public class SqliteDataSource implements DataSource {
             rs.close();
             rs = con.getMetaData().getColumns(null, null, tableName, columnEmail);
             if (!rs.next()) {
-            	st.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + columnEmail + "  VARCHAR(255) NOT NULL DEFAULT 'your@email.com';");
+            	st.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + columnEmail + "  VARCHAR(255) DEFAULT 'your@email.com';");
             }
         } finally {
             close(rs);
@@ -127,13 +127,10 @@ public class SqliteDataSource implements DataSource {
 
     @Override
     public synchronized boolean isAuthAvailable(String user) {
-        //Connection con = null;
         PreparedStatement pst = null;
         ResultSet rs = null;
         try {
-             pst = con.prepareStatement("SELECT * FROM " + tableName + " WHERE "
-                    + columnName + "=?;");               
-             
+            pst = con.prepareStatement("SELECT * FROM " + tableName + " WHERE " + columnName + "=?");
             pst.setString(1, user);
             rs = pst.executeQuery();
             return rs.next();
@@ -298,7 +295,7 @@ public class SqliteDataSource implements DataSource {
         PreparedStatement pst = null;
         try {
            
-            pst = con.prepareStatement("UPDATE " + tableName + " SET "+ lastlocX + " =?, "+ lastlocY +"=?, "+ lastlocZ +"=? WHERE " + columnName + "=?;");
+            pst = con.prepareStatement("UPDATE " + tableName + " SET " + lastlocX + "=?, "+ lastlocY +"=?, "+ lastlocZ +"=? WHERE " + columnName + "=?;");
             pst.setLong(1, auth.getQuitLocX());
             pst.setLong(2, auth.getQuitLocY());
             pst.setLong(3, auth.getQuitLocZ());
@@ -448,10 +445,12 @@ public class SqliteDataSource implements DataSource {
         } catch (TimeoutException ex) {
             ConsoleLogger.showError(ex.getMessage());
             return new ArrayList<String>();
+        } catch (NullPointerException npe) {
+        	return new ArrayList<String>();
         } finally {
             close(rs);
             close(pst);
-            close(con);
+            //close(con);
         } 
 	}
 
@@ -475,10 +474,12 @@ public class SqliteDataSource implements DataSource {
         } catch (TimeoutException ex) {
             ConsoleLogger.showError(ex.getMessage());
             return new ArrayList<String>();
+        } catch (NullPointerException npe) {
+        	return new ArrayList<String>();
         } finally {
             close(rs);
             close(pst);
-            close(con);
+            //close(con);
         } 
 	}
     

@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -47,6 +48,11 @@ public class Management {
             
         String name = player.getName().toLowerCase();
         String ip = player.getAddress().getAddress().getHostAddress();
+        World world = player.getWorld();
+        Location spawnLoc = world.getSpawnLocation();
+        while(world.getBlockAt(spawnLoc).getType() != Material.AIR) {
+        	spawnLoc.setY(spawnLoc.getY() + 1);
+        }
         
         if (PlayerCache.getInstance().isAuthenticated(name)) {
             return m._("logged_in");
@@ -61,6 +67,11 @@ public class Management {
             // if Mysql is unavaible
             if(pAuth == null)
                 return m._("user_unknown");
+            
+            //if columnGroup is set
+            if(!Settings.getMySQLColumnGroup.isEmpty() && pAuth.getGroupId() == Settings.getNonActivatedGroup) {
+            	return m._("vb_nonActiv");
+            }
             
         String hash = pAuth.getHash();
         String email = pAuth.getEmail();
@@ -81,7 +92,6 @@ public class Management {
                     
                       this.utils.addNormal(player, limbo.getGroup());
                     
-                      World world = player.getWorld();
                     
                       if ((Settings.isTeleportToSpawnEnabled.booleanValue()) && (!Settings.isForceSpawnLocOnJoinEnabled.booleanValue()))
                                 {
@@ -93,15 +103,18 @@ public class Management {
                           if (!world.getChunkAt(limbo.getLoc()).isLoaded()) {
                             world.getChunkAt(limbo.getLoc()).load();
                                     }
+                          while(world.getBlockAt(limbo.getLoc()).getType() != Material.AIR) {
+                        	  limbo.getLoc().setY(limbo.getLoc().getY() + 1);
+                          }
                          player.teleport(limbo.getLoc());
                                   }
                     
                                 }
                       else if (Settings.isForceSpawnLocOnJoinEnabled.booleanValue()) {
-                          if (!world.getChunkAt(world.getSpawnLocation()).isLoaded()) {
-                              world.getChunkAt(world.getSpawnLocation()).load();
+                          if (!world.getChunkAt(spawnLoc).isLoaded()) {
+                              world.getChunkAt(spawnLoc).load();
                                       }
-                        player.teleport(player.getWorld().getSpawnLocation());
+                        player.teleport(spawnLoc);
                                 }
                       else if ((Settings.isSaveQuitLocationEnabled.booleanValue()) && (this.database.getAuth(name).getQuitLocY() != 0))
                                 {
@@ -112,6 +125,9 @@ public class Management {
                                   {
                           world.getChunkAt(limbo.getLoc()).load();
                                   }
+                        while(world.getBlockAt(limbo.getLoc()).getType() != Material.AIR) {
+                      	  limbo.getLoc().setY(limbo.getLoc().getY() + 1);
+                        }
                         player.teleport(limbo.getLoc());
                                 }
                       
@@ -183,7 +199,7 @@ public class Management {
                       
                       this.utils.addNormal(player, limbo.getGroup());
                       
-                      World world = player.getWorld();
+
                       if ((Settings.isTeleportToSpawnEnabled.booleanValue()) && (!Settings.isForceSpawnLocOnJoinEnabled.booleanValue()))
                                 {
                         if ((Settings.isSaveQuitLocationEnabled.booleanValue()) && (this.database.getAuth(name).getQuitLocY() != 0)) {
@@ -193,21 +209,27 @@ public class Management {
                                     {
                             world.getChunkAt(quitLoc).load();
                                     }
+                          while(world.getBlockAt(quitLoc).getType() != Material.AIR) {
+                        	  quitLoc.setY(quitLoc.getY() + 1);
+                          }
                           player.teleport(quitLoc);
                                   }
                                   else
                                   {
                           if (!world.getChunkAt(limbo.getLoc()).isLoaded())
                             world.getChunkAt(limbo.getLoc()).load();
+                          while(world.getBlockAt(limbo.getLoc()).getType() != Material.AIR) {
+                        	  limbo.getLoc().setY(limbo.getLoc().getY() + 1);
+                          }
                           player.teleport(limbo.getLoc());
                                   }
                       
                                 }
                       else if (Settings.isForceSpawnLocOnJoinEnabled.booleanValue()) {
-                          if (!world.getChunkAt(world.getSpawnLocation()).isLoaded()) {
-                              world.getChunkAt(world.getSpawnLocation()).load();
+                          if (!world.getChunkAt(spawnLoc).isLoaded()) {
+                              world.getChunkAt(spawnLoc).load();
                                       }
-                        player.teleport(player.getWorld().getSpawnLocation());
+                        player.teleport(spawnLoc);
                                 }
                       else if ((Settings.isSaveQuitLocationEnabled.booleanValue()) && (this.database.getAuth(name).getQuitLocY() != 0)) {
                         Location quitLoc = new Location(player.getWorld(), this.database.getAuth(name).getQuitLocX() + 0.5D, this.database.getAuth(name).getQuitLocY() + 0.5D, this.database.getAuth(name).getQuitLocZ() + 0.5D);
@@ -216,6 +238,9 @@ public class Management {
                                   {
                           world.getChunkAt(quitLoc).load();
                                   }
+                        while(world.getBlockAt(quitLoc).getType() != Material.AIR) {
+                      	  quitLoc.setY(quitLoc.getY() + 1);
+                        }
                         player.teleport(quitLoc);
                                 }
                                 else
@@ -224,6 +249,9 @@ public class Management {
                                   {
                           world.getChunkAt(limbo.getLoc()).load();
                                   }
+                        while(world.getBlockAt(limbo.getLoc()).getType() != Material.AIR) {
+                      	  limbo.getLoc().setY(limbo.getLoc().getY() + 1);
+                        }
                         player.teleport(limbo.getLoc());
                                 }
                       

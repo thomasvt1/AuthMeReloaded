@@ -83,13 +83,14 @@ public class AuthMe extends JavaPlugin {
 	public SendMailSSL mail = null;
 	public int CitizensVersion = 0;
 	public int CombatTag = 0;
+	public API api;
 
     
     @Override
     public void onEnable() {
     	instance = this;
     	authme = instance;
-    	API.setPlugin(this);
+    	
     	citizens = new CitizensCommunicator(this);
 
         settings = new Settings(this);
@@ -207,6 +208,8 @@ public class AuthMe extends JavaPlugin {
             database = new CacheDataSource(database);
         }
         
+    	api = new API(this, database);
+        
         management =  new Management(database);
         
         PluginManager pm = getServer().getPluginManager();
@@ -237,11 +240,6 @@ public class AuthMe extends JavaPlugin {
         this.getCommand("unregister").setExecutor(new UnregisterCommand(this, database));
         this.getCommand("passpartu").setExecutor(new PasspartuCommand(database));
         this.getCommand("email").setExecutor(new EmailCommand(this, database));
-
-        
-        if (!new File(getDataFolder() + File.separator + "players.yml").exists()) {
-        	pllog = new PlayersLogs();
-        }
         
         if(!Settings.isForceSingleSessionEnabled) {
             ConsoleLogger.info("ATTENTION by disabling ForceSingleSession Your server protection is set to low");
@@ -249,19 +247,20 @@ public class AuthMe extends JavaPlugin {
         
         if (Settings.reloadSupport)
         	try {
+                if (!new File(getDataFolder() + File.separator + "players.yml").exists()) {
+                	pllog = new PlayersLogs();
+                }
                 onReload();
+                if (server.getOnlinePlayers().length < 1) {
+                	try {
+                    	PlayersLogs.players.clear();
+                    	pllog.save();
+                	} catch (NullPointerException npe) {
+                	}
+                }
         	} catch (NullPointerException ex) {
         		
         	}
-
-        if (server.getOnlinePlayers().length < 1) {
-        	try {
-            	PlayersLogs.players.clear();
-            	pllog.save();
-        	} catch (NullPointerException ex) {
-        		
-        	}
-        }
         
         ConsoleLogger.info("Authme " + this.getDescription().getVersion() + " enabled");
     }

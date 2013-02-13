@@ -22,6 +22,8 @@ import java.util.HashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -661,6 +663,11 @@ public class AuthMePlayerListener implements Listener {
         }
 
         Player player = event.getPlayer();
+        World world = player.getWorld();
+        Location spawnLoc = world.getSpawnLocation();
+        while(world.getBlockAt(spawnLoc).getType() != Material.AIR) {
+        	spawnLoc.setY(spawnLoc.getY() + 1);
+        }
         gm = player.getGameMode().getValue();
         String name = player.getName().toLowerCase();
         gameMode.put(name, gm);
@@ -746,10 +753,10 @@ public class AuthMePlayerListener implements Listener {
             player.setOp(false);
 
         if (Settings.isTeleportToSpawnEnabled || Settings.isForceSpawnLocOnJoinEnabled) {
-        	if (!player.getWorld().getChunkAt(player.getWorld().getSpawnLocation()).isLoaded()) {
-        		player.getWorld().getChunkAt(player.getWorld().getSpawnLocation()).load();
+        	if (!player.getWorld().getChunkAt(spawnLoc).isLoaded()) {
+        		player.getWorld().getChunkAt(spawnLoc).load();
         	}
-            player.teleport(player.getWorld().getSpawnLocation());  
+            player.teleport(spawnLoc);  
         }
         
 
@@ -870,6 +877,9 @@ public class AuthMePlayerListener implements Listener {
         }
         if (!limbo.getLoc().getWorld().getChunkAt(limbo.getLoc()).isLoaded()) {
         	limbo.getLoc().getWorld().getChunkAt(limbo.getLoc()).load();
+        }
+        while(limbo.getLoc().getWorld().getBlockAt(limbo.getLoc()).getType() != Material.AIR) {
+        	limbo.getLoc().setY(limbo.getLoc().getY() + 1);
         }
         player.teleport(limbo.getLoc());
         this.utils.addNormal(player, limbo.getGroup());

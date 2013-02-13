@@ -108,7 +108,7 @@ public class MySQLDataSource implements DataSource {
                     + lastlocX + " smallint(6) DEFAULT '0',"
                     + lastlocY + " smallint(6) DEFAULT '0',"
                     + lastlocZ + " smallint(6) DEFAULT '0',"
-                    + columnEmail + " VARCHAR(255) NOT NULL,"
+                    + columnEmail + " VARCHAR(255) DEFAULT 'your@email.com',"
                     + "CONSTRAINT table_const_prim PRIMARY KEY (" + columnID + "));");
 
             rs = con.getMetaData().getColumns(null, null, tableName, columnIp);
@@ -131,7 +131,7 @@ public class MySQLDataSource implements DataSource {
             rs.close();
             rs = con.getMetaData().getColumns(null, null, tableName, columnEmail);
             if (!rs.next()) {
-            	st.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + columnEmail + " VARCHAR(255) NOT NULL DEFAULT 'your@email.com' AFTER " + lastlocZ +";");
+            	st.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + columnEmail + " VARCHAR(255) DEFAULT 'your@email.com' AFTER " + lastlocZ +";");
             }
         } finally {
             close(rs);

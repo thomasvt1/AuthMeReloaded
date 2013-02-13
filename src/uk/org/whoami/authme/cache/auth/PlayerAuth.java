@@ -24,9 +24,11 @@ public class PlayerAuth {
 
     private String nickname;
     private String hash;
-    private String ip;
+    private String ip = "198.18.0.1";
     private long lastLogin;
-    private int x,y,z;
+    private int x = 0;
+    private int y = 0;
+    private int z = 0;
     private String salt = "";
     private String vBhash = null;
     private int groupId;
@@ -81,13 +83,23 @@ public class PlayerAuth {
         this.email = email; 
     }
     
-    // IPB Constructor
+    // IPB Constructor with groups
+    public PlayerAuth(String nickname, String hash, String salt, int groupId , String ip, long lastLogin) {
+        this.nickname = nickname;
+        this.hash = hash;
+        this.ip = ip;
+        this.lastLogin = lastLogin;  
+        this.salt = salt;
+        this.groupId = groupId;
+    }
+    
+    // IPB Constructor without groups
     public PlayerAuth(String nickname, String hash, String salt, String ip, long lastLogin) {
         this.nickname = nickname;
         this.hash = hash;
         this.ip = ip;
         this.lastLogin = lastLogin;  
-        this.salt = salt; 
+        this.salt = salt;
     }
     
     public PlayerAuth(String nickname, String hash, String salt, String ip, long lastLogin, int x, int y, int z, String email) {

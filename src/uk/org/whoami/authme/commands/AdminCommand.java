@@ -43,6 +43,7 @@ import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
 import uk.org.whoami.authme.converter.FlatToSql;
 import uk.org.whoami.authme.converter.RakamakConverter;
+import uk.org.whoami.authme.converter.xAuthToFlat;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.settings.Messages;
@@ -51,12 +52,12 @@ import uk.org.whoami.authme.settings.SpoutCfg;
 
 public class AdminCommand implements CommandExecutor {
 	
-	private AuthMe plugin;
+	public AuthMe plugin;
 
     private Messages m = Messages.getInstance();
     private SpoutCfg s = SpoutCfg.getInstance();
     //private Settings settings = Settings.getInstance();
-    private DataSource database;
+    public DataSource database;
     
     public AdminCommand(AuthMe plugin, DataSource database) {
         this.database = database;
@@ -305,6 +306,14 @@ public class AdminCommand implements CommandExecutor {
 				} catch (NullPointerException ex) {
 					System.out.println(ex.getMessage());
 				}
+        	
+        } else if (args[0].equalsIgnoreCase("xauthimport")) {
+            	xAuthToFlat converter = new xAuthToFlat(plugin, database);
+            	if (converter.convert(sender)) {
+            		sender.sendMessage("[AuthMe] Successfull convert from xAuth database");
+            	} else {
+            		sender.sendMessage("[AuthMe] Error while trying to convert from xAuth database");
+            	}
         	
         } else if (args[0].equalsIgnoreCase("getemail")) {
             if (args.length != 2) {

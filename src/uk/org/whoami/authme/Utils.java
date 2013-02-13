@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -151,6 +152,9 @@ public class Utils {
     {
     	final World world = pl.getWorld();
     	final Location loc = new Location(world, x + 0.5D, y + 0.6D, z + 0.5D);
+    	while (world.getBlockAt(loc).getType() != Material.AIR) {
+    		loc.setY(loc.getY() + 1);
+    	}
 
     	if (!world.getChunkAt(loc).isLoaded())
     	{
@@ -165,12 +169,12 @@ public class Utils {
     			int current = (int)pl.getLocation().getY();
     			
     			if (current != y) {
-    				//ConsoleLogger.showError("Problems on SpawnLocation: " + pl.getLocation());
     				pl.teleport(loc);
     			}
     		}
     		
     	}, 1L, 20L);
+    	
     	
     	Bukkit.getScheduler().runTaskLaterAsynchronously(AuthMe.authme, new Runnable()
     	{

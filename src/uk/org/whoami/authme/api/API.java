@@ -13,14 +13,20 @@ import uk.org.whoami.authme.AuthMe;
 import uk.org.whoami.authme.Utils;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
+import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.datasource.DataSource.DataSourceType;
 import uk.org.whoami.authme.security.PasswordSecurity.HashAlgorithm;
 import uk.org.whoami.authme.settings.Settings;
 
 public class API {
 	
-	private static AuthMe instance;
+	public AuthMe instance;
+	public DataSource database;
 	
+	public API(AuthMe instance, DataSource database) {
+		this.instance = instance;
+		this.database = database;
+	}
 	/**
 	 * Hook into AuthMe
 	 * @return AuthMe instance
@@ -33,12 +39,8 @@ public class API {
     	return (AuthMe) plugin;
     }
 
-    public static AuthMe getPlugin() {
+    public AuthMe getPlugin() {
     	return instance;
-    }
-    
-    public static void setPlugin(AuthMe instance) {
-    	API.instance = instance;
     }
     
     /**
@@ -55,7 +57,7 @@ public class API {
      * @param player
      * @return true if player is a npc
      */
-    public static boolean isaNPC(Player player) {
+    public boolean isaNPC(Player player) {
     	return instance.getCitizensCommunicator().isNPC(player, instance);
     }
     
@@ -169,6 +171,17 @@ public class API {
     	player.getInventory().setContents(content);
     	player.getInventory().setArmorContents(armor);
     	
+    }
+    
+    public void saveAuth(final PlayerAuth auth) {
+    	instance.getServer().getScheduler().runTask(instance, new Runnable() {
+
+			@Override
+			public void run() {
+				database.saveAuth(auth);
+			}
+    		
+    	});
     }
     
 }
