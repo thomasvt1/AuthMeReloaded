@@ -1,4 +1,4 @@
-# This file must be in ANSI
+# This file must be in ANSI if win, or UTF-8 if linux.
 unknown_user: '&fEl usuario no está en la base de datos'
 unsafe_spawn: '&fTu lugar de desconexión es inseguro, teletransportándote al punto inicial del mundo'
 not_logged_in: '&c¡No has iniciado sesión!'
