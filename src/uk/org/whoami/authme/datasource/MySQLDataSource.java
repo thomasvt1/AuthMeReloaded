@@ -138,7 +138,6 @@ public class MySQLDataSource implements DataSource {
             close(st);
             close(con);
         }
-        ConsoleLogger.info("MySQL Setup finished");
     }
 
     @Override

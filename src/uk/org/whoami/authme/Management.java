@@ -4,10 +4,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
 
+import me.muizers.Notifications.Notification;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -22,6 +23,7 @@ import uk.org.whoami.authme.events.LoginEvent;
 import uk.org.whoami.authme.events.RestoreInventoryEvent;
 import uk.org.whoami.authme.listener.AuthMePlayerListener;
 import uk.org.whoami.authme.security.PasswordSecurity;
+import uk.org.whoami.authme.security.RandomString;
 import uk.org.whoami.authme.settings.Messages;
 import uk.org.whoami.authme.settings.PlayersLogs;
 import uk.org.whoami.authme.settings.Settings;
@@ -33,15 +35,19 @@ public class Management {
     private Utils utils = Utils.getInstance();
     private FileCache playerCache = new FileCache();
     private DataSource database;
+    public AuthMe plugin;
     private boolean passpartu = false;
+    public static RandomString rdm = new RandomString(Settings.captchaLength);
     
-    public Management(DataSource database) {
+    public Management(DataSource database, AuthMe plugin) {
         this.database = database;
+        this.plugin = plugin;
     }
 
-    public Management(DataSource database, boolean passpartu) {
+    public Management(DataSource database, boolean passpartu, AuthMe plugin) {
         this.database = database;
         this.passpartu = passpartu;
+        this.plugin = plugin;
     }   
     
     public String performLogin(Player player, String password) {
@@ -50,8 +56,13 @@ public class Management {
         String ip = player.getAddress().getAddress().getHostAddress();
         World world = player.getWorld();
         Location spawnLoc = world.getSpawnLocation();
-        while(world.getBlockAt(spawnLoc).getType() != Material.AIR) {
-        	spawnLoc.setY(spawnLoc.getY() + 1);
+        if (plugin.mv != null) {
+    		try {
+    			spawnLoc = plugin.mv.getMVWorldManager().getMVWorld(world).getSpawnLocation();
+    		} catch (NullPointerException npe) {
+    		} catch (ClassCastException cce) {	
+    		} catch (NoClassDefFoundError ncdfe) {
+    		}
         }
         
         if (PlayerCache.getInstance().isAuthenticated(name)) {
@@ -79,6 +90,28 @@ public class Management {
 
         try {
             if(!passpartu) {
+            	if (Settings.useCaptcha) {
+                    if(!plugin.captcha.containsKey(name)) {
+                    	plugin.captcha.put(name, 1);
+                    } else {
+                    	int i = plugin.captcha.get(name) + 1;
+                    	plugin.captcha.remove(name);
+                    	plugin.captcha.put(name, i);
+                    }
+                    
+                    if(plugin.captcha.containsKey(name) && plugin.captcha.get(name) > Settings.maxLoginTry) {
+                    	player.sendMessage(m._("need_captcha"));
+                    	plugin.cap.put(name, rdm.nextString());
+                    	return "Type : /captcha " + plugin.cap.get(name);
+                    } else if (plugin.captcha.containsKey(name) && plugin.captcha.get(name) > Settings.maxLoginTry) {
+                    	try {
+                    		plugin.captcha.remove(name);
+                    		plugin.cap.remove(name);
+                    	} catch (NullPointerException npe) {
+                    	}
+
+                    }
+            	}
             if (PasswordSecurity.comparePasswordWithHash(password, hash, name)) {
                 PlayerAuth auth = new PlayerAuth(name, hash, ip, new Date().getTime(), email);
             
@@ -103,9 +136,6 @@ public class Management {
                           if (!world.getChunkAt(limbo.getLoc()).isLoaded()) {
                             world.getChunkAt(limbo.getLoc()).load();
                                     }
-                          while(world.getBlockAt(limbo.getLoc()).getType() != Material.AIR) {
-                        	  limbo.getLoc().setY(limbo.getLoc().getY() + 1);
-                          }
                          player.teleport(limbo.getLoc());
                                   }
                     
@@ -125,9 +155,6 @@ public class Management {
                                   {
                           world.getChunkAt(limbo.getLoc()).load();
                                   }
-                        while(world.getBlockAt(limbo.getLoc()).getType() != Material.AIR) {
-                      	  limbo.getLoc().setY(limbo.getLoc().getY() + 1);
-                        }
                         player.teleport(limbo.getLoc());
                                 }
                       
@@ -169,10 +196,21 @@ public class Management {
                 }
                 
                 Bukkit.getServer().getPluginManager().callEvent(new LoginEvent(player, true));
+                if (Settings.useCaptcha) {
+                    if(plugin.captcha.containsKey(name)) {
+                    	plugin.captcha.remove(name);
+                    }
+                    if(plugin.cap.containsKey(name)) {
+                    	plugin.cap.containsKey(name);
+                    }
+                }
                 player.sendMessage(m._("login"));
                 displayOtherAccounts(auth);
                 if(!Settings.noConsoleSpam)
                 ConsoleLogger.info(player.getDisplayName() + " logged in!");
+                if(plugin.notifications != null) {
+                	plugin.notifications.showNotification(new Notification("[AuthMe] " + player.getName() + " logged in!"));
+                }
                 player.saveData();
                 
             } else {
@@ -209,18 +247,12 @@ public class Management {
                                     {
                             world.getChunkAt(quitLoc).load();
                                     }
-                          while(world.getBlockAt(quitLoc).getType() != Material.AIR) {
-                        	  quitLoc.setY(quitLoc.getY() + 1);
-                          }
                           player.teleport(quitLoc);
                                   }
                                   else
                                   {
                           if (!world.getChunkAt(limbo.getLoc()).isLoaded())
                             world.getChunkAt(limbo.getLoc()).load();
-                          while(world.getBlockAt(limbo.getLoc()).getType() != Material.AIR) {
-                        	  limbo.getLoc().setY(limbo.getLoc().getY() + 1);
-                          }
                           player.teleport(limbo.getLoc());
                                   }
                       
@@ -238,9 +270,6 @@ public class Management {
                                   {
                           world.getChunkAt(quitLoc).load();
                                   }
-                        while(world.getBlockAt(quitLoc).getType() != Material.AIR) {
-                      	  quitLoc.setY(quitLoc.getY() + 1);
-                        }
                         player.teleport(quitLoc);
                                 }
                                 else
@@ -249,9 +278,6 @@ public class Management {
                                   {
                           world.getChunkAt(limbo.getLoc()).load();
                                   }
-                        while(world.getBlockAt(limbo.getLoc()).getType() != Material.AIR) {
-                      	  limbo.getLoc().setY(limbo.getLoc().getY() + 1);
-                        }
                         player.teleport(limbo.getLoc());
                                 }
                       
@@ -290,10 +316,21 @@ public class Management {
                 } catch (NullPointerException ex) { }
                 
                 Bukkit.getServer().getPluginManager().callEvent(new LoginEvent(player, true));
+                if (Settings.useCaptcha) {
+                    if(plugin.captcha.containsKey(name)) {
+                    	plugin.captcha.remove(name);
+                    }
+                    if(plugin.cap.containsKey(name)) {
+                    	plugin.cap.containsKey(name);
+                    }
+                }
                 player.sendMessage(m._("login"));
                 displayOtherAccounts(auth);
                 if(!Settings.noConsoleSpam)
                 ConsoleLogger.info(player.getDisplayName() + " logged in!");
+                if(plugin.notifications != null) {
+                	plugin.notifications.showNotification(new Notification("[AuthMe] " + player.getName() + " logged in!"));
+                }
                 player.saveData(); 
                 this.passpartu = false;
             }                

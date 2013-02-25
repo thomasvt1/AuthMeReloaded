@@ -168,8 +168,12 @@ public class API {
     }
     
     public static void setPlayerInventory(Player player, ItemStack[] content, ItemStack[] armor) {
-    	player.getInventory().setContents(content);
-    	player.getInventory().setArmorContents(armor);
+    	try {
+        	player.getInventory().setContents(content);
+        	player.getInventory().setArmorContents(armor);
+    	} catch (NullPointerException npe) {
+    	}
+
     	
     }
     

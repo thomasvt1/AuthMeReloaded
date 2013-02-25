@@ -15,6 +15,8 @@ import java.util.Scanner;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
+import uk.org.whoami.authme.ConsoleLogger;
+
 
 public class FileCache {
         //private HashMap<Enchantment, Integer> ench;
@@ -69,9 +71,14 @@ public class FileCache {
                                         
                                                 for(Enchantment e : invstack[i].getEnchantments().keySet())
                                                  {
-                                                    //System.out.println("enchant "+e.getName()+" bog "+invstack[i].getEnchantmentLevel(e));
-                                                    enchList = enchList.concat(e.getName()+":"+invstack[i].getEnchantmentLevel(e)+":");
-                                                    //System.out.println(enchList);
+                                                	try {
+                                                		enchList = enchList.concat(e.getName()+":"+invstack[i].getEnchantmentLevel(e)+":");
+                                                	} catch (NullPointerException npe) {
+                                                		ConsoleLogger.showError(npe.getMessage());
+                                                		ConsoleLogger.showError("The player " + playername + " has an illegaly enchant, Check Him !");
+                                                	}
+                                                    
+
                                                     
                                                  }
                                         }

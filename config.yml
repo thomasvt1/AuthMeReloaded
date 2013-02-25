@@ -34,6 +34,7 @@ settings:
         - /reg
         - /passpartu
         - /email
+        - /captcha
         maxRegPerIp: 1
         maxNicknameLength: 20
         ForceSingleSession: true
@@ -59,10 +60,12 @@ settings:
         minPasswordLength: 4
         unLoggedinGroup: unLoggedinGroup
         passwordHash: SHA256
+        doubleMD5SaltLength: 8
     registration:
         enabled: true
         messageInterval: 5
         force: true
+        enableEmailRegistrationSystem: false
     unrestrictions:
         UnrestrictedName: []
     messagesLanguage: en
@@ -90,6 +93,10 @@ Security:
     console:
         noConsoleSpam: false
         removePassword: true
+    captcha:
+        useCaptcha: false
+        maxLoginTry: 5
+        captchaLength: 5
 Converter:
     Rakamak:
         fileName: users.rak
@@ -103,3 +110,5 @@ Email:
     mailPassword: ''
     mailSenderName: ''
     RecoveryPasswordLength: 8
+    mailSubject: 'Your new AuthMe Password'
+    mailText: 'Dear <playername>, \n\n This is your new AuthMe password for the server \n\n <servername> : \n\n <generatedpass>\n\nDo not forget to change password after login! \n /changepassword <generatedpass> newPassword'

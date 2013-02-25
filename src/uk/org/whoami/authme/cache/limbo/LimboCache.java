@@ -22,6 +22,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import uk.org.whoami.authme.AuthMe;
 import uk.org.whoami.authme.cache.backup.FileCache;
 import uk.org.whoami.authme.events.ResetInventoryEvent;
 import uk.org.whoami.authme.events.StoreInventoryEvent;
@@ -32,8 +34,10 @@ public class LimboCache {
     private static LimboCache singleton = null;
     private HashMap<String, LimboPlayer> cache;
     private FileCache playerData = new FileCache();
+    public AuthMe plugin;
     
-    private LimboCache() {
+    private LimboCache(AuthMe plugin) {
+    	this.plugin = plugin;
         this.cache = new HashMap<String, LimboPlayer>();
     }
 
@@ -50,8 +54,8 @@ public class LimboCache {
         	StoreInventoryEvent event = new StoreInventoryEvent(player, playerData);
         	Bukkit.getServer().getPluginManager().callEvent(event);
         	if (!event.isCancelled()) {
-                inv =  playerData.readCache(name).getInventory();
-                arm =  playerData.readCache(name).getArmour();
+                inv =  event.getInventory();
+                arm =  event.getArmor();
         	} else {
         		inv = null;
         		arm = null;
@@ -62,8 +66,8 @@ public class LimboCache {
         	StoreInventoryEvent event = new StoreInventoryEvent(player);
         	Bukkit.getServer().getPluginManager().callEvent(event);
         	if (!event.isCancelled()) {
-        		inv =  player.getInventory().getContents();
-        		arm =  player.getInventory().getArmorContents();
+                inv =  event.getInventory();
+                arm =  event.getArmor();
         	} else {
         		inv = null;
         		arm = null;
@@ -121,7 +125,7 @@ public class LimboCache {
     
     public static LimboCache getInstance() {
         if (singleton == null) {
-            singleton = new LimboCache();
+            singleton = new LimboCache(AuthMe.getInstance());
         }
         return singleton;
     }

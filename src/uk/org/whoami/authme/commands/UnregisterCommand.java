@@ -18,15 +18,17 @@ package uk.org.whoami.authme.commands;
 
 import java.security.NoSuchAlgorithmException;
 
+import me.muizers.Notifications.Notification;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
+import uk.org.whoami.authme.AuthMe;
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.Utils;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
@@ -45,11 +47,11 @@ public class UnregisterCommand implements CommandExecutor {
     private Messages m = Messages.getInstance();
     private PlayersLogs pllog = PlayersLogs.getInstance();
     //private Settings settings = Settings.getInstance();
-    private JavaPlugin plugin;
+    public AuthMe plugin;
     private DataSource database;
     private FileCache playerCache = new FileCache();
     
-    public UnregisterCommand(JavaPlugin plugin, DataSource database) {
+    public UnregisterCommand(AuthMe plugin, DataSource database) {
         this.plugin = plugin;
         this.database = database;
     }
@@ -104,6 +106,9 @@ public class UnregisterCommand implements CommandExecutor {
                         }
                         player.sendMessage("unregistered");
                         ConsoleLogger.info(player.getDisplayName() + " unregistered himself");
+                        if(plugin.notifications != null) {
+                        	plugin.notifications.showNotification(new Notification("[AuthMe] " + player.getName() + " unregistered himself!"));
+                        }
                     return true;
                 }
                 if(!Settings.unRegisteredGroup.isEmpty()){
@@ -120,7 +125,10 @@ public class UnregisterCommand implements CommandExecutor {
                 	 pllog.save();
                  }
                  player.sendMessage("unregistered");
-                 ConsoleLogger.info(player.getDisplayName() + " unregistered himself");                
+                 ConsoleLogger.info(player.getDisplayName() + " unregistered himself");
+                 if(plugin.notifications != null) {
+                 	plugin.notifications.showNotification(new Notification("[AuthMe] " + player.getName() + " unregistered himself!"));
+                 }
                 return true;
             } else {
                 player.sendMessage(m._("wrong_pwd"));

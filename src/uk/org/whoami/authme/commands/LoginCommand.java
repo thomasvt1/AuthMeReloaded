@@ -23,20 +23,25 @@ import org.bukkit.entity.Player;
 
 import uk.org.whoami.authme.AuthMe;
 import uk.org.whoami.authme.settings.Messages;
+import uk.org.whoami.authme.settings.Settings;
 
 public class LoginCommand implements CommandExecutor {
 
-    private AuthMe plugin = AuthMe.getInstance();
+    private AuthMe plugin;
     private Messages m = Messages.getInstance();
     
-    public LoginCommand() {
-        
+    public LoginCommand(AuthMe plugin) {
+    	this.plugin = plugin;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmnd, String label, String[] args) {
         if (!(sender instanceof Player)) {
             return true;
+        }
+        
+        if(!Settings.useCaptcha) {
+        	
         }
         
         Player player = (Player) sender;
@@ -50,7 +55,7 @@ public class LoginCommand implements CommandExecutor {
             player.sendMessage(m._("no_perm"));
             return true;
         }
-            
+    
         String result = plugin.management.performLogin(player, args[0]);
         if (result != "") sender.sendMessage(result);
 

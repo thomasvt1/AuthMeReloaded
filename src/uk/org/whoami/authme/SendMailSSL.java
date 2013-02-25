@@ -57,8 +57,12 @@ public class SendMailSSL {
 					}
 					message.setRecipients(Message.RecipientType.TO,
 							InternetAddress.parse(auth.getEmail()));
-					message.setSubject("Your New AuthMe Password");
-					message.setText("Dear " + auth.getNickname() + ", " + "\n\n This is your new AuthMe password for the server : \n\n" + instance.getServer().getServerName() + "\n\n" + newPass + "\n\n Do not forget to change password after login! \n /changepassword " + newPass +" <newPass>");
+					message.setSubject(Settings.getMailSubject);
+					String text = Settings.getMailText;
+					text = text.replaceAll("<playername>", auth.getNickname());
+					text = text.replaceAll("<servername>", instance.getServer().getServerName());
+					text = text.replaceAll("<generatedpass>", newPass);
+					message.setText(text);
 					
 					Bukkit.getScheduler().runTaskAsynchronously(instance, new Runnable() {
 
@@ -74,8 +78,8 @@ public class SendMailSSL {
 						
 					});
 					
-
-					ConsoleLogger.info("Recovery Email sent to : " + auth.getNickname());
+					if(!Settings.noConsoleSpam)
+					ConsoleLogger.info("Email sent to : " + auth.getNickname());
 		 
 				} catch (MessagingException e) {
 					throw new RuntimeException(e);

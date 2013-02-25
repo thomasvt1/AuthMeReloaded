@@ -18,11 +18,14 @@ package uk.org.whoami.authme.commands;
 
 import java.security.NoSuchAlgorithmException;
 
+import me.muizers.Notifications.Notification;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import uk.org.whoami.authme.AuthMe;
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
@@ -36,9 +39,11 @@ public class ChangePasswordCommand implements CommandExecutor {
     private Messages m = Messages.getInstance();
     //private Settings settings = Settings.getInstance();
     private DataSource database;
+    public AuthMe plugin;
 
-    public ChangePasswordCommand(DataSource database) {
+    public ChangePasswordCommand(DataSource database, AuthMe plugin) {
         this.database = database;
+        this.plugin = plugin;
     }
 
     @Override
@@ -63,7 +68,7 @@ public class ChangePasswordCommand implements CommandExecutor {
         // Check to prevent Changing Password if is active VBullettin system
         //
         if(!Settings.getMySQLColumnSalt.isEmpty()) {
-            player.sendMessage(m._("You can Change Your Password on Vbullettin Forum panel!"));
+            player.sendMessage(m._("You can Change Your Password on Forum panel!"));
             return true;            
         }
         
@@ -84,7 +89,10 @@ public class ChangePasswordCommand implements CommandExecutor {
                 }
                 PlayerCache.getInstance().updatePlayer(auth);
                 player.sendMessage(m._("pwd_changed"));
-                ConsoleLogger.info(player.getDisplayName() + " changed his password");
+                ConsoleLogger.info(player.getName() + " changed his password");
+                if(plugin.notifications != null) {
+                	plugin.notifications.showNotification(new Notification("[AuthMe] " + player.getName() + " change his password!"));
+                }
             } else {
                 player.sendMessage(m._("wrong_pwd"));
             }

@@ -22,6 +22,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -165,4 +166,64 @@ public class AuthMeEntityListener implements Listener{
         event.setCancelled(true);       
     }
  
+    @EventHandler (priority = EventPriority.MONITOR)
+    public void onEntityInteract(EntityInteractEvent event) {
+    	if (event.isCancelled() || event == null) {
+    		return;
+    	}
+    	
+    	if (!(event.getEntity() instanceof Player)) {
+    		return;
+    	}
+    	
+        Player player = (Player) event.getEntity();
+        String name = player.getName().toLowerCase();
+
+        if (instance.getCitizensCommunicator().isNPC(player, instance) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
+            return;
+        }
+
+        if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
+            return;
+        }
+
+        if (!data.isAuthAvailable(name)) {
+            if (!Settings.isForcedRegistrationEnabled) {
+                return;
+            }
+        }
+        event.setCancelled(true);
+    	
+    }
+    
+    @EventHandler (priority = EventPriority.LOWEST)
+    public void onLowestEntityInteract(EntityInteractEvent event) {
+    	if (event.isCancelled() || event == null) {
+    		return;
+    	}
+    	
+    	if (!(event.getEntity() instanceof Player)) {
+    		return;
+    	}
+    	
+        Player player = (Player) event.getEntity();
+        String name = player.getName().toLowerCase();
+
+        if (instance.getCitizensCommunicator().isNPC(player, instance) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
+            return;
+        }
+
+        if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
+            return;
+        }
+
+        if (!data.isAuthAvailable(name)) {
+            if (!Settings.isForcedRegistrationEnabled) {
+                return;
+            }
+        }
+        
+        event.setCancelled(true);
+    	
+    }
 }

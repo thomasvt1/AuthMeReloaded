@@ -40,7 +40,6 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
-
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -115,7 +114,7 @@ public class AuthMePlayerListener implements Listener {
         }
 
         String cmd = msg.split(" ")[0];
-        if (cmd.equalsIgnoreCase("/login") || cmd.equalsIgnoreCase("/register") || cmd.equalsIgnoreCase("/passpartu") || cmd.equalsIgnoreCase("/l") || cmd.equalsIgnoreCase("/reg") || cmd.equalsIgnoreCase("/email")) {
+        if (cmd.equalsIgnoreCase("/login") || cmd.equalsIgnoreCase("/register") || cmd.equalsIgnoreCase("/passpartu") || cmd.equalsIgnoreCase("/l") || cmd.equalsIgnoreCase("/reg") || cmd.equalsIgnoreCase("/email") || cmd.equalsIgnoreCase("/captcha")) {
             return;
         }
         
@@ -529,39 +528,35 @@ public class AuthMePlayerListener implements Listener {
             return;
         }
 
-        if (data.isAuthAvailable(name)) {
-            event.setTo(event.getFrom());
-            //event.setCancelled(true);
-            return;
-        }
-
         if (!Settings.isForcedRegistrationEnabled) {
             return;
         }
-
+        
         if (!Settings.isMovementAllowed) {
             event.setTo(event.getFrom());
-            //event.setCancelled(true);
             return;
         }
 
         if (Settings.getMovementRadius == 0) {
             return;
         }
+        
 
         int radius = Settings.getMovementRadius;
         Location spawn = player.getWorld().getSpawnLocation();
-        //Location to = event.getTo();
+        if (plugin.mv != null) {
+        	try {
+        		spawn = plugin.mv.getMVWorldManager().getMVWorld(player.getWorld()).getSpawnLocation();
+        	} catch (NullPointerException npe) {
+    		} catch (ClassCastException cce) {
+    		} catch (NoClassDefFoundError ncdfe) {
+    		}
+        }
         
         if ((spawn.distance(player.getLocation()) > radius) ) {
-            event.setTo(spawn);
+            event.getPlayer().teleport(spawn);
         }
-        /* old method
-        if (to.getX() > spawn.getX() + radius || to.getX() < spawn.getX() - radius ||
-            to.getY() > spawn.getY() + radius || to.getY() < spawn.getY() - radius ||
-            to.getZ() > spawn.getZ() + radius || to.getZ() < spawn.getZ() - radius) {
-            event.setTo(event.getFrom());
-        } */
+
     }
     
     @EventHandler(priority = EventPriority.LOWEST)
@@ -573,17 +568,12 @@ public class AuthMePlayerListener implements Listener {
         if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
             return;
         }
-
-        //
-        // If this check will fail mean that some permissions bypass kick, so player has to be
-        // Switched on nonloggedIn group and try another time this kick!!
-        //
-        if(player.isOnline() && Settings.isForceSingleSessionEnabled ) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, m._("same_nick"));
+        
+        if (player.isOnline() && Settings.isForceSingleSessionEnabled) {
+        	event.disallow(PlayerLoginEvent.Result.KICK_OTHER, m._("same_nick"));
             return;
         }
         
-
         if(!event.isAsynchronous()) {
             if(data.isAuthAvailable(name) && !LimboCache.getInstance().hasLimboPlayer(name)) {
                 if(!Settings.isSessionsEnabled) {
@@ -665,9 +655,6 @@ public class AuthMePlayerListener implements Listener {
         Player player = event.getPlayer();
         World world = player.getWorld();
         Location spawnLoc = world.getSpawnLocation();
-        while(world.getBlockAt(spawnLoc).getType() != Material.AIR) {
-        	spawnLoc.setY(spawnLoc.getY() + 1);
-        }
         gm = player.getGameMode().getValue();
         String name = player.getName().toLowerCase();
         gameMode.put(name, gm);
@@ -699,13 +686,14 @@ public class AuthMePlayerListener implements Listener {
 
              if((cur - lastLogin < timeout || timeout == 0) && !auth.getIp().equals("198.18.0.1") ) {
                 if (auth.getNickname().equalsIgnoreCase(name) && auth.getIp().equals(ip) ) {
-                	SessionEvent sessionevent = new SessionEvent(auth, true);
-                	Bukkit.getServer().getPluginManager().callEvent(sessionevent);
-                	if (!sessionevent.isCancelled() && sessionevent.isLogin()) {
-                        PlayerCache.getInstance().addPlayer(auth);
-                        player.sendMessage(m._("valid_session"));
-                        return;
+                	Bukkit.getServer().getPluginManager().callEvent(new SessionEvent(auth, true));
+                	if(PlayerCache.getInstance().getAuth(name) != null) {
+                		PlayerCache.getInstance().updatePlayer(auth);
+                	} else {
+                		PlayerCache.getInstance().addPlayer(auth);
                 	}
+                    player.sendMessage(m._("valid_session"));
+                    return;
                 } else {
                     int gM = gameMode.get(name);
                 	player.setGameMode(GameMode.getByValue(gM));
@@ -740,13 +728,10 @@ public class AuthMePlayerListener implements Listener {
             	Bukkit.getServer().getPluginManager().callEvent(ev);
             	if (ev.isCancelled()) {
             		if (!Settings.noConsoleSpam)
-            		ConsoleLogger.showError("ProtectInventoryEvent has been cancelled for " + player.getName() + " ...");
+            		ConsoleLogger.info("ProtectInventoryEvent has been cancelled for " + player.getName() + " ...");
             	}
-            		
         	} catch (NullPointerException ex) {
-
         	}
-
         }
  
         if(player.isOp()) 
@@ -771,6 +756,7 @@ public class AuthMePlayerListener implements Listener {
             
             LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id.getTaskId());
         }
+        
         sched.runTask(plugin, new MessageTask(plugin, name, msg, msgInterval));
         
         if (Settings.isForceSurvivalModeEnabled)
@@ -799,7 +785,10 @@ public class AuthMePlayerListener implements Listener {
     if (PlayerCache.getInstance().isAuthenticated(name) && !player.isDead()) { 
         if(Settings.isSaveQuitLocationEnabled && data.isAuthAvailable(name)) {
             PlayerAuth auth = new PlayerAuth(event.getPlayer().getName().toLowerCase(),(int)player.getLocation().getX(),(int)player.getLocation().getY(),(int)player.getLocation().getZ());
-            data.updateQuitLoc(auth);
+            try {
+            	data.updateQuitLoc(auth);
+            } catch (NullPointerException npe) { }
+            
         }
     } 
         
@@ -872,14 +861,11 @@ public class AuthMePlayerListener implements Listener {
         	RestoreInventoryEvent ev = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
         	Bukkit.getServer().getPluginManager().callEvent(ev);
         	if (!ev.isCancelled()) {
-        		API.setPlayerInventory(player, limbo.getInventory(), limbo.getArmour());
+        		API.setPlayerInventory(player, ev.getInventory(), ev.getArmor());
         	}
         }
         if (!limbo.getLoc().getWorld().getChunkAt(limbo.getLoc()).isLoaded()) {
         	limbo.getLoc().getWorld().getChunkAt(limbo.getLoc()).load();
-        }
-        while(limbo.getLoc().getWorld().getBlockAt(limbo.getLoc()).getType() != Material.AIR) {
-        	limbo.getLoc().setY(limbo.getLoc().getY() + 1);
         }
         player.teleport(limbo.getLoc());
         this.utils.addNormal(player, limbo.getGroup());
@@ -949,6 +935,11 @@ public class AuthMePlayerListener implements Listener {
                 return;
             }
         }
+        
+        final int sign = event.getClickedBlock().getTypeId();
+        if (sign == Material.SIGN_POST.getId() || sign == Material.WALL_SIGN.getId()) {
+        	event.setUseInteractedBlock(org.bukkit.event.Event.Result.DENY);
+        }
 
         event.setCancelled(true);
     }
@@ -958,8 +949,6 @@ public class AuthMePlayerListener implements Listener {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
         }
-        
-        
 
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
@@ -1032,7 +1021,7 @@ public class AuthMePlayerListener implements Listener {
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void onSignChange(SignChangeEvent event) {
-        if (event.isCancelled() || event.getPlayer() == null) {
+        if (event.isCancelled() || event.getPlayer() == null || event == null) {
             return;
         }
         Player player = event.getPlayer();
@@ -1042,7 +1031,7 @@ public class AuthMePlayerListener implements Listener {
             return;
         }
 
-        if (PlayerCache.getInstance().isAuthenticated(player.getName().toLowerCase())) {
+        if (PlayerCache.getInstance().isAuthenticated(name)) {
             return;
         }
 
@@ -1054,5 +1043,6 @@ public class AuthMePlayerListener implements Listener {
         event.setCancelled(true);
         
     }
-    
+
+
 }

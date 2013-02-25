@@ -19,12 +19,19 @@ package uk.org.whoami.authme.commands;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
+import me.muizers.Notifications.Notification;
+
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
+import uk.org.whoami.authme.AuthMe;
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.Utils;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
@@ -33,22 +40,26 @@ import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.cache.limbo.LimboPlayer;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.security.PasswordSecurity;
+import uk.org.whoami.authme.security.RandomString;
 import uk.org.whoami.authme.settings.Messages;
 import uk.org.whoami.authme.settings.PlayersLogs;
 import uk.org.whoami.authme.settings.Settings;
+import uk.org.whoami.authme.task.MessageTask;
+import uk.org.whoami.authme.task.TimeoutTask;
 
 public class RegisterCommand implements CommandExecutor {
 
     private Messages m = Messages.getInstance();
     private PlayersLogs pllog = PlayersLogs.getInstance();
-    //private Settings settings = Settings.getInstance();
     private DataSource database;
     public boolean isFirstTimeJoin;
 	public PlayerAuth auth;
+	public AuthMe plugin;
 
-    public RegisterCommand(DataSource database) {
+    public RegisterCommand(DataSource database, AuthMe plugin) {
         this.database = database;
         this.isFirstTimeJoin = false;
+        this.plugin = plugin;
     }
 
     @Override
@@ -62,9 +73,9 @@ public class RegisterCommand implements CommandExecutor {
             return true;
         }
 
-        Player player = (Player) sender;
-        String name = player.getName().toLowerCase();
-        String ip = player.getAddress().getAddress().getHostAddress();
+        final Player player = (Player) sender;
+        final String name = player.getName().toLowerCase();
+        final String ip = player.getAddress().getAddress().getHostAddress();
 
         if (PlayerCache.getInstance().isAuthenticated(name)) {
             player.sendMessage(m._("logged_in"));
@@ -73,17 +84,6 @@ public class RegisterCommand implements CommandExecutor {
 
         if (!Settings.isRegistrationEnabled) {
             player.sendMessage(m._("reg_disabled"));
-            return true;
-        }
-
-        if (args.length == 0 || (Settings.getEnablePasswordVerifier && args.length < 2) ) {
-            player.sendMessage(m._("usage_reg"));
-            return true;
-        }
-        //System.out.println("pass legth "+args[0].length());
-        //System.out.println("pass length permit"+Settings.passwordMaxLength);
-        if(args[0].length() < Settings.getPasswordMinLen || args[0].length() > Settings.passwordMaxLength) {
-            player.sendMessage(m._("pass_len"));
             return true;
         }
 
@@ -102,12 +102,94 @@ public class RegisterCommand implements CommandExecutor {
             
         String ipAddress = player.getAddress().getAddress().getHostAddress();
         
-         if(!sender.hasPermission("authme.allow2accounts") && database.getIps(ipAddress) >= Settings.getmaxRegPerIp) {
-                //System.out.println("number of reg "+database.getIps(ipAddress));
+         if(!sender.hasPermission("authme.allow2accounts") && database.getAllAuthsByIp(ipAddress).size() >= Settings.getmaxRegPerIp) {
                 player.sendMessage(m._("max_reg"));
                 return true;
                 }
+         }
+        
+        if(Settings.emailRegistration && !Settings.getmailAccount.isEmpty()) {
+        	if(!args[0].contains("@")) {
+                player.sendMessage(m._("usage_reg"));
+                return true;
+        	}
+        	final String email = args[0];
+			RandomString rand = new RandomString(Settings.getRecoveryPassLength);
+			final String thePass = rand.nextString();
+
+            if (!thePass.isEmpty()) {
+            	Bukkit.getScheduler().runTask(plugin, new Runnable() {
+
+					@Override
+					public void run() {
+		            	if (PasswordSecurity.userSalt.containsKey(name)) {
+		        			try {
+		        				final String hashnew = PasswordSecurity.getHash(Settings.getPasswordHash, thePass, name);
+			            		final PlayerAuth fAuth = new PlayerAuth(name, hashnew, PasswordSecurity.userSalt.get(name), ip, new Date().getTime(), (int) player.getLocation().getX() , (int) player.getLocation().getY(), (int) player.getLocation().getZ(), email);
+		        	            database.saveAuth(fAuth);
+								database.updateEmail(fAuth);
+								database.updateSession(fAuth);
+								plugin.mail.main(fAuth, thePass);
+		        			} catch (NoSuchAlgorithmException e) {
+		        				ConsoleLogger.showError(e.getMessage());
+		        			}
+		            	} else {
+		        			try {
+		        				final String hashnew = PasswordSecurity.getHash(Settings.getPasswordHash, thePass, name);
+		        				final PlayerAuth fAuth = new PlayerAuth(name, hashnew, ip, new Date().getTime(), (int) player.getLocation().getX() , (int) player.getLocation().getY(), (int) player.getLocation().getZ(), email);
+		        				database.saveAuth(fAuth);
+								database.updateEmail(fAuth);
+								database.updateSession(fAuth);
+								plugin.mail.main(fAuth, thePass);
+		        			} catch (NoSuchAlgorithmException e) {
+		        				ConsoleLogger.showError(e.getMessage());
+		        			}
+		            	}
+					}
+            		
+            	});
+
+     
+                if(!Settings.getRegisteredGroup.isEmpty()){
+                    Utils.getInstance().setGroup(player, Utils.groupType.REGISTERED);
+                }
+            	player.sendMessage(m._("login_msg"));
+            	String msg = m._("login_msg");
+            	int time = Settings.getRegistrationTimeout * 20;
+            	int msgInterval = Settings.getWarnMessageInterval;
+                if (time != 0) {
+                	Bukkit.getScheduler().cancelTask(LimboCache.getInstance().getLimboPlayer(name).getTimeoutTaskId());
+                    BukkitTask id = Bukkit.getScheduler().runTaskLater(plugin, new TimeoutTask(plugin, name), time);
+                    LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id.getTaskId());
+                }
+                if (plugin.msgtask.containsKey(name)) {
+                	Bukkit.getScheduler().cancelTask(plugin.msgtask.get(name));
+                	plugin.msgtask.remove(name);
+                }
+                Bukkit.getScheduler().runTask(plugin, new MessageTask(plugin, name, msg, msgInterval));
+
+            	LimboCache.getInstance().deleteLimboPlayer(name);
+                this.isFirstTimeJoin = true;
+                player.saveData();
+                if (!Settings.noConsoleSpam)
+                ConsoleLogger.info(player.getName() + " registered "+player.getAddress().getAddress().getHostAddress());
+                if(plugin.notifications != null) {
+                	plugin.notifications.showNotification(new Notification("[AuthMe] " + player.getName() + " has registered!"));
+                }
+            	return true;
             }
+        }
+        
+        if (args.length == 0 || (Settings.getEnablePasswordVerifier && args.length < 2) ) {
+            player.sendMessage(m._("usage_reg"));
+            return true;
+        }
+        //System.out.println("pass legth "+args[0].length());
+        //System.out.println("pass length permit"+Settings.passwordMaxLength);
+        if(args[0].length() < Settings.getPasswordMinLen || args[0].length() > Settings.passwordMaxLength) {
+            player.sendMessage(m._("pass_len"));
+            return true;
+        }
                    
         
 
@@ -137,14 +219,25 @@ public class RegisterCommand implements CommandExecutor {
 
             LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
             if (limbo != null) {
-               // player.getInventory().setContents(limbo.getInventory());
-               // player.getInventory().setArmorContents(limbo.getArmour());
                 player.setGameMode(GameMode.getByValue(limbo.getGameMode()));      
                 if (Settings.isTeleportToSpawnEnabled) {
-                	if (!limbo.getLoc().getChunk().isLoaded()) {
-                		limbo.getLoc().getChunk().load();
+                	World world = player.getWorld();
+                	Location loca = world.getSpawnLocation();
+                	if (plugin.mv != null) {
+                		try {
+                			loca = plugin.mv.getMVWorldManager().getMVWorld(world).getSpawnLocation();
+                		} catch (NullPointerException npe) {
+                			
+                		} catch (ClassCastException cce) {
+                			
+                		} catch (NoClassDefFoundError ncdfe) {
+                			
+                		}
                 	}
-                    player.teleport(limbo.getLoc());
+                	if (!world.getChunkAt(loca).isLoaded()) {
+                		world.getChunkAt(loca).load();
+                	}
+                	player.teleport(loca);
                 }
                 
                 sender.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
@@ -161,7 +254,10 @@ public class RegisterCommand implements CommandExecutor {
             this.isFirstTimeJoin = true;
             player.saveData();
             if (!Settings.noConsoleSpam)
-            ConsoleLogger.info(player.getDisplayName() + " registered "+player.getAddress().getAddress().getHostAddress());
+            ConsoleLogger.info(player.getName() + " registered "+player.getAddress().getAddress().getHostAddress());
+            if(plugin.notifications != null) {
+            	plugin.notifications.showNotification(new Notification("[AuthMe] " + player.getName() + " has registered!"));
+            }
 
         } catch (NoSuchAlgorithmException ex) {
             ConsoleLogger.showError(ex.getMessage());

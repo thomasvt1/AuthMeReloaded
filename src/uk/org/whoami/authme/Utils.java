@@ -12,7 +12,6 @@ import java.util.Scanner;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -148,13 +147,11 @@ public class Utils {
             
     }
     
-    public void packCoords(int x, final int y, int z, final Player pl)
+    public void packCoords(int x, int y, int z, final Player pl)
     {
     	final World world = pl.getWorld();
+    	final int fY = y;
     	final Location loc = new Location(world, x + 0.5D, y + 0.6D, z + 0.5D);
-    	while (world.getBlockAt(loc).getType() != Material.AIR) {
-    		loc.setY(loc.getY() + 1);
-    	}
 
     	if (!world.getChunkAt(loc).isLoaded())
     	{
@@ -167,8 +164,9 @@ public class Utils {
     		@Override
     		public void run() {
     			int current = (int)pl.getLocation().getY();
+    			World currentWorld = pl.getWorld();
     			
-    			if (current != y) {
+    			if (current != fY && world.getName() == currentWorld.getName()) {
     				pl.teleport(loc);
     			}
     		}

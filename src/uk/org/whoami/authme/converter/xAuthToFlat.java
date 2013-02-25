@@ -34,8 +34,7 @@ public class xAuthToFlat {
 			return false;
 		}
 		if (!(new File("./plugins/xAuth/xAuth.h2.db").exists())) {
-			sender.sendMessage("[AuthMe] xAuth database not found");
-			return false;
+			sender.sendMessage("[AuthMe] xAuth H2 database not found, checking for MySQL or SQLite data...");
 		}
 		List<Integer> players = getXAuthPlayers();
 		if (players == null || players.isEmpty()) {

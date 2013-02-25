@@ -70,7 +70,9 @@ public class Messages extends CustomConfiguration {
         this.set("add_email","&cPlease add your email with : /email add yourEmail confirmEmail");
         this.set("bad_database_email", "[AuthMe] This /email command only available with MySQL and SQLite, contact an Admin");
         this.set("recovery_email", "&cForgot your password? Please use /email recovery <yourEmail>");
-        
+        this.set("usage_captcha", "&cUsage: /captcha <theCaptcha>");
+        this.set("wrong_captcha", "&cWrong Captcha, please use : /captcha THE_CAPTCHA");
+        this.set("valid_captcha", "&cYour captcha is valid !");
     }
 
 	private void loadFile() {

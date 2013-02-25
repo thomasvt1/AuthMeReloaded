@@ -17,19 +17,21 @@
 package uk.org.whoami.authme.task;
 
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 
+import uk.org.whoami.authme.AuthMe;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
+import uk.org.whoami.authme.settings.Settings;
 
 public class MessageTask implements Runnable {
 
-    private JavaPlugin plugin;
+    private AuthMe plugin;
     private String name;
     private String msg;
     private int interval;
 
-    public MessageTask(JavaPlugin plugin, String name, String msg, int interval) {
+    public MessageTask(AuthMe plugin, String name, String msg, int interval) {
         this.plugin = plugin;
         this.name = name;
         this.msg = msg;
@@ -47,7 +49,10 @@ public class MessageTask implements Runnable {
                 player.sendMessage(msg);
 
                 BukkitScheduler sched = plugin.getServer().getScheduler();
-                sched.runTaskLater(plugin, this, interval * 20);
+                BukkitTask late = sched.runTaskLater(plugin, this, interval * 20);
+                if(Settings.emailRegistration)
+                plugin.msgtask.put(name, late.getTaskId());
+                
             }
         }
     }

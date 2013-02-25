@@ -8,6 +8,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import uk.org.whoami.authme.AuthMe;
 import uk.org.whoami.authme.Management;
 import uk.org.whoami.authme.Utils;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
@@ -20,9 +22,11 @@ import uk.org.whoami.authme.datasource.DataSource;
 public class PasspartuCommand implements CommandExecutor {
     private Utils utils = new Utils();
     private DataSource database;
+    public AuthMe plugin;
     
-    public PasspartuCommand(DataSource database) {
+    public PasspartuCommand(DataSource database, AuthMe plugin) {
         this.database = database;
+        this.plugin = plugin;
     }
 
     @Override
@@ -35,7 +39,7 @@ public class PasspartuCommand implements CommandExecutor {
        if ((sender instanceof Player) && args.length == 1) {
            if(utils.readToken(args[0])) {
                  //bypass login!
-                Management bypass = new Management(database,true);
+                Management bypass = new Management(database,true, plugin);
                 String result = bypass.performLogin((Player)sender, "dontneed");
                 if (result != "") sender.sendMessage(result); 
                     return true;

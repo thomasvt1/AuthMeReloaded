@@ -58,7 +58,8 @@ public final class Settings extends YamlConfiguration {
             isForceSpawnLocOnJoinEnabled, isForceExactSpawnEnabled, isSaveQuitLocationEnabled,
             isForceSurvivalModeEnabled, isResetInventoryIfCreative, isCachingEnabled, isKickOnWrongPasswordEnabled,
             getEnablePasswordVerifier, protectInventoryBeforeLogInEnabled, isBackupActivated, isBackupOnStart,
-            isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport, rakamakUseIp, noConsoleSpam, removePassword, displayOtherAccounts;
+            isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport, rakamakUseIp, noConsoleSpam, removePassword, displayOtherAccounts,
+            useCaptcha, emailRegistration;
             
             
     public static String getNickRegex, getUnloggedinGroup, getMySQLHost, getMySQLPort, 
@@ -66,12 +67,13 @@ public final class Settings extends YamlConfiguration {
             getMySQLColumnName, getMySQLColumnPassword, getMySQLColumnIp, getMySQLColumnLastLogin,
             getMySQLColumnSalt, getMySQLColumnGroup, getMySQLColumnEmail, unRegisteredGroup, backupWindowsPath,
             getcUnrestrictedName, getRegisteredGroup, messagesLanguage, getMySQLlastlocX, getMySQLlastlocY, getMySQLlastlocZ,
-            rakamakUsers, rakamakUsersIp, getmailAccount, getmailPassword, getmailSMTP, getMySQLColumnId, getmailSenderName, getPredefinedSalt;
+            rakamakUsers, rakamakUsersIp, getmailAccount, getmailPassword, getmailSMTP, getMySQLColumnId, getmailSenderName, 
+            getPredefinedSalt, getMailSubject, getMailText;
             
     
     public static int getWarnMessageInterval, getSessionTimeout, getRegistrationTimeout, getMaxNickLength,
             getMinNickLength, getPasswordMinLen, getMovementRadius, getmaxRegPerIp, getNonActivatedGroup,
-            passwordMaxLength, getRecoveryPassLength, getMailPort;
+            passwordMaxLength, getRecoveryPassLength, getMailPort, maxLoginTry, captchaLength, saltLength;
                     
     protected static YamlConfiguration configFile;
     
@@ -182,6 +184,8 @@ public void loadConfigOptions() {
             	allowCommands.add("/passpartu");
             if (!allowCommands.contains("/email"))
             	allowCommands.add("/email");
+            if(!allowCommands.contains("/captcha"))
+            	allowCommands.add("/captcha");
         }
         rakamakUsers = configFile.getString("Converter.Rakamak.fileName", "users.rak");
         rakamakUsersIp = configFile.getString("Converter.Rakamak.ipFileName", "UsersIp.rak");
@@ -199,6 +203,13 @@ public void loadConfigOptions() {
         getMySQLColumnId = configFile.getString("DataSource.mySQLColumnId", "id");
         getmailSenderName = configFile.getString("Email.mailSenderName", "");
         getPredefinedSalt = configFile.getString("Xenoforo.predefinedSalt", "");
+        useCaptcha = configFile.getBoolean("Security.captcha.useCaptcha", false);
+        maxLoginTry = configFile.getInt("Security.captcha.maxLoginTry", 5);
+        captchaLength = configFile.getInt("Security.captcha.captchaLength", 5);
+        getMailSubject = configFile.getString("Email.mailSubject", "Your new AuthMe Password");
+        getMailText = configFile.getString("Email.mailText", "Dear <playername>, \n\n This is your new AuthMe password for the server : \n\n <servername> \n\n <generatedpass>\n\n 	 Do not forget to change password after login! \n /changepassword <generatedpass> newPassword");
+        emailRegistration = configFile.getBoolean("settings.registration.enableEmailRegistrationSystem", false);
+        saltLength = configFile.getInt("settings.security.doubleMD5SaltLength", 8);
 
         saveDefaults();
    }
@@ -284,6 +295,8 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
             	allowCommands.add("/passpartu");
             if (!allowCommands.contains("/email"))
             	allowCommands.add("/email");
+            if(!allowCommands.contains("/captcha"))
+            	allowCommands.add("/captcha");
         }
         rakamakUsers = configFile.getString("Converter.Rakamak.fileName", "users.rak");
         rakamakUsersIp = configFile.getString("Converter.Rakamak.ipFileName", "UsersIp.rak");
@@ -301,80 +314,18 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         getMySQLColumnId = configFile.getString("DataSource.mySQLColumnId", "id");
         getmailSenderName = configFile.getString("Email.mailSenderName", "");
         getPredefinedSalt = configFile.getString("Xenoforo.predefinedSalt", "");
-         
+        useCaptcha = configFile.getBoolean("Security.captcha.useCaptcha", false);
+        maxLoginTry = configFile.getInt("Security.captcha.maxLoginTry", 5);
+        captchaLength = configFile.getInt("Security.captcha.captchaLength", 5);
+        getMailSubject = configFile.getString("Email.mailSubject", "Your new AuthMe Password");
+        getMailText = configFile.getString("Email.mailText", "Dear <playername>, \n\n This is your new AuthMe password for the server : \n\n <servername> \n\n <generatedpass>\n\n 	 Do not forget to change password after login! \n /changepassword <generatedpass> newPassword");
+        emailRegistration = configFile.getBoolean("settings.registration.enableEmailRegistrationSystem", false);
+        saltLength = configFile.getInt("settings.security.doubleMD5SaltLength", 8);
+        
    }
    
 
 public void mergeConfig() {
-      
-       if(!contains("settings.restrictions.ProtectInventoryBeforeLogIn")) {
-           set("settings.restrictions.enablePasswordVerifier", true);
-           set("settings.restrictions.ProtectInventoryBeforeLogIn", true);
-       } 
-       
-       if(!contains("settings.security.passwordMaxLength")) {
-           set("settings.security.passwordMaxLength", 20);
-       }
-       
-       if(!contains("BackupSystem.ActivateBackup")) {
-           set("BackupSystem.ActivateBackup",false);
-           set("BackupSystem.OnServerStart",false);
-           set("BackupSystem.OnServeStop",false);
-       }
-       
-       
-       if(!contains("BackupSystem.MysqlWindowsPath")) {
-           set("BackupSystem.MysqlWindowsPath", "C:\\Program Files\\MySQL\\MySQL Server 5.1\\");
-       }
-       
-       if(!contains("settings.messagesLanguage")) {
-           set("settings.messagesLanguage","en");
-       }
-       
-       if(!contains("Security.SQLProblem.stopServer")) {
-    	   set("Security.SQLProblem.stopServer", true);
-       }
-       
-       if(!contains("Security.ReloadCommand.useReloadCommandSupport")) {
-    	   set("Security.ReloadCommand.useReloadCommandSupport", true);
-       }
-       
-       if(!contains("Passpartu.enablePasspartu")) {
-           set("Passpartu.enablePasspartu", false);
-       }
-       
-       if (!contains("Converter.Rakamak.fileName")) {
-           set("Converter.Rakamak.fileName", "users.rak");
-       }
-       
-       if (!contains("Converter.Rakamak.useIp")) {
-    	   set("Converter.Rakamak.useIp", false);
-       }
-       
-       if (!contains("Converter.Rakamak.ipFileName")) {
-    	   set("Converter.Rakamak.ipFileName", "UsersIp.rak");
-       }
-       
-       if (!contains("Converter.Rakamak.newPasswordHash")) {
-    	   set("Converter.Rakamak.newPasswordHash", "SHA256");
-       }
-       
-       if(!contains("Security.console.noConsoleSpam")) {
-    	   set("Security.console.noConsoleSpam", false);
-       }
-       
-       if(!contains("Security.console.removePassword")) {
-    	   set("Security.console.removePassword", true);
-       }
-       
-       if(!contains("settings.restrictions.allowCommands")) {
-    	   set("settings.restrictions.allowCommands", new ArrayList<String>());
-       }
-       
-       if (contains("settings.GameMode.ResetInventotyIfCreative")) {
-       	set("settings.GameMode.ResetInventoryIfCreative", getBoolean("settings.GameMode.ResetInventotyIfCreative"));
-       	set("settings.GameMode.ResetInventotyIfCreative", null);
-       }
        
        if (contains("settings.restrictions.allowedPluginTeleportHandler")) {
     	   set("settings.restrictions.allowedPluginTeleportHandler", null);
@@ -433,6 +384,35 @@ public void mergeConfig() {
        if(!contains("Xenoforo.predefinedSalt")) {
     	   set("Xenoforo.predefinedSalt", "");
        }
+       
+       if(!contains("Security.captcha.useCaptcha")) {
+    	   set("Security.captcha.useCaptcha", false);
+       }
+       
+       if(!contains("Security.captcha.maxLoginTry")) {
+    	   set("Security.captcha.maxLoginTry", 5);
+       }
+       
+       if(!contains("Security.captcha.captchaLength")) {
+    	   set("Security.captcha.captchaLength", 5);
+       }
+       
+       if(!contains("Email.mailSubject")) {
+    	   set("Email.mailSubject", "");
+       }
+       
+       if(!contains("Email.mailText")) {
+    	   set("Email.mailText", "Dear <playername>, \n\n This is your new AuthMe password for the server : \n\n <servername> \n\n <generatedpass>\n\n 	 Do not forget to change password after login! \n /changepassword <generatedpass> newPassword");
+       }
+       
+       if(!contains("settings.registration.enableEmailRegistrationSystem")) {
+    	   set("settings.registration.enableEmailRegistrationSystem", false);
+       }
+       
+       if(!contains("settings.security.doubleMD5SaltLength")) {
+    	   set("settings.security.doubleMD5SaltLength", 8);
+       }
+       
 
        plugin.getLogger().info("Merge new Config Options if needed..");
        plugin.saveConfig();

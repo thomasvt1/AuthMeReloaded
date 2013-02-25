@@ -19,14 +19,20 @@ package uk.org.whoami.authme.datasource;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.entity.Player;
+
+import uk.org.whoami.authme.AuthMe;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
+import uk.org.whoami.authme.cache.auth.PlayerCache;
 
 public class CacheDataSource implements DataSource {
 
     private DataSource source;
+    public AuthMe plugin;
     private final HashMap<String, PlayerAuth> cache = new HashMap<String, PlayerAuth>();
 
-    public CacheDataSource(DataSource source) {
+    public CacheDataSource(AuthMe plugin, DataSource source) {
+    	this.plugin = plugin;
         this.source = source;
     }
         
@@ -123,7 +129,18 @@ public class CacheDataSource implements DataSource {
 
     @Override
     public void reload() {
-        cache.clear();
+    	cache.clear();
+    	for (Player player : plugin.getServer().getOnlinePlayers()) {
+    		String user = player.getName().toLowerCase();
+    		if (PlayerCache.getInstance().isAuthenticated(user)) {
+    			try {
+                    PlayerAuth auth = source.getAuth(user);
+                    cache.put(user, auth);
+    			} catch (NullPointerException npe) {
+    			}
+
+    		}
+    	}
     }
 
 	@Override

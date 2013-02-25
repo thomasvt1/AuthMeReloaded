@@ -12,7 +12,6 @@ public class ResetInventoryEvent extends CustomEvent {
 	public ResetInventoryEvent(Player player) {
 		this.player = player;
 		API.setPlayerInventory(player, new ItemStack[36], new ItemStack[4]);
-		
 	}
 	
 	public Player getPlayer() {

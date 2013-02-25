@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -34,6 +35,7 @@ import uk.org.whoami.authme.cache.backup.FileCache;
 import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.cache.limbo.LimboPlayer;
 import uk.org.whoami.authme.commands.AdminCommand;
+import uk.org.whoami.authme.commands.CaptchaCommand;
 import uk.org.whoami.authme.commands.ChangePasswordCommand;
 import uk.org.whoami.authme.commands.EmailCommand;
 import uk.org.whoami.authme.commands.LoginCommand;
@@ -46,6 +48,7 @@ import uk.org.whoami.authme.datasource.FileDataSource;
 import uk.org.whoami.authme.datasource.MiniConnectionPoolManager.TimeoutException;
 import uk.org.whoami.authme.datasource.MySQLDataSource;
 import uk.org.whoami.authme.listener.AuthMeBlockListener;
+import uk.org.whoami.authme.listener.AuthMeChestShopListener;
 import uk.org.whoami.authme.listener.AuthMeEntityListener;
 import uk.org.whoami.authme.listener.AuthMePlayerListener;
 import uk.org.whoami.authme.listener.AuthMeSpoutListener;
@@ -55,11 +58,14 @@ import uk.org.whoami.authme.settings.Messages;
 import uk.org.whoami.authme.settings.PlayersLogs;
 import uk.org.whoami.authme.settings.Settings;
 
+import me.muizers.Notifications.Notifications;
 import net.citizensnpcs.Citizens;
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
+
+import com.onarandombox.MultiverseCore.MultiverseCore;
 
 import uk.org.whoami.authme.commands.PasspartuCommand;
 import uk.org.whoami.authme.datasource.SqliteDataSource;
@@ -83,7 +89,12 @@ public class AuthMe extends JavaPlugin {
 	public SendMailSSL mail = null;
 	public int CitizensVersion = 0;
 	public int CombatTag = 0;
+	public Notifications notifications;
 	public API api;
+    public HashMap<String, Integer> captcha = new HashMap<String, Integer>();
+    public HashMap<String, String> cap = new HashMap<String, String>();
+    public HashMap<String, Integer> msgtask = new HashMap<String, Integer>();
+	public MultiverseCore mv = null;
 
     
     @Override
@@ -120,6 +131,13 @@ public class AuthMe extends JavaPlugin {
         
 		//Check Combat Tag Version
 		combatTag();
+		
+		//Check Notifications
+		checkNotifications();
+		
+		//Check Multiverse
+		checkMultiverse();
+		
         /*
          *  Back style on start if avaible
          */
@@ -205,19 +223,26 @@ public class AuthMe extends JavaPlugin {
         }
 
         if (Settings.isCachingEnabled) {
-            database = new CacheDataSource(database);
+            database = new CacheDataSource(this, database);
         }
         
     	api = new API(this, database);
         
-        management =  new Management(database);
+        management =  new Management(database, this);
         
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new AuthMePlayerListener(this,database),this);
         pm.registerEvents(new AuthMeBlockListener(database, this),this);
         pm.registerEvents(new AuthMeEntityListener(database, this),this);
-        if (pm.isPluginEnabled("Spout")) 
+        if (pm.isPluginEnabled("Spout")) {
         	pm.registerEvents(new AuthMeSpoutListener(database),this);
+        	ConsoleLogger.info("Successfully hook with Spout!");
+        }
+        if (pm.isPluginEnabled("ChestShop")) {
+        	pm.registerEvents(new AuthMeChestShopListener(database, this), this);
+        	ConsoleLogger.info("Successfully hook with ChestShop!");
+        }
+        	
         
         //Find Permissions
         if(Settings.isPermissionCheckEnabled) {
@@ -233,16 +258,17 @@ public class AuthMe extends JavaPlugin {
         }
    
         this.getCommand("authme").setExecutor(new AdminCommand(this, database));
-        this.getCommand("register").setExecutor(new RegisterCommand(database));
-        this.getCommand("login").setExecutor(new LoginCommand());
-        this.getCommand("changepassword").setExecutor(new ChangePasswordCommand(database));
+        this.getCommand("register").setExecutor(new RegisterCommand(database, this));
+        this.getCommand("login").setExecutor(new LoginCommand(this));
+        this.getCommand("changepassword").setExecutor(new ChangePasswordCommand(database, this));
         this.getCommand("logout").setExecutor(new LogoutCommand(this,database));
         this.getCommand("unregister").setExecutor(new UnregisterCommand(this, database));
-        this.getCommand("passpartu").setExecutor(new PasspartuCommand(database));
+        this.getCommand("passpartu").setExecutor(new PasspartuCommand(database, this));
         this.getCommand("email").setExecutor(new EmailCommand(this, database));
+        this.getCommand("captcha").setExecutor(new CaptchaCommand(this));
         
         if(!Settings.isForceSingleSessionEnabled) {
-            ConsoleLogger.info("ATTENTION by disabling ForceSingleSession Your server protection is set to low");
+            ConsoleLogger.showError("ATTENTION by disabling ForceSingleSession, your server protection is set to low");
         }
         
         if (Settings.reloadSupport)
@@ -265,8 +291,33 @@ public class AuthMe extends JavaPlugin {
         ConsoleLogger.info("Authme " + this.getDescription().getVersion() + " enabled");
     }
 
-    private void combatTag() {
-		if (this.getServer().getPluginManager().getPlugin("CombatTag") != null) {
+    private void checkMultiverse() {
+    	if (this.getServer().getPluginManager().getPlugin("Multiverse-Core") != null && this.getServer().getPluginManager().getPlugin("Multiverse-Core").isEnabled()) {
+    		try {
+    			mv  = (MultiverseCore) this.getServer().getPluginManager().getPlugin("Multiverse-Core");
+    			ConsoleLogger.info("Hook with Multiverse-Core for SpawnLocations");
+    		} catch (NullPointerException npe) {
+    			mv = null;
+    		} catch (ClassCastException cce) {
+    			mv = null;
+    		} catch (NoClassDefFoundError ncdfe) {
+    			mv = null;
+    		}
+    	}
+	}
+
+	private void checkNotifications() {
+		if (this.getServer().getPluginManager().getPlugin("Notifications") != null && this.getServer().getPluginManager().getPlugin("Notifications").isEnabled()) {
+			this.notifications = (Notifications) this.getServer().getPluginManager().getPlugin("Notifications");
+			ConsoleLogger.info("Successfully hook with Notifications");
+		} else {
+			this.notifications = null;
+		}
+		
+	}
+
+	private void combatTag() {
+		if (this.getServer().getPluginManager().getPlugin("CombatTag") != null && this.getServer().getPluginManager().getPlugin("CombatTag").isEnabled()) {
 			this.CombatTag = 1;
 		} else {
 			this.CombatTag = 0;
@@ -274,7 +325,7 @@ public class AuthMe extends JavaPlugin {
 	}
 
 	private void citizensVersion() {
-		if (this.getServer().getPluginManager().getPlugin("Citizens") != null) {
+		if (this.getServer().getPluginManager().getPlugin("Citizens") != null && this.getServer().getPluginManager().getPlugin("Citizens").isEnabled()) {
 			Citizens cit = (Citizens) this.getServer().getPluginManager().getPlugin("Citizens");
             String ver = cit.getDescription().getVersion();
             String[] args = ver.split("\\.");

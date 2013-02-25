@@ -3,8 +3,8 @@ author: darkwarriros,Xephi
 website: http://www.multiplayer-italia.com/
 description: AuthMe prevents people, which aren't logged in, from doing stuff like placing blocks, moving, typing commands or seeing the inventory of the current player.
 main: uk.org.whoami.authme.AuthMe
-version: 2.7.8
-softdepend: [Vault]
+version: 2.7.9
+softdepend: [Vault, ChestShop, Spout, Multiverse-Core, Notifications, Citizens, CombatTag]
 commands:
     register:
         description: Register an account
@@ -32,6 +32,9 @@ commands:
     email:
         description: Add Email or recover password
         usage: '/email add your@email.com your@email.com|change oldEmail newEmail|recovery your@email.com'
+    captcha:
+        description: Captcha
+        usage: /captcha theCaptcha
 permissions:
     authme.player.*:
         description: Gives access to all authme player commands
@@ -120,3 +123,6 @@ permissions:
     authme.admin.xauthimport:
         description: Import xAuth Database to AuthMe Database
         default: op
+    authme.captcha:
+        description: Captcha
+        default: true

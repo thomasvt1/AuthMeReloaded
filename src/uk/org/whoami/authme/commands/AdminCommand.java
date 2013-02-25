@@ -151,10 +151,7 @@ public class AdminCommand implements CommandExecutor {
             	}
             }
             YamlConfiguration newConfig = YamlConfiguration.loadConfiguration(newConfigFile);
-            Settings.reloadConfigOptions(newConfig);         
-            //settings.clearDefaults();
-            //setting.load();
-            //setting.reload();
+            Settings.reloadConfigOptions(newConfig);
             m.reload();
             s.reload();
             sender.sendMessage(m._("reload"));

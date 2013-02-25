@@ -16,15 +16,17 @@
 
 package uk.org.whoami.authme.commands;
 
+import me.muizers.Notifications.Notification;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
+import uk.org.whoami.authme.AuthMe;
 import uk.org.whoami.authme.Utils;
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
@@ -44,12 +46,12 @@ public class LogoutCommand implements CommandExecutor {
     private Messages m = Messages.getInstance();
     private PlayersLogs pllog = PlayersLogs.getInstance();
     //private Settings settings = Settings.getInstance();
-    private JavaPlugin plugin;
+    private AuthMe plugin;
     private DataSource database;
     private Utils utils = Utils.getInstance();
     private FileCache playerBackup = new FileCache();
     
-    public LogoutCommand(JavaPlugin plugin, DataSource database) {
+    public LogoutCommand(AuthMe plugin, DataSource database) {
         this.plugin = plugin;
         this.database = database;
     }
@@ -116,6 +118,9 @@ public class LogoutCommand implements CommandExecutor {
 
         player.sendMessage(m._("logout"));
         ConsoleLogger.info(player.getDisplayName() + " logged out");
+        if(plugin.notifications != null) {
+        	plugin.notifications.showNotification(new Notification("[AuthMe] " + player.getName() + " logged out!"));
+        }
 
         return true;
     }

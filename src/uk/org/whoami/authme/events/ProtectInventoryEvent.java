@@ -23,8 +23,8 @@ public class ProtectInventoryEvent extends CustomEvent {
 		this.player = player;
 		this.storedinventory = storedinventory;
 		this.storedarmor = storedarmor;
-		this.setEmptyInventory(new ItemStack[newInventory]);
-		this.setEmptyArmor(new ItemStack[newArmor]);
+		this.setNewInventory(new ItemStack[newInventory]);
+		this.setNewArmor(new ItemStack[newArmor]);
 		API.setPlayerInventory(player, new ItemStack[newInventory], new ItemStack[newArmor]);
 	}
 
@@ -32,27 +32,15 @@ public class ProtectInventoryEvent extends CustomEvent {
 		return this.storedinventory;
 	}
 	
-	public void setStoredInventory(ItemStack[] inventory) {
-		this.storedinventory = inventory;
-	}
-	
 	public ItemStack[] getStoredArmor() {
 		return this.storedarmor;
-	}
-	
-	public void setStoredArmor(ItemStack[] armor) {
-		this.storedarmor = armor;
 	}
 	
 	public Player getPlayer() {
 		return this.player;
 	}
-	
-	public void setPlayer(Player player) {
-		this.player = player;
-	}
 
-	public void setEmptyInventory(ItemStack[] emptyInventory) {
+	public void setNewInventory(ItemStack[] emptyInventory) {
 		this.emptyInventory = emptyInventory;
 	}
 
@@ -60,7 +48,7 @@ public class ProtectInventoryEvent extends CustomEvent {
 		return this.emptyInventory;
 	}
 
-	public void setEmptyArmor(ItemStack[] emptyArmor) {
+	public void setNewArmor(ItemStack[] emptyArmor) {
 		this.emptyArmor = emptyArmor;
 	}
 
