@@ -482,5 +482,33 @@ public class SqliteDataSource implements DataSource {
             //close(con);
         } 
 	}
+	
+	@Override
+	public List<String> getAllAuthsByEmail(String email) {
+        PreparedStatement pst = null;
+        ResultSet rs = null;
+        List<String> countEmail = new ArrayList<String>();
+        try {
+            pst = con.prepareStatement("SELECT * FROM " + tableName + " WHERE "
+                    + columnEmail + "=?;");
+            pst.setString(1, email);
+            rs = pst.executeQuery();
+            while(rs.next()) {
+                countEmail.add(rs.getString(columnName));    
+            } 
+             return countEmail;
+        } catch (SQLException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return new ArrayList<String>();
+        } catch (TimeoutException ex) {
+            ConsoleLogger.showError(ex.getMessage());
+            return new ArrayList<String>();
+        } catch (NullPointerException npe) {
+        	return new ArrayList<String>();
+        } finally {
+            close(rs);
+            close(pst);
+        } 
+	}
     
 }

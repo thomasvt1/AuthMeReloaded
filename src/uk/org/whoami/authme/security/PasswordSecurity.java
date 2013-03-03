@@ -177,6 +177,18 @@ public class PasswordSecurity {
             		userSalt.put(name, salt6);
             	}
             	return getMD5(getMD5(password) + salt6);
+            case JOOMLA:
+            	String saltj = "";
+            	try {
+            		saltj = AuthMe.getInstance().database.getAuth(name).getHash().split(":")[1];
+            		} catch (NullPointerException npe) {
+            		} catch (ArrayIndexOutOfBoundsException aioobe) {
+            		}
+            	if (saltj.isEmpty() || saltj == null) {
+            		saltj = createSalt(32);
+            		userSalt.put(name, saltj);
+            	}
+            	return getMD5(password + saltj) + ":" + saltj;
             default:
                 throw new NoSuchAlgorithmException("Unknown hash algorithm");
         }
@@ -212,6 +224,10 @@ public class PasswordSecurity {
         if(!Settings.getMySQLColumnSalt.isEmpty() && Settings.getPasswordHash == HashAlgorithm.SALTED2MD5) {
         	String salt2md5 = AuthMe.getInstance().database.getAuth(playername).getSalt();
         	return hash.equals(getMD5(getMD5(password) + salt2md5));
+        }
+        if(Settings.getPasswordHash == HashAlgorithm.JOOMLA) {
+        	String saltj = hash.split(":")[1];
+        	return hash.equals(getMD5(password + saltj) + ":" + saltj);
         }
         // PlainText Password
         if(hash.length() < 32 ) {
@@ -289,6 +305,6 @@ public class PasswordSecurity {
 
     public enum HashAlgorithm {
 
-        MD5, SHA1, SHA256, WHIRLPOOL, XAUTH, MD5VB, PHPBB, PLAINTEXT, MYBB, IPB3, PHPFUSION, SMF, XFSHA1, XFSHA256, SALTED2MD5
+        MD5, SHA1, SHA256, WHIRLPOOL, XAUTH, MD5VB, PHPBB, PLAINTEXT, MYBB, IPB3, PHPFUSION, SMF, XFSHA1, XFSHA256, SALTED2MD5, JOOMLA
     }
 }

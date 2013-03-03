@@ -112,3 +112,9 @@ Email:
     RecoveryPasswordLength: 8
     mailSubject: 'Your new AuthMe Password'
     mailText: 'Dear <playername>, \n\n This is your new AuthMe password for the server \n\n <servername> : \n\n <generatedpass>\n\nDo not forget to change password after login! \n /changepassword <generatedpass> newPassword'
+    maxRegPerEmail: 1
+Hooks:
+    multiverse: true
+    chestshop: true
+    bungeecord: false
+    notifications: true

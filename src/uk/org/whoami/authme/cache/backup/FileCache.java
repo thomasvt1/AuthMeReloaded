@@ -103,9 +103,13 @@ public class FileCache {
                                         
                                                 for(Enchantment e : armorstack[i].getEnchantments().keySet())
                                                  {
-                                                    //System.out.println("enchant "+e.getName()+" bog "+armorstack[i].getEnchantmentLevel(e));
-                                                    enchList = enchList.concat(e.getName()+":"+armorstack[i].getEnchantmentLevel(e)+":");
-                                                    //System.out.println(enchList);
+                                                    try {
+                                                    	enchList = enchList.concat(e.getName()+":"+armorstack[i].getEnchantmentLevel(e)+":");
+                                                    } catch (NullPointerException npe) {
+                                                		ConsoleLogger.showError(npe.getMessage());
+                                                		ConsoleLogger.showError("The player " + playername + " has an illegaly enchant, Check Him !");
+                                                	}
+                                                    
                                                     
                                                  }                                        
 				}

@@ -51,7 +51,6 @@ import uk.org.whoami.authme.listener.AuthMeBlockListener;
 import uk.org.whoami.authme.listener.AuthMeChestShopListener;
 import uk.org.whoami.authme.listener.AuthMeEntityListener;
 import uk.org.whoami.authme.listener.AuthMePlayerListener;
-import uk.org.whoami.authme.listener.AuthMeSpoutListener;
 import uk.org.whoami.authme.plugin.manager.CitizensCommunicator;
 import uk.org.whoami.authme.plugin.manager.CombatTagComunicator;
 import uk.org.whoami.authme.settings.Messages;
@@ -89,13 +88,14 @@ public class AuthMe extends JavaPlugin {
 	public SendMailSSL mail = null;
 	public int CitizensVersion = 0;
 	public int CombatTag = 0;
+	public double ChestShop = 0;
+	public boolean BungeeCord = false;
+	public boolean useSpout = false;
 	public Notifications notifications;
 	public API api;
     public HashMap<String, Integer> captcha = new HashMap<String, Integer>();
     public HashMap<String, String> cap = new HashMap<String, String>();
-    public HashMap<String, Integer> msgtask = new HashMap<String, Integer>();
 	public MultiverseCore mv = null;
-
     
     @Override
     public void onEnable() {
@@ -137,6 +137,9 @@ public class AuthMe extends JavaPlugin {
 		
 		//Check Multiverse
 		checkMultiverse();
+		
+		//Check ChestShop
+		checkChestShop();
 		
         /*
          *  Back style on start if avaible
@@ -235,10 +238,10 @@ public class AuthMe extends JavaPlugin {
         pm.registerEvents(new AuthMeBlockListener(database, this),this);
         pm.registerEvents(new AuthMeEntityListener(database, this),this);
         if (pm.isPluginEnabled("Spout")) {
-        	pm.registerEvents(new AuthMeSpoutListener(database),this);
+        	this.useSpout = true;
         	ConsoleLogger.info("Successfully hook with Spout!");
         }
-        if (pm.isPluginEnabled("ChestShop")) {
+        if (ChestShop != 0) {
         	pm.registerEvents(new AuthMeChestShopListener(database, this), this);
         	ConsoleLogger.info("Successfully hook with ChestShop!");
         }
@@ -291,7 +294,48 @@ public class AuthMe extends JavaPlugin {
         ConsoleLogger.info("Authme " + this.getDescription().getVersion() + " enabled");
     }
 
-    private void checkMultiverse() {
+
+	private void checkChestShop() {
+    	if (!Settings.chestshop) {
+    		this.ChestShop = 0;
+    		return;
+    	}
+    	if (this.getServer().getPluginManager().isPluginEnabled("ChestShop")) {
+    		try {
+				String ver = com.Acrobot.ChestShop.ChestShop.getVersion();
+				try {
+					double version = Double.valueOf(ver.split(" ")[0]);
+	    			if (version >= 3.50) {
+	    				this.ChestShop = version;
+	    			} else {
+	    				ConsoleLogger.showError("Please Update your ChestShop version!");
+	    			}
+				} catch (NumberFormatException nfe) {
+					try {
+						double version = Double.valueOf(ver.split("t")[0]);
+		    			if (version >= 3.50) {
+		    				this.ChestShop = version;
+		    			} else {
+		    				ConsoleLogger.showError("Please Update your ChestShop version!");
+		    			}
+					} catch (NumberFormatException nfee) {
+						
+					}
+					
+				}
+    			
+    		} catch (NullPointerException npe) {}
+    		catch (NoClassDefFoundError ncdfe) {}
+    		catch (ClassCastException cce) {}
+    	}
+		
+	}
+
+	private void checkMultiverse() {
+		if(!Settings.multiverse) {
+			mv = null;
+			return;
+		}
     	if (this.getServer().getPluginManager().getPlugin("Multiverse-Core") != null && this.getServer().getPluginManager().getPlugin("Multiverse-Core").isEnabled()) {
     		try {
     			mv  = (MultiverseCore) this.getServer().getPluginManager().getPlugin("Multiverse-Core");
@@ -307,6 +351,10 @@ public class AuthMe extends JavaPlugin {
 	}
 
 	private void checkNotifications() {
+		if (!Settings.notifications) {
+			this.notifications = null;
+			return;
+		}
 		if (this.getServer().getPluginManager().getPlugin("Notifications") != null && this.getServer().getPluginManager().getPlugin("Notifications").isEnabled()) {
 			this.notifications = (Notifications) this.getServer().getPluginManager().getPlugin("Notifications");
 			ConsoleLogger.info("Successfully hook with Notifications");

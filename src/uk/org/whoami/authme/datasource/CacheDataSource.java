@@ -170,4 +170,9 @@ public class CacheDataSource implements DataSource {
 	public List<String> getAllAuthsByIp(String ip) {
 		return source.getAllAuthsByIp(ip);
 	}
+	
+	@Override
+	public List<String> getAllAuthsByEmail(String email) {
+		return source.getAllAuthsByEmail(email);
+	}
 }

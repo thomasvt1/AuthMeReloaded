@@ -171,6 +171,7 @@ public class Management {
 
                     
                       player.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
+                      player.getServer().getScheduler().cancelTask(limbo.getMessageTaskId());
                       LimboCache.getInstance().deleteLimboPlayer(name);
                       if (this.playerCache.doesCacheExist(name)) {
                         this.playerCache.removeCache(name);
@@ -294,6 +295,7 @@ public class Management {
                       
                       
                       player.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
+                      player.getServer().getScheduler().cancelTask(limbo.getMessageTaskId());
                       LimboCache.getInstance().deleteLimboPlayer(name);
                       if (this.playerCache.doesCacheExist(name)) {
                         this.playerCache.removeCache(name);

@@ -466,4 +466,9 @@ public class FileDataSource implements DataSource {
             }
         } 
 	}
+
+	@Override
+	public List<String> getAllAuthsByEmail(String email) {
+		return new ArrayList<String>();
+	}
 }

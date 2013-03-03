@@ -5,12 +5,15 @@ package uk.org.whoami.authme.gui.screens;
  */
 import java.util.List;
 
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.getspout.spoutapi.event.screen.ButtonClickEvent;
 import org.getspout.spoutapi.gui.Button;
 import org.getspout.spoutapi.gui.Color;
 import org.getspout.spoutapi.gui.GenericLabel;
 import org.getspout.spoutapi.gui.GenericPopup;
 import org.getspout.spoutapi.gui.GenericTextField;
+import org.getspout.spoutapi.gui.RenderPriority;
 import org.getspout.spoutapi.gui.Widget;
 import org.getspout.spoutapi.gui.WidgetAnchor;
 import org.getspout.spoutapi.player.SpoutPlayer;
@@ -22,7 +25,7 @@ import uk.org.whoami.authme.settings.SpoutCfg;
 
 public class LoginScreen extends GenericPopup implements Clickable{
 
-	private AuthMe plugin = AuthMe.getInstance();
+	public AuthMe plugin = AuthMe.getInstance();
 	private SpoutCfg spoutCfg = SpoutCfg.getInstance();
 	
 	private CustomButton exitBtn;
@@ -32,13 +35,13 @@ public class LoginScreen extends GenericPopup implements Clickable{
 	private GenericLabel textLbl;
 	private GenericLabel errorLbl;
 	
-	String exitTxt = spoutCfg.getString("LoginScreen.exit button"); //"Quit";
-	String loginTxt = spoutCfg.getString("LoginScreen.login button"); //"Login";
-	String exitMsg = spoutCfg.getString("LoginScreen.exit message"); //"Good Bye";
+	String exitTxt = spoutCfg.getString("LoginScreen.exit_button"); //"Quit";
+	String loginTxt = spoutCfg.getString("LoginScreen.login_button"); //"Login";
+	String exitMsg = spoutCfg.getString("LoginScreen.exit_message"); //"Good Bye";
 	String title = spoutCfg.getString("LoginScreen.title"); //"LOGIN"
-	List<String> textlines = spoutCfg.getStringList("LoginScreen.text");
-	@SuppressWarnings("unused")
-	private SpoutPlayer splayer;
+	@SuppressWarnings("unchecked")
+	List<String> textlines = (List<String>) spoutCfg.getList("LoginScreen.text");
+	public SpoutPlayer splayer;
 	
 	public LoginScreen(SpoutPlayer player) {
 		this.splayer = player;
@@ -114,17 +117,21 @@ public class LoginScreen extends GenericPopup implements Clickable{
 			.setY(220-h);
 		setXToMid(exitBtn);
 		this.attachWidget(plugin, exitBtn);
+		this.setPriority(RenderPriority.Highest);
 		
 	}
 
 	@SuppressWarnings("deprecation")
+	@EventHandler (priority = EventPriority.HIGHEST)
 	public void handleClick(ButtonClickEvent event) {
 		Button b = event.getButton();
+		if (event.isCancelled() || event == null || event.getPlayer() == null) return;
 		if (b.equals(loginBtn))
 		{
-			//System.out.println("player: " + event.getPlayer().getName() + ", Password: " + passBox.getText() + ", Management: " + plugin.management + ", Plugin: " + plugin);
 			String result = plugin.management.performLogin(event.getPlayer(), passBox.getText());
-			if(result == "") event.getPlayer().closeActiveWindow();
+			if(result == "") {
+				event.getPlayer().closeActiveWindow();
+			}
 			else
 			{
 				errorLbl.setText(result);
@@ -133,6 +140,7 @@ public class LoginScreen extends GenericPopup implements Clickable{
 		}else if(b.equals(exitBtn))
 		{
 			event.getPlayer().kickPlayer(exitMsg);
+			
 		}
 	}
 

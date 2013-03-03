@@ -53,7 +53,7 @@ public class LimboCache {
         if (playerData.doesCacheExist(name)) {
         	StoreInventoryEvent event = new StoreInventoryEvent(player, playerData);
         	Bukkit.getServer().getPluginManager().callEvent(event);
-        	if (!event.isCancelled()) {
+        	if (!event.isCancelled() && event.getInventory() != null && event.getArmor() != null) {
                 inv =  event.getInventory();
                 arm =  event.getArmor();
         	} else {
@@ -65,7 +65,7 @@ public class LimboCache {
         } else {
         	StoreInventoryEvent event = new StoreInventoryEvent(player);
         	Bukkit.getServer().getPluginManager().callEvent(event);
-        	if (!event.isCancelled()) {
+        	if (!event.isCancelled() && event.getInventory() != null && event.getArmor() != null) {
                 inv =  event.getInventory();
                 arm =  event.getArmor();
         	} else {
@@ -75,8 +75,9 @@ public class LimboCache {
    
             if(player.isOp() ) {
                 operator = true;
+                } else {
+                	operator = false;      
                 }
-                   else operator = false;      
         }
 
        
@@ -93,6 +94,13 @@ public class LimboCache {
         } 
         if(player.isDead()) {
         	loc = player.getWorld().getSpawnLocation();
+        	if (plugin.mv != null)
+        		{
+        			try {
+        				loc = plugin.mv.getMVWorldManager().getMVWorld(player.getWorld().getName()).getSpawnLocation();
+        			} catch (NullPointerException npe) {}
+        		}
+
         }
         try {
             if(cache.containsKey(name) && playerGroup.isEmpty()) {
@@ -129,4 +137,11 @@ public class LimboCache {
         }
         return singleton;
     }
+
+	public void updateLimboPlayer(Player player) {
+		if (this.hasLimboPlayer(player.getName().toLowerCase())) {
+			this.deleteLimboPlayer(player.getName().toLowerCase());
+		}
+		this.addLimboPlayer(player);
+	}
 }

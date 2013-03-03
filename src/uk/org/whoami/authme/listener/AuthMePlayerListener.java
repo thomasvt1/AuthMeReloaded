@@ -44,6 +44,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.getspout.spoutapi.Spout;
+import org.getspout.spoutapi.player.SpoutPlayer;
 
 import uk.org.whoami.authme.api.API;
 import uk.org.whoami.authme.cache.backup.DataFileCache;
@@ -59,10 +61,12 @@ import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.events.ProtectInventoryEvent;
 import uk.org.whoami.authme.events.RestoreInventoryEvent;
 import uk.org.whoami.authme.events.SessionEvent;
+import uk.org.whoami.authme.gui.screens.LoginScreen;
 import uk.org.whoami.authme.plugin.manager.CombatTagComunicator;
 import uk.org.whoami.authme.settings.Messages;
 import uk.org.whoami.authme.settings.PlayersLogs;
 import uk.org.whoami.authme.settings.Settings;
+import uk.org.whoami.authme.settings.SpoutCfg;
 import uk.org.whoami.authme.task.MessageTask;
 import uk.org.whoami.authme.task.TimeoutTask;
 
@@ -672,7 +676,7 @@ public class AuthMePlayerListener implements Listener {
             	player.setGameMode(GameMode.getByValue(gM));
                 player.kickPlayer("You are not the Owner of this account, please try another name!");
                 return;           
-                }         
+            }
         
         if (data.isAuthAvailable(name)) {    
        
@@ -708,8 +712,12 @@ public class AuthMePlayerListener implements Listener {
           } 
           // isent in session or session was ended correctly
           LimboCache.getInstance().addLimboPlayer(player);
-          DataFileCache playerData = new DataFileCache(LimboCache.getInstance().getLimboPlayer(name).getInventory(),LimboCache.getInstance().getLimboPlayer(name).getArmour());      
-          playerBackup.createCache(name, playerData, LimboCache.getInstance().getLimboPlayer(name).getGroup(),LimboCache.getInstance().getLimboPlayer(name).getOperator());                      
+          try {
+        	  playerBackup.createCache(name, new DataFileCache(LimboCache.getInstance().getLimboPlayer(name).getInventory(),LimboCache.getInstance().getLimboPlayer(name).getArmour()), LimboCache.getInstance().getLimboPlayer(name).getGroup(),LimboCache.getInstance().getLimboPlayer(name).getOperator());
+          } catch (NullPointerException npe) {
+        	  ConsoleLogger.showError("Problem while trying to create player cache for : " + name);
+          }
+                             
         } else {  
             if(!Settings.unRegisteredGroup.isEmpty()){
                utils.setGroup(player, Utils.groupType.UNREGISTERED);
@@ -757,7 +765,20 @@ public class AuthMePlayerListener implements Listener {
             LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id.getTaskId());
         }
         
-        sched.runTask(plugin, new MessageTask(plugin, name, msg, msgInterval));
+        if(!LimboCache.getInstance().hasLimboPlayer(name))
+            LimboCache.getInstance().addLimboPlayer(player);
+        BukkitTask msgT = sched.runTask(plugin, new MessageTask(plugin, name, msg, msgInterval));
+        LimboCache.getInstance().getLimboPlayer(name).setMessageTaskId(msgT.getTaskId());
+        
+        if(plugin.useSpout) {
+            if(SpoutCfg.getInstance().getBoolean("LoginScreen.enabled")) {
+        		if (data.isAuthAvailable(event.getPlayer().getName().toLowerCase()) && !PlayerCache.getInstance().isAuthenticated(event.getPlayer().getName().toLowerCase()) ) {
+                	SpoutPlayer splayer = Spout.getServer().getPlayerExact(event.getPlayer().getName());
+                	splayer.getMainScreen().attachPopupScreen(new LoginScreen(splayer));
+        		}
+            }
+        	
+        }
         
         if (Settings.isForceSurvivalModeEnabled)
         	sched.runTask(plugin, new Runnable() {

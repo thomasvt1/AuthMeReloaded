@@ -59,7 +59,7 @@ public final class Settings extends YamlConfiguration {
             isForceSurvivalModeEnabled, isResetInventoryIfCreative, isCachingEnabled, isKickOnWrongPasswordEnabled,
             getEnablePasswordVerifier, protectInventoryBeforeLogInEnabled, isBackupActivated, isBackupOnStart,
             isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport, rakamakUseIp, noConsoleSpam, removePassword, displayOtherAccounts,
-            useCaptcha, emailRegistration;
+            useCaptcha, emailRegistration, multiverse, notifications, chestshop;
             
             
     public static String getNickRegex, getUnloggedinGroup, getMySQLHost, getMySQLPort, 
@@ -73,7 +73,7 @@ public final class Settings extends YamlConfiguration {
     
     public static int getWarnMessageInterval, getSessionTimeout, getRegistrationTimeout, getMaxNickLength,
             getMinNickLength, getPasswordMinLen, getMovementRadius, getmaxRegPerIp, getNonActivatedGroup,
-            passwordMaxLength, getRecoveryPassLength, getMailPort, maxLoginTry, captchaLength, saltLength;
+            passwordMaxLength, getRecoveryPassLength, getMailPort, maxLoginTry, captchaLength, saltLength, getmaxRegPerEmail;
                     
     protected static YamlConfiguration configFile;
     
@@ -210,6 +210,10 @@ public void loadConfigOptions() {
         getMailText = configFile.getString("Email.mailText", "Dear <playername>, \n\n This is your new AuthMe password for the server : \n\n <servername> \n\n <generatedpass>\n\n 	 Do not forget to change password after login! \n /changepassword <generatedpass> newPassword");
         emailRegistration = configFile.getBoolean("settings.registration.enableEmailRegistrationSystem", false);
         saltLength = configFile.getInt("settings.security.doubleMD5SaltLength", 8);
+        getmaxRegPerEmail = configFile.getInt("Email.maxRegPerEmail", 1);
+        multiverse = configFile.getBoolean("Hooks.multiverse", true);
+        chestshop = configFile.getBoolean("Hooks.chestshop", true);
+        notifications = configFile.getBoolean("Hooks.notifications", true);
 
         saveDefaults();
    }
@@ -321,6 +325,10 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         getMailText = configFile.getString("Email.mailText", "Dear <playername>, \n\n This is your new AuthMe password for the server : \n\n <servername> \n\n <generatedpass>\n\n 	 Do not forget to change password after login! \n /changepassword <generatedpass> newPassword");
         emailRegistration = configFile.getBoolean("settings.registration.enableEmailRegistrationSystem", false);
         saltLength = configFile.getInt("settings.security.doubleMD5SaltLength", 8);
+        getmaxRegPerEmail = configFile.getInt("Email.maxRegPerEmail", 1);
+        multiverse = configFile.getBoolean("Hooks.multiverse", true);
+        chestshop = configFile.getBoolean("Hooks.chestshop", true);
+        notifications = configFile.getBoolean("Hooks.notifications", true);
         
    }
    
@@ -411,6 +419,16 @@ public void mergeConfig() {
        
        if(!contains("settings.security.doubleMD5SaltLength")) {
     	   set("settings.security.doubleMD5SaltLength", 8);
+       }
+       
+       if(!contains("Email.maxRegPerEmail")) {
+    	   set("Email.maxRegPerEmail", 1);
+       }
+       
+       if(!contains("Hooks.multiverse")) {
+    	   set("Hooks.multiverse", true);
+           set("Hooks.chestshop", true);
+           set("Hooks.notifications", true);
        }
        
 

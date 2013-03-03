@@ -22,7 +22,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import uk.org.whoami.authme.AuthMe;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
-import uk.org.whoami.authme.settings.Settings;
+import uk.org.whoami.authme.cache.limbo.LimboCache;
 
 public class MessageTask implements Runnable {
 
@@ -50,8 +50,9 @@ public class MessageTask implements Runnable {
 
                 BukkitScheduler sched = plugin.getServer().getScheduler();
                 BukkitTask late = sched.runTaskLater(plugin, this, interval * 20);
-                if(Settings.emailRegistration)
-                plugin.msgtask.put(name, late.getTaskId());
+                if(LimboCache.getInstance().hasLimboPlayer(name)) {
+                	LimboCache.getInstance().getLimboPlayer(name).setMessageTaskId(late.getTaskId());
+                }
                 
             }
         }

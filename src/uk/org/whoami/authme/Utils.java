@@ -61,14 +61,7 @@ public class Utils {
         if(!Utils.getInstance().useGroupSystem()){
             return null;
         }
-        
-        /*if (AuthMe.permission.playerAdd(this.player,"-*") ) {
-            AuthMe.permission.playerAdd(this.player,"authme.login");
-            return true;
-        }*/
-        
-        
-        //System.out.println("permissions? "+ hasPerm);
+
         if( !Settings.getJoinPermissions.isEmpty() ) {
             hasPermOnJoin(player);
         }

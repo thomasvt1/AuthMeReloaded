@@ -105,7 +105,8 @@ public class LogoutCommand implements CommandExecutor {
             BukkitTask id = sched.runTaskLater(plugin, new TimeoutTask(plugin, name), delay);
             LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id.getTaskId());
         }
-        sched.scheduleSyncDelayedTask(plugin, new MessageTask(plugin, name, m._("login_msg"), interval));
+        BukkitTask msgT = sched.runTask(plugin, new MessageTask(plugin, name, m._("login_msg"), interval));
+        LimboCache.getInstance().getLimboPlayer(name).setMessageTaskId(msgT.getTaskId());
 
         try {
         	         if (PlayersLogs.players.contains(player.getName())) {

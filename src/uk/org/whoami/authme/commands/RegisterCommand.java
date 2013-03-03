@@ -114,6 +114,12 @@ public class RegisterCommand implements CommandExecutor {
                 return true;
         	}
         	final String email = args[0];
+        	if(Settings.getmaxRegPerEmail > 0) {
+        		if (!sender.hasPermission("authme.allow2accounts") && database.getAllAuthsByEmail(email).size() >= Settings.getmaxRegPerEmail) {
+        			player.sendMessage(m._("max_reg"));
+        			return true;
+        		}
+        	}
 			RandomString rand = new RandomString(Settings.getRecoveryPassLength);
 			final String thePass = rand.nextString();
 
@@ -153,7 +159,7 @@ public class RegisterCommand implements CommandExecutor {
                 if(!Settings.getRegisteredGroup.isEmpty()){
                     Utils.getInstance().setGroup(player, Utils.groupType.REGISTERED);
                 }
-            	player.sendMessage(m._("login_msg"));
+            	player.sendMessage(m._("vb_nonActiv"));
             	String msg = m._("login_msg");
             	int time = Settings.getRegistrationTimeout * 20;
             	int msgInterval = Settings.getWarnMessageInterval;
@@ -162,11 +168,10 @@ public class RegisterCommand implements CommandExecutor {
                     BukkitTask id = Bukkit.getScheduler().runTaskLater(plugin, new TimeoutTask(plugin, name), time);
                     LimboCache.getInstance().getLimboPlayer(name).setTimeoutTaskId(id.getTaskId());
                 }
-                if (plugin.msgtask.containsKey(name)) {
-                	Bukkit.getScheduler().cancelTask(plugin.msgtask.get(name));
-                	plugin.msgtask.remove(name);
-                }
-                Bukkit.getScheduler().runTask(plugin, new MessageTask(plugin, name, msg, msgInterval));
+
+                Bukkit.getScheduler().cancelTask(LimboCache.getInstance().getLimboPlayer(name).getMessageTaskId());
+                BukkitTask nwMsg = Bukkit.getScheduler().runTask(plugin, new MessageTask(plugin, name, msg, msgInterval));
+                LimboCache.getInstance().getLimboPlayer(name).setMessageTaskId(nwMsg.getTaskId());
 
             	LimboCache.getInstance().deleteLimboPlayer(name);
                 this.isFirstTimeJoin = true;
@@ -241,6 +246,7 @@ public class RegisterCommand implements CommandExecutor {
                 }
                 
                 sender.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
+                sender.getServer().getScheduler().cancelTask(limbo.getMessageTaskId());
                 LimboCache.getInstance().deleteLimboPlayer(name);
             }
   

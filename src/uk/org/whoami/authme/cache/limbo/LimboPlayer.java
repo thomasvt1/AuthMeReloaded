@@ -24,11 +24,12 @@ public class LimboPlayer {
     private String name;
     private ItemStack[] inventory;
     private ItemStack[] armour;
-    private Location loc;
+    private Location loc = null;
     private int timeoutTaskId = -1;
+    private int messageTaskId = -1;
     private int gameMode = 0;
-    private boolean operator;
-    private String group;
+    private boolean operator = false;
+    private String group = null;
 
     public LimboPlayer(String name, Location loc, ItemStack[] inventory, ItemStack[] armour, int gameMode, boolean operator, String group) {
         this.name = name;
@@ -88,6 +89,14 @@ public class LimboPlayer {
 
 	public int getTimeoutTaskId() {
 		return timeoutTaskId;
+	}
+
+	public void setMessageTaskId(int messageTaskId) {
+		this.messageTaskId = messageTaskId;
+	}
+
+	public int getMessageTaskId() {
+		return messageTaskId;
 	}
 
 }

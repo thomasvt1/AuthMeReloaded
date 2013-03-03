@@ -62,6 +62,10 @@ public abstract class CombatTagComunicator {
                     }
         	} catch (ClassCastException ex) {
         		return false;
+        	} catch (NullPointerException npe) {
+        		return false;
+        	} catch (NoClassDefFoundError ncdfe) {
+        		return false;
         	}
         return false;
         }
