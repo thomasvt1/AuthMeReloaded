@@ -489,15 +489,43 @@ public void mergeConfig() {
     public static Boolean getRestrictedIp(String name, String ip) {
                  
               Iterator<String> iter = getRestrictedIp.iterator();
+              
+              /* setup a few boolean variables to test the parameters */
+              Boolean trueonce = false;
+              Boolean namefound = false;
+              
                 while (iter.hasNext()) {
                    String[] args =  iter.next().split(";");
-                   if(args[0].equalsIgnoreCase(name) ) {
-                           if(args[1].equalsIgnoreCase(ip)) {
-                           return true;
-                            } else return false;
+                   
+                   String testname = args[0];
+                   String testip = args[1];
+                   
+                   /** Changing this logic to be more customized
+                    *  test each case against the entire
+                    *  list not just the first one in the list.*/
+                   
+                   /* Fist Check the name */
+                   if(testname.equalsIgnoreCase(name) ) {
+                           namefound = true;
+                           /* Check to see if the IP is the same */
+                           if(testip.equalsIgnoreCase(ip)) {
+                           trueonce = true;
+                            };
                         } 
                 }
-            return true;
+             // if the name is not found in the list let the user pass they are not being monitored    
+             if ( namefound == false){
+            	 return true;
+             }
+             	else { 
+                    // if the name and IP was found once in the list let the user pass they are in the config
+             		if ( trueonce == true ){
+             		return true;
+                    // otherwise nip them in the bud and THEY SHALL NOT PASS!
+             	} else { 
+             		return false;
+             		}
+             	}		
     }
 
     
