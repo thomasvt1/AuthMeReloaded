@@ -41,6 +41,7 @@ import uk.org.whoami.authme.cache.auth.PlayerCache;
 import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.cache.limbo.LimboPlayer;
 import uk.org.whoami.authme.datasource.DataSource;
+import uk.org.whoami.authme.events.AuthMeTeleportEvent;
 import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.security.RandomString;
 import uk.org.whoami.authme.settings.Messages;
@@ -259,10 +260,14 @@ public class RegisterCommand implements CommandExecutor {
                 			
                 		}
                 	}
-                	if (!world.getChunkAt(loca).isLoaded()) {
-                		world.getChunkAt(loca).load();
-                	}
-                	player.teleport(loca);
+                    AuthMeTeleportEvent tpEvent = new AuthMeTeleportEvent(player, loca);
+                    plugin.getServer().getPluginManager().callEvent(tpEvent);
+                    if(!tpEvent.isCancelled()) {
+                    	if (!tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).isLoaded()) {
+                    		tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).load();
+                    	}
+                  	  	player.teleport(tpEvent.getTo());
+                    }
                 }
                 
                 sender.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());

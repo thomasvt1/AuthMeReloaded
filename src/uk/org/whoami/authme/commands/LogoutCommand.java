@@ -35,6 +35,7 @@ import uk.org.whoami.authme.cache.backup.DataFileCache;
 import uk.org.whoami.authme.cache.backup.FileCache;
 import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.datasource.DataSource;
+import uk.org.whoami.authme.events.AuthMeTeleportEvent;
 import uk.org.whoami.authme.settings.Messages;
 import uk.org.whoami.authme.settings.PlayersLogs;
 import uk.org.whoami.authme.settings.Settings;
@@ -92,10 +93,14 @@ public class LogoutCommand implements CommandExecutor {
             playerBackup.createCache(name, playerData, LimboCache.getInstance().getLimboPlayer(name).getGroup(),LimboCache.getInstance().getLimboPlayer(name).getOperator());            
         }
         if (Settings.isTeleportToSpawnEnabled) {
-        	if (!player.getWorld().getSpawnLocation().getChunk().isLoaded()) {
-        		player.getWorld().getSpawnLocation().getChunk().load();
-        	}
-            player.teleport(player.getWorld().getSpawnLocation());
+            AuthMeTeleportEvent tpEvent = new AuthMeTeleportEvent(player, player.getWorld().getSpawnLocation());
+            plugin.getServer().getPluginManager().callEvent(tpEvent);
+            if(!tpEvent.isCancelled()) {
+            	if (!tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).isLoaded()) {
+            		tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).load();
+            	}
+          	  	player.teleport(tpEvent.getTo());
+            }
         }
 
         int delay = Settings.getRegistrationTimeout * 20;

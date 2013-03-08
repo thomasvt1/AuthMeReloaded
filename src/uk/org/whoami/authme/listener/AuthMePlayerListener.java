@@ -61,9 +61,11 @@ import uk.org.whoami.authme.cache.auth.PlayerCache;
 import uk.org.whoami.authme.cache.limbo.LimboPlayer;
 import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.datasource.DataSource;
+import uk.org.whoami.authme.events.AuthMeTeleportEvent;
 import uk.org.whoami.authme.events.ProtectInventoryEvent;
 import uk.org.whoami.authme.events.RestoreInventoryEvent;
 import uk.org.whoami.authme.events.SessionEvent;
+import uk.org.whoami.authme.events.SpawnTeleportEvent;
 import uk.org.whoami.authme.gui.screens.LoginScreen;
 import uk.org.whoami.authme.plugin.manager.CombatTagComunicator;
 import uk.org.whoami.authme.settings.Messages;
@@ -759,10 +761,14 @@ public class AuthMePlayerListener implements Listener {
             player.setOp(false);
 
         if (Settings.isTeleportToSpawnEnabled || (Settings.isForceSpawnLocOnJoinEnabled  && Settings.getForcedWorlds.contains(player.getWorld().getName()))) {
-        	if (!player.getWorld().getChunkAt(spawnLoc).isLoaded()) {
-        		player.getWorld().getChunkAt(spawnLoc).load();
-        	}
-            player.teleport(spawnLoc);  
+            SpawnTeleportEvent tpEvent = new SpawnTeleportEvent(player, player.getLocation(), spawnLoc, PlayerCache.getInstance().isAuthenticated(name));
+            plugin.getServer().getPluginManager().callEvent(tpEvent);
+            if(!tpEvent.isCancelled()) {
+            	if (!tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).isLoaded()) {
+            		tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).load();
+            	}
+          	  player.teleport(tpEvent.getTo());
+            }
         }
         
 
@@ -901,10 +907,14 @@ public class AuthMePlayerListener implements Listener {
         		API.setPlayerInventory(player, ev.getInventory(), ev.getArmor());
         	}
         }
-        if (!limbo.getLoc().getWorld().getChunkAt(limbo.getLoc()).isLoaded()) {
-        	limbo.getLoc().getWorld().getChunkAt(limbo.getLoc()).load();
+        AuthMeTeleportEvent tpEvent = new AuthMeTeleportEvent(player, limbo.getLoc());
+        plugin.getServer().getPluginManager().callEvent(tpEvent);
+        if(!tpEvent.isCancelled()) {
+        	if (!tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).isLoaded()) {
+        		tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).load();
+        	}
+      	  player.teleport(tpEvent.getTo());
         }
-        player.teleport(limbo.getLoc());
         this.utils.addNormal(player, limbo.getGroup());
         player.setOp(limbo.getOperator());
 

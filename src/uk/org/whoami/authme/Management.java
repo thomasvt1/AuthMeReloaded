@@ -13,6 +13,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
 
 import uk.org.whoami.authme.api.API;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
@@ -21,8 +22,10 @@ import uk.org.whoami.authme.cache.backup.FileCache;
 import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.cache.limbo.LimboPlayer;
 import uk.org.whoami.authme.datasource.DataSource;
+import uk.org.whoami.authme.events.AuthMeTeleportEvent;
 import uk.org.whoami.authme.events.LoginEvent;
 import uk.org.whoami.authme.events.RestoreInventoryEvent;
+import uk.org.whoami.authme.events.SpawnTeleportEvent;
 import uk.org.whoami.authme.listener.AuthMePlayerListener;
 import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.security.RandomString;
@@ -40,16 +43,19 @@ public class Management {
     public AuthMe plugin;
     private boolean passpartu = false;
     public static RandomString rdm = new RandomString(Settings.captchaLength);
+    public PluginManager pm;
     
     public Management(DataSource database, AuthMe plugin) {
         this.database = database;
         this.plugin = plugin;
+        this.pm = plugin.getServer().getPluginManager();
     }
 
     public Management(DataSource database, boolean passpartu, AuthMe plugin) {
         this.database = database;
         this.passpartu = passpartu;
         this.plugin = plugin;
+        this.pm = plugin.getServer().getPluginManager();
     }   
     
     public String performLogin(Player player, String password) {
@@ -142,29 +148,42 @@ public class Management {
                           this.utils.packCoords(this.database.getAuth(name).getQuitLocX(), this.database.getAuth(name).getQuitLocY(), this.database.getAuth(name).getQuitLocZ(), player);
                                   }
                                   else {
-                          if (!world.getChunkAt(limbo.getLoc()).isLoaded()) {
-                            world.getChunkAt(limbo.getLoc()).load();
-                                    }
-                         player.teleport(limbo.getLoc());
+
+                          AuthMeTeleportEvent tpEvent = new AuthMeTeleportEvent(player, limbo.getLoc());
+                          pm.callEvent(tpEvent);
+                          if(!tpEvent.isCancelled()) {
+                          	if (!tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).isLoaded()) {
+                        		tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).load();
+                        	}
+                        	  player.teleport(tpEvent.getTo());
+                          }
+                         
                                   }
                     
                                 }
                       else if (Settings.isForceSpawnLocOnJoinEnabled.booleanValue() && Settings.getForcedWorlds.contains(player.getWorld().getName())) {
-                          if (!world.getChunkAt(spawnLoc).isLoaded()) {
-                              world.getChunkAt(spawnLoc).load();
-                                      }
-                        player.teleport(spawnLoc);
+                          SpawnTeleportEvent tpEvent = new SpawnTeleportEvent(player, player.getLocation(), spawnLoc, true);
+                          pm.callEvent(tpEvent);
+                          if(!tpEvent.isCancelled()) {
+                          	if (!tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).isLoaded()) {
+                        		tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).load();
+                        	}
+                        	  player.teleport(tpEvent.getTo());
+                          }
                                 }
                       else if ((Settings.isSaveQuitLocationEnabled.booleanValue()) && (this.database.getAuth(name).getQuitLocY() != 0))
                                 {
                         this.utils.packCoords(this.database.getAuth(name).getQuitLocX(), this.database.getAuth(name).getQuitLocY(), this.database.getAuth(name).getQuitLocZ(), player);
                                 }
                                 else {
-                        if (!world.getChunkAt(limbo.getLoc()).isLoaded())
-                                  {
-                          world.getChunkAt(limbo.getLoc()).load();
-                                  }
-                        player.teleport(limbo.getLoc());
+                        AuthMeTeleportEvent tpEvent = new AuthMeTeleportEvent(player, limbo.getLoc());
+                        pm.callEvent(tpEvent);
+                        if(!tpEvent.isCancelled()) {
+                        	if (!tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).isLoaded()) {
+                        		tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).load();
+                        	}
+                      	  player.teleport(tpEvent.getTo());
+                        }
                                 }
                       
                       
@@ -252,43 +271,60 @@ public class Management {
                                 {
                         if ((Settings.isSaveQuitLocationEnabled.booleanValue()) && (this.database.getAuth(name).getQuitLocY() != 0)) {
                           Location quitLoc = new Location(player.getWorld(), this.database.getAuth(name).getQuitLocX() + 0.5D, this.database.getAuth(name).getQuitLocY() + 0.5D, this.database.getAuth(name).getQuitLocZ() + 0.5D);
-                      
-                          if (!world.getChunkAt(quitLoc).isLoaded())
-                                    {
-                            world.getChunkAt(quitLoc).load();
-                                    }
-                          player.teleport(quitLoc);
+                          AuthMeTeleportEvent tpEvent = new AuthMeTeleportEvent(player, quitLoc);
+                          pm.callEvent(tpEvent);
+                          if(!tpEvent.isCancelled()) {
+                          	if (!tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).isLoaded()) {
+                        		tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).load();
+                        	}
+                        	  player.teleport(tpEvent.getTo());
+                          }
                                   }
                                   else
                                   {
-                          if (!world.getChunkAt(limbo.getLoc()).isLoaded())
-                            world.getChunkAt(limbo.getLoc()).load();
-                          player.teleport(limbo.getLoc());
+                          AuthMeTeleportEvent tpEvent = new AuthMeTeleportEvent(player, limbo.getLoc());
+                          pm.callEvent(tpEvent);
+                          if(!tpEvent.isCancelled()) {
+                          	if (!tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).isLoaded()) {
+                        		tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).load();
+                        	}
+                        	  player.teleport(tpEvent.getTo());
+                          }
                                   }
                       
                                 }
                       else if (Settings.isForceSpawnLocOnJoinEnabled.booleanValue() && Settings.getForcedWorlds.contains(player.getWorld().getName())) {
-                          if (!world.getChunkAt(spawnLoc).isLoaded()) {
-                              world.getChunkAt(spawnLoc).load();
-                                      }
-                        player.teleport(spawnLoc);
+
+                          SpawnTeleportEvent tpEvent = new SpawnTeleportEvent(player, player.getLocation(), spawnLoc, true);
+                          pm.callEvent(tpEvent);
+                          if(!tpEvent.isCancelled()) {
+                          	if (!tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).isLoaded()) {
+                        		tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).load();
+                        	}
+                        	  player.teleport(tpEvent.getTo());
+                          }
                                 }
                       else if ((Settings.isSaveQuitLocationEnabled.booleanValue()) && (this.database.getAuth(name).getQuitLocY() != 0)) {
                         Location quitLoc = new Location(player.getWorld(), this.database.getAuth(name).getQuitLocX() + 0.5D, this.database.getAuth(name).getQuitLocY() + 0.5D, this.database.getAuth(name).getQuitLocZ() + 0.5D);
-                      
-                        if (!world.getChunkAt(quitLoc).isLoaded())
-                                  {
-                          world.getChunkAt(quitLoc).load();
-                                  }
-                        player.teleport(quitLoc);
+                        AuthMeTeleportEvent tpEvent = new AuthMeTeleportEvent(player, quitLoc);
+                        pm.callEvent(tpEvent);
+                        if(!tpEvent.isCancelled()) {
+                        	if (!tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).isLoaded()) {
+                        		tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).load();
+                        	}
+                      	  player.teleport(tpEvent.getTo());
+                        }
                                 }
                                 else
                                 {
-                        if (!world.getChunkAt(limbo.getLoc()).isLoaded())
-                                  {
-                          world.getChunkAt(limbo.getLoc()).load();
-                                  }
-                        player.teleport(limbo.getLoc());
+                        AuthMeTeleportEvent tpEvent = new AuthMeTeleportEvent(player, limbo.getLoc());
+                        pm.callEvent(tpEvent);
+                        if(!tpEvent.isCancelled()) {
+                        	if (!tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).isLoaded()) {
+                        		tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).load();
+                        	}
+                      	  player.teleport(tpEvent.getTo());
+                        }
                                 }
                       
                       

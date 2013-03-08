@@ -16,6 +16,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
+import uk.org.whoami.authme.events.AuthMeTeleportEvent;
 import uk.org.whoami.authme.settings.Settings;
 
 /**
@@ -146,11 +147,14 @@ public class Utils {
     	final int fY = y;
     	final Location loc = new Location(world, x + 0.5D, y + 0.6D, z + 0.5D);
 
-    	if (!world.getChunkAt(loc).isLoaded())
-    	{
-    		world.getChunkAt(loc).load();
-    	}
-    	pl.teleport(loc);
+        AuthMeTeleportEvent tpEvent = new AuthMeTeleportEvent(pl, loc);
+        AuthMe.getInstance().getServer().getPluginManager().callEvent(tpEvent);
+        if(!tpEvent.isCancelled()) {
+        	if (!tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).isLoaded()) {
+      		tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).load();
+      	}
+      	  pl.teleport(tpEvent.getTo());
+        }
     	
     	id = Bukkit.getScheduler().runTaskTimerAsynchronously(AuthMe.authme, new Runnable()
     	{
