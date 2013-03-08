@@ -53,6 +53,11 @@ settings:
         enablePasswordVerifier: true
         ProtectInventoryBeforeLogIn: true
         displayOtherAccounts: true
+        ForceSpawnOnTheseWorlds:
+        - world
+        - world_nether
+        - world_the_end
+        banUnsafedIP: false
     GameMode:
         ForceSurvivalMode: false
         ResetInventoryIfCreative: false
@@ -66,6 +71,7 @@ settings:
         messageInterval: 5
         force: true
         enableEmailRegistrationSystem: false
+        doubleEmailCheck: false
     unrestrictions:
         UnrestrictedName: []
     messagesLanguage: en

@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import me.muizers.Notifications.Notification;
+import net.md_5.bungee.api.connection.ConnectedPlayer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -54,6 +56,13 @@ public class Management {
             
         String name = player.getName().toLowerCase();
         String ip = player.getAddress().getAddress().getHostAddress();
+        if (Settings.bungee && player instanceof ProxiedPlayer) {
+        	ProxiedPlayer pPlayer = (ProxiedPlayer) player;
+        	ip = pPlayer.getAddress().getAddress().getHostAddress();
+        } else if (Settings.bungee && player instanceof ConnectedPlayer) {
+        	ConnectedPlayer cPlayer = (ConnectedPlayer) player;
+        	ip = cPlayer.getAddress().getAddress().getHostAddress();
+        }
         World world = player.getWorld();
         Location spawnLoc = world.getSpawnLocation();
         if (plugin.mv != null) {
@@ -126,7 +135,7 @@ public class Management {
                       this.utils.addNormal(player, limbo.getGroup());
                     
                     
-                      if ((Settings.isTeleportToSpawnEnabled.booleanValue()) && (!Settings.isForceSpawnLocOnJoinEnabled.booleanValue()))
+                      if ((Settings.isTeleportToSpawnEnabled.booleanValue()) && (!Settings.isForceSpawnLocOnJoinEnabled.booleanValue()  && Settings.getForcedWorlds.contains(player.getWorld().getName())))
                                 {
                         if ((Settings.isSaveQuitLocationEnabled.booleanValue()) && (this.database.getAuth(name).getQuitLocY() != 0))
                                   {
@@ -140,7 +149,7 @@ public class Management {
                                   }
                     
                                 }
-                      else if (Settings.isForceSpawnLocOnJoinEnabled.booleanValue()) {
+                      else if (Settings.isForceSpawnLocOnJoinEnabled.booleanValue() && Settings.getForcedWorlds.contains(player.getWorld().getName())) {
                           if (!world.getChunkAt(spawnLoc).isLoaded()) {
                               world.getChunkAt(spawnLoc).load();
                                       }
@@ -239,7 +248,7 @@ public class Management {
                       this.utils.addNormal(player, limbo.getGroup());
                       
 
-                      if ((Settings.isTeleportToSpawnEnabled.booleanValue()) && (!Settings.isForceSpawnLocOnJoinEnabled.booleanValue()))
+                      if ((Settings.isTeleportToSpawnEnabled.booleanValue()) && (!Settings.isForceSpawnLocOnJoinEnabled.booleanValue() && Settings.getForcedWorlds.contains(player.getWorld().getName())))
                                 {
                         if ((Settings.isSaveQuitLocationEnabled.booleanValue()) && (this.database.getAuth(name).getQuitLocY() != 0)) {
                           Location quitLoc = new Location(player.getWorld(), this.database.getAuth(name).getQuitLocX() + 0.5D, this.database.getAuth(name).getQuitLocY() + 0.5D, this.database.getAuth(name).getQuitLocZ() + 0.5D);
@@ -258,7 +267,7 @@ public class Management {
                                   }
                       
                                 }
-                      else if (Settings.isForceSpawnLocOnJoinEnabled.booleanValue()) {
+                      else if (Settings.isForceSpawnLocOnJoinEnabled.booleanValue() && Settings.getForcedWorlds.contains(player.getWorld().getName())) {
                           if (!world.getChunkAt(spawnLoc).isLoaded()) {
                               world.getChunkAt(spawnLoc).load();
                                       }

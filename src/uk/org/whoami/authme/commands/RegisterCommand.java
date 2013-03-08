@@ -20,6 +20,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 import me.muizers.Notifications.Notification;
+import net.md_5.bungee.api.connection.ConnectedPlayer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -72,10 +74,20 @@ public class RegisterCommand implements CommandExecutor {
             sender.sendMessage(m._("no_perm"));
             return true;
         }
-
+        
         final Player player = (Player) sender;
         final String name = player.getName().toLowerCase();
-        final String ip = player.getAddress().getAddress().getHostAddress();
+        String ipA = player.getAddress().getAddress().getHostAddress();
+        
+        if (Settings.bungee && player instanceof ProxiedPlayer) {
+        	ProxiedPlayer pPlayer = (ProxiedPlayer) player;
+        	ipA = pPlayer.getAddress().getAddress().getHostAddress();
+        } else if (Settings.bungee && player instanceof ConnectedPlayer) {
+        	ConnectedPlayer cPlayer = (ConnectedPlayer) player;
+        	ipA = cPlayer.getAddress().getAddress().getHostAddress();
+        }
+        
+        final String ip = ipA;
 
         if (PlayerCache.getInstance().isAuthenticated(name)) {
             player.sendMessage(m._("logged_in"));
@@ -99,10 +111,8 @@ public class RegisterCommand implements CommandExecutor {
         //
         
         if(Settings.getmaxRegPerIp > 0 ){
-            
-        String ipAddress = player.getAddress().getAddress().getHostAddress();
         
-         if(!sender.hasPermission("authme.allow2accounts") && database.getAllAuthsByIp(ipAddress).size() >= Settings.getmaxRegPerIp) {
+         if(!sender.hasPermission("authme.allow2accounts") && database.getAllAuthsByIp(ipA).size() >= Settings.getmaxRegPerIp) {
                 player.sendMessage(m._("max_reg"));
                 return true;
                 }
@@ -112,6 +122,16 @@ public class RegisterCommand implements CommandExecutor {
         	if(!args[0].contains("@")) {
                 player.sendMessage(m._("usage_reg"));
                 return true;
+        	}
+        	if(Settings.doubleEmailCheck) {
+        		if(args.length < 2) {
+                    player.sendMessage(m._("usage_reg"));
+                    return true;
+        		}
+        		if(args[0] != args[1]) {
+                    player.sendMessage(m._("usage_reg"));
+                    return true;
+        		}
         	}
         	final String email = args[0];
         	if(Settings.getmaxRegPerEmail > 0) {

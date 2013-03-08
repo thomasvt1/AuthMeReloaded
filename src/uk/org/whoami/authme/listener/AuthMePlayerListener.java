@@ -19,6 +19,9 @@ package uk.org.whoami.authme.listener;
 import java.util.Date;
 import java.util.HashMap;
 
+import net.md_5.bungee.api.connection.ConnectedPlayer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -660,7 +663,7 @@ public class AuthMePlayerListener implements Listener {
         World world = player.getWorld();
         Location spawnLoc = world.getSpawnLocation();
         gm = player.getGameMode().getValue();
-        String name = player.getName().toLowerCase();
+        final String name = player.getName().toLowerCase();
         gameMode.put(name, gm);
         BukkitScheduler sched = plugin.getServer().getScheduler();
         final PlayerJoinEvent e = event;
@@ -671,10 +674,19 @@ public class AuthMePlayerListener implements Listener {
         }
 
         String ip = player.getAddress().getAddress().getHostAddress();
+        if (Settings.bungee && player instanceof ProxiedPlayer) {
+        	ProxiedPlayer pPlayer = (ProxiedPlayer) player;
+        	ip = pPlayer.getAddress().getAddress().getHostAddress();
+        } else if (Settings.bungee && player instanceof ConnectedPlayer) {
+        	ConnectedPlayer cPlayer = (ConnectedPlayer) player;
+        	ip = cPlayer.getAddress().getAddress().getHostAddress();
+        }
             if(Settings.isAllowRestrictedIp && !Settings.getRestrictedIp(name, ip)) {
                 int gM = gameMode.get(name);
             	player.setGameMode(GameMode.getByValue(gM));
                 player.kickPlayer("You are not the Owner of this account, please try another name!");
+                if (Settings.banUnsafeIp)
+                plugin.getServer().banIP(ip);
                 return;           
             }
         
@@ -712,11 +724,12 @@ public class AuthMePlayerListener implements Listener {
           } 
           // isent in session or session was ended correctly
           LimboCache.getInstance().addLimboPlayer(player);
-          try {
-        	  playerBackup.createCache(name, new DataFileCache(LimboCache.getInstance().getLimboPlayer(name).getInventory(),LimboCache.getInstance().getLimboPlayer(name).getArmour()), LimboCache.getInstance().getLimboPlayer(name).getGroup(),LimboCache.getInstance().getLimboPlayer(name).getOperator());
-          } catch (NullPointerException npe) {
-        	  ConsoleLogger.showError("Problem while trying to create player cache for : " + name);
-          }
+
+	    try {
+	    	playerBackup.createCache(name, new DataFileCache(LimboCache.getInstance().getLimboPlayer(name).getInventory(),LimboCache.getInstance().getLimboPlayer(name).getArmour()), LimboCache.getInstance().getLimboPlayer(name).getGroup(),LimboCache.getInstance().getLimboPlayer(name).getOperator());
+	    } catch (NullPointerException npe) {
+	    	ConsoleLogger.showError("Problem while trying to create player cache for : " + name);
+	    }
                              
         } else {  
             if(!Settings.unRegisteredGroup.isEmpty()){
@@ -745,7 +758,7 @@ public class AuthMePlayerListener implements Listener {
         if(player.isOp()) 
             player.setOp(false);
 
-        if (Settings.isTeleportToSpawnEnabled || Settings.isForceSpawnLocOnJoinEnabled) {
+        if (Settings.isTeleportToSpawnEnabled || (Settings.isForceSpawnLocOnJoinEnabled  && Settings.getForcedWorlds.contains(player.getWorld().getName()))) {
         	if (!player.getWorld().getChunkAt(spawnLoc).isLoaded()) {
         		player.getWorld().getChunkAt(spawnLoc).load();
         	}
@@ -773,8 +786,11 @@ public class AuthMePlayerListener implements Listener {
         if(plugin.useSpout) {
             if(SpoutCfg.getInstance().getBoolean("LoginScreen.enabled")) {
         		if (data.isAuthAvailable(event.getPlayer().getName().toLowerCase()) && !PlayerCache.getInstance().isAuthenticated(event.getPlayer().getName().toLowerCase()) ) {
-                	SpoutPlayer splayer = Spout.getServer().getPlayerExact(event.getPlayer().getName());
-                	splayer.getMainScreen().attachPopupScreen(new LoginScreen(splayer));
+        			try {
+                    	SpoutPlayer splayer = Spout.getServer().getPlayerExact(event.getPlayer().getName());
+                    	splayer.getMainScreen().attachPopupScreen(new LoginScreen(splayer));
+        			} catch (NoClassDefFoundError ncdfe) {
+        			}
         		}
             }
         	

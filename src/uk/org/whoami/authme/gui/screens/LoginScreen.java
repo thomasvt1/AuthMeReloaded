@@ -35,9 +35,9 @@ public class LoginScreen extends GenericPopup implements Clickable{
 	private GenericLabel textLbl;
 	private GenericLabel errorLbl;
 	
-	String exitTxt = spoutCfg.getString("LoginScreen.exit_button"); //"Quit";
-	String loginTxt = spoutCfg.getString("LoginScreen.login_button"); //"Login";
-	String exitMsg = spoutCfg.getString("LoginScreen.exit_message"); //"Good Bye";
+	String exitTxt = spoutCfg.getString("LoginScreen.exit button"); //"Quit";
+	String loginTxt = spoutCfg.getString("LoginScreen.login button"); //"Login";
+	String exitMsg = spoutCfg.getString("LoginScreen.exit message"); //"Good Bye";
 	String title = spoutCfg.getString("LoginScreen.title"); //"LOGIN"
 	@SuppressWarnings("unchecked")
 	List<String> textlines = (List<String>) spoutCfg.getList("LoginScreen.text");
@@ -125,18 +125,19 @@ public class LoginScreen extends GenericPopup implements Clickable{
 	@EventHandler (priority = EventPriority.HIGHEST)
 	public void handleClick(ButtonClickEvent event) {
 		Button b = event.getButton();
+		SpoutPlayer player = event.getPlayer();
 		if (event.isCancelled() || event == null || event.getPlayer() == null) return;
 		if (b.equals(loginBtn))
 		{
-			String result = plugin.management.performLogin(event.getPlayer(), passBox.getText());
-			if(result == "") {
-				event.getPlayer().closeActiveWindow();
-			}
-			else
-			{
-				errorLbl.setText(result);
-				passBox.setText("");
-			}
+				String result = plugin.management.performLogin(player, passBox.getText());
+				if(result == "") {
+					player.closeActiveWindow();
+				}
+				else
+				{
+					errorLbl.setText(result);
+					passBox.setText("");
+				}
 		}else if(b.equals(exitBtn))
 		{
 			event.getPlayer().kickPlayer(exitMsg);

@@ -44,6 +44,7 @@ public final class Settings extends YamlConfiguration {
     public static List<String> getUnrestrictedName = null;
     private static List<String> getRestrictedIp;
     public static List<String> getMySQLOtherUsernameColumn = null;
+    public static List<String> getForcedWorlds = null;
    
     public final Plugin plugin;
     private final File file;    
@@ -59,7 +60,7 @@ public final class Settings extends YamlConfiguration {
             isForceSurvivalModeEnabled, isResetInventoryIfCreative, isCachingEnabled, isKickOnWrongPasswordEnabled,
             getEnablePasswordVerifier, protectInventoryBeforeLogInEnabled, isBackupActivated, isBackupOnStart,
             isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport, rakamakUseIp, noConsoleSpam, removePassword, displayOtherAccounts,
-            useCaptcha, emailRegistration, multiverse, notifications, chestshop;
+            useCaptcha, emailRegistration, multiverse, notifications, chestshop, bungee, banUnsafeIp, doubleEmailCheck;
             
             
     public static String getNickRegex, getUnloggedinGroup, getMySQLHost, getMySQLPort, 
@@ -214,6 +215,10 @@ public void loadConfigOptions() {
         multiverse = configFile.getBoolean("Hooks.multiverse", true);
         chestshop = configFile.getBoolean("Hooks.chestshop", true);
         notifications = configFile.getBoolean("Hooks.notifications", true);
+        bungee = configFile.getBoolean("Hooks.bungeecord", false);
+        getForcedWorlds = (List<String>) configFile.getList("settings.restrictions.ForceSpawnOnTheseWorlds");
+        banUnsafeIp = configFile.getBoolean("settings.restrictions.banUnsafedIP", false);
+        doubleEmailCheck = configFile.getBoolean("settings.registration.doubleEmailCheck", false);
 
         saveDefaults();
    }
@@ -329,6 +334,10 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         multiverse = configFile.getBoolean("Hooks.multiverse", true);
         chestshop = configFile.getBoolean("Hooks.chestshop", true);
         notifications = configFile.getBoolean("Hooks.notifications", true);
+        bungee = configFile.getBoolean("Hooks.bungeecord", false);
+        getForcedWorlds = (List<String>) configFile.getList("settings.restrictions.ForceSpawnOnTheseWorlds");
+        banUnsafeIp = configFile.getBoolean("settings.restrictions.banUnsafedIP", false);
+        doubleEmailCheck = configFile.getBoolean("settings.registration.doubleEmailCheck", false);
         
    }
    
@@ -429,8 +438,20 @@ public void mergeConfig() {
     	   set("Hooks.multiverse", true);
            set("Hooks.chestshop", true);
            set("Hooks.notifications", true);
+           set("Hooks.bungeecord", false);
        }
        
+       if(!contains("settings.restrictions.ForceSpawnOnTheseWorlds")) {
+    	   set("settings.restrictions.ForceSpawnOnTheseWorlds", new ArrayList<String>());
+       }
+       
+       if(!contains("settings.restrictions.banUnsafedIP")) {
+    	   set("settings.restrictions.banUnsafedIP", false);
+       }
+       
+       if(!contains("settings.registration.doubleEmailCheck")) {
+    	   set("settings.registration.doubleEmailCheck", false);
+       }
 
        plugin.getLogger().info("Merge new Config Options if needed..");
        plugin.saveConfig();
@@ -487,46 +508,46 @@ public void mergeConfig() {
      * player that join the server, so player has a restricted access
     */   
     public static Boolean getRestrictedIp(String name, String ip) {
-                 
-              Iterator<String> iter = getRestrictedIp.iterator();
-              
-              /* setup a few boolean variables to test the parameters */
-              Boolean trueonce = false;
-              Boolean namefound = false;
-              
-                while (iter.hasNext()) {
-                   String[] args =  iter.next().split(";");
-                   
-                   String testname = args[0];
-                   String testip = args[1];
-                   
-                   /** Changing this logic to be more customized
-                    *  test each case against the entire
-                    *  list not just the first one in the list.*/
-                   
-                   /* Fist Check the name */
-                   if(testname.equalsIgnoreCase(name) ) {
-                           namefound = true;
-                           /* Check to see if the IP is the same */
-                           if(testip.equalsIgnoreCase(ip)) {
-                           trueonce = true;
-                            };
-                        } 
-                }
-             // if the name is not found in the list let the user pass they are not being monitored    
-             if ( namefound == false){
-            	 return true;
-             }
-             	else { 
-                    // if the name and IP was found once in the list let the user pass they are in the config
-             		if ( trueonce == true ){
-             		return true;
-                    // otherwise nip them in the bud and THEY SHALL NOT PASS!
-             	} else { 
-             		return false;
-             		}
-             	}		
-    }
+        
+        Iterator<String> iter = getRestrictedIp.iterator();
+        
+        /* setup a few boolean variables to test the parameters */
+        Boolean trueonce = false;
+        Boolean namefound = false;
+        
+          while (iter.hasNext()) {
+             String[] args =  iter.next().split(";");
+             
+             String testname = args[0];
+             String testip = args[1];
+             
+             /** Changing this logic to be more customized
+              *  test each case against the entire
+              *  list not just the first one in the list.*/
+             
+             /* Fist Check the name */
+             if(testname.equalsIgnoreCase(name) ) {
+                     namefound = true;
+                     /* Check to see if the IP is the same */
+                     if(testip.equalsIgnoreCase(ip)) {
+                     trueonce = true;
+                      };
+                  } 
+          }
+       // if the name is not found in the list let the user pass they are not being monitored    
+       if ( namefound == false){
+      	 return true;
+       }
+       	else { 
+              // if the name and IP was found once in the list let the user pass they are in the config
+       		if ( trueonce == true ){
+       		return true;
+              // otherwise nip them in the bud and THEY SHALL NOT PASS!
+       	} else { 
+       		return false;
+       		}
+       	}		
+}
 
     
     /**

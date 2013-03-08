@@ -240,6 +240,8 @@ public class AuthMe extends JavaPlugin {
         if (pm.isPluginEnabled("Spout")) {
         	this.useSpout = true;
         	ConsoleLogger.info("Successfully hook with Spout!");
+        } else {
+        	this.useSpout = false;
         }
         if (ChestShop != 0) {
         	pm.registerEvents(new AuthMeChestShopListener(database, this), this);

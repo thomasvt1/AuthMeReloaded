@@ -35,7 +35,7 @@ public class LoginCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmnd, String label, String[] args) {
+    public boolean onCommand(CommandSender sender, Command cmnd, String label, final String[] args) {
         if (!(sender instanceof Player)) {
             return true;
         }
@@ -44,7 +44,7 @@ public class LoginCommand implements CommandExecutor {
         	
         }
         
-        Player player = (Player) sender;
+        final Player player = (Player) sender;
         
         if (args.length == 0) {
             player.sendMessage(m._("usage_log"));
@@ -55,9 +55,9 @@ public class LoginCommand implements CommandExecutor {
             player.sendMessage(m._("no_perm"));
             return true;
         }
-    
-        String result = plugin.management.performLogin(player, args[0]);
-        if (result != "") sender.sendMessage(result);
+
+		String result = plugin.management.performLogin(player, args[0]);
+		if (result != "") player.sendMessage(result);
 
         return true;
     }
