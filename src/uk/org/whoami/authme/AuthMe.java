@@ -51,6 +51,7 @@ import uk.org.whoami.authme.listener.AuthMeBlockListener;
 import uk.org.whoami.authme.listener.AuthMeChestShopListener;
 import uk.org.whoami.authme.listener.AuthMeEntityListener;
 import uk.org.whoami.authme.listener.AuthMePlayerListener;
+import uk.org.whoami.authme.listener.AuthMeSpoutListener;
 import uk.org.whoami.authme.plugin.manager.CitizensCommunicator;
 import uk.org.whoami.authme.plugin.manager.CombatTagComunicator;
 import uk.org.whoami.authme.settings.Messages;
@@ -90,7 +91,6 @@ public class AuthMe extends JavaPlugin {
 	public int CombatTag = 0;
 	public double ChestShop = 0;
 	public boolean BungeeCord = false;
-	public boolean useSpout = false;
 	public Notifications notifications;
 	public API api;
     public HashMap<String, Integer> captcha = new HashMap<String, Integer>();
@@ -111,6 +111,7 @@ public class AuthMe extends JavaPlugin {
         pllog = PlayersLogs.getInstance();
         
         server = getServer();
+        
         
         //Set Console Filter
         if (Settings.removePassword)
@@ -232,17 +233,15 @@ public class AuthMe extends JavaPlugin {
     	api = new API(this, database);
         
         management =  new Management(database, this);
-        
+                
         PluginManager pm = getServer().getPluginManager();
+        if (pm.isPluginEnabled("Spout")) {
+        	pm.registerEvents(new AuthMeSpoutListener(database), this);
+        	ConsoleLogger.info("Successfully hook with Spout!");
+        }
         pm.registerEvents(new AuthMePlayerListener(this,database),this);
         pm.registerEvents(new AuthMeBlockListener(database, this),this);
         pm.registerEvents(new AuthMeEntityListener(database, this),this);
-        if (pm.isPluginEnabled("Spout")) {
-        	this.useSpout = true;
-        	ConsoleLogger.info("Successfully hook with Spout!");
-        } else {
-        	this.useSpout = false;
-        }
         if (ChestShop != 0) {
         	pm.registerEvents(new AuthMeChestShopListener(database, this), this);
         	ConsoleLogger.info("Successfully hook with ChestShop!");
@@ -498,4 +497,5 @@ public class AuthMe extends JavaPlugin {
 	public Messages getMessages() {
 		return m;
 	}
+	
 }

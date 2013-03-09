@@ -16,9 +16,6 @@ public class SpawnTeleportEvent extends CustomEvent {
 		this.to = to;
 		this.isAuthenticated = isAuthenticated;
 	}
-	public void setPlayer(Player player) {
-		this.player = player;
-	}
 	public Player getPlayer() {
 		return player;
 	}

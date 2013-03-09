@@ -47,8 +47,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.getspout.spoutapi.Spout;
-import org.getspout.spoutapi.player.SpoutPlayer;
 
 import uk.org.whoami.authme.api.API;
 import uk.org.whoami.authme.cache.backup.DataFileCache;
@@ -66,12 +64,10 @@ import uk.org.whoami.authme.events.ProtectInventoryEvent;
 import uk.org.whoami.authme.events.RestoreInventoryEvent;
 import uk.org.whoami.authme.events.SessionEvent;
 import uk.org.whoami.authme.events.SpawnTeleportEvent;
-import uk.org.whoami.authme.gui.screens.LoginScreen;
 import uk.org.whoami.authme.plugin.manager.CombatTagComunicator;
 import uk.org.whoami.authme.settings.Messages;
 import uk.org.whoami.authme.settings.PlayersLogs;
 import uk.org.whoami.authme.settings.Settings;
-import uk.org.whoami.authme.settings.SpoutCfg;
 import uk.org.whoami.authme.task.MessageTask;
 import uk.org.whoami.authme.task.TimeoutTask;
 
@@ -789,19 +785,6 @@ public class AuthMePlayerListener implements Listener {
         BukkitTask msgT = sched.runTask(plugin, new MessageTask(plugin, name, msg, msgInterval));
         LimboCache.getInstance().getLimboPlayer(name).setMessageTaskId(msgT.getTaskId());
         
-        if(plugin.useSpout) {
-            if(SpoutCfg.getInstance().getBoolean("LoginScreen.enabled")) {
-        		if (data.isAuthAvailable(event.getPlayer().getName().toLowerCase()) && !PlayerCache.getInstance().isAuthenticated(event.getPlayer().getName().toLowerCase()) ) {
-        			try {
-                    	SpoutPlayer splayer = Spout.getServer().getPlayerExact(event.getPlayer().getName());
-                    	splayer.getMainScreen().attachPopupScreen(new LoginScreen(splayer));
-        			} catch (NoClassDefFoundError ncdfe) {
-        			}
-        		}
-            }
-        	
-        }
-        
         if (Settings.isForceSurvivalModeEnabled)
         	sched.runTask(plugin, new Runnable() {
         		public void run() {
@@ -901,19 +884,27 @@ public class AuthMePlayerListener implements Listener {
       {
         LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
         if (Settings.protectInventoryBeforeLogInEnabled.booleanValue()) {
-        	RestoreInventoryEvent ev = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
-        	Bukkit.getServer().getPluginManager().callEvent(ev);
-        	if (!ev.isCancelled()) {
-        		API.setPlayerInventory(player, ev.getInventory(), ev.getArmor());
+        	try {
+            	RestoreInventoryEvent ev = new RestoreInventoryEvent(player, limbo.getInventory(), limbo.getArmour());
+            	Bukkit.getServer().getPluginManager().callEvent(ev);
+            	if (!ev.isCancelled()) {
+            		API.setPlayerInventory(player, ev.getInventory(), ev.getArmor());
+            	}
+        	} catch (NullPointerException npe){
+        		ConsoleLogger.showError("Problem while restore " + name + "inventory after a kick");
         	}
         }
-        AuthMeTeleportEvent tpEvent = new AuthMeTeleportEvent(player, limbo.getLoc());
-        plugin.getServer().getPluginManager().callEvent(tpEvent);
-        if(!tpEvent.isCancelled()) {
-        	if (!tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).isLoaded()) {
-        		tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).load();
-        	}
-      	  player.teleport(tpEvent.getTo());
+        try {
+            AuthMeTeleportEvent tpEvent = new AuthMeTeleportEvent(player, limbo.getLoc());
+            plugin.getServer().getPluginManager().callEvent(tpEvent);
+            if(!tpEvent.isCancelled()) {
+            	if (!tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).isLoaded()) {
+            		tpEvent.getTo().getWorld().getChunkAt(tpEvent.getTo()).load();
+            	}
+          	  player.teleport(tpEvent.getTo());
+            }
+        } catch (NullPointerException npe) {
+        	
         }
         this.utils.addNormal(player, limbo.getGroup());
         player.setOp(limbo.getOperator());
@@ -924,14 +915,13 @@ public class AuthMePlayerListener implements Listener {
           this.playerBackup.removeCache(name);
         }
       }
-
-      PlayerCache.getInstance().removePlayer(name);
       try {
-          PlayersLogs.players.remove(player.getName());
-    	  PlayersLogs.getInstance().save();
+      	PlayerCache.getInstance().removePlayer(name);
+      	PlayersLogs.players.remove(player.getName());
+      	PlayersLogs.getInstance().save();
+      	if (gameMode.containsKey(name)) gameMode.remove(name);
+      	player.saveData();
       } catch (NullPointerException ex) {}
-      if (gameMode.containsKey(name)) gameMode.remove(name);
-      player.saveData();
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

@@ -89,7 +89,7 @@ public class PasswordSecurity {
     }
     
     private static String getSaltedMyBB(String message, String salt) throws NoSuchAlgorithmException {
-    	return getMD5(getMD5(salt)+ message);
+    	return getMD5(getMD5(salt)+ getMD5(message));
     }
     
     private static String getXAuth(String message, String salt) {
@@ -136,7 +136,15 @@ public class PasswordSecurity {
             case PLAINTEXT:
                 return getPlainText(password);
             case MYBB:
-            	String salt3 = createSalt(8);
+            	String salt3 = "";
+            	try {
+            		salt3 = AuthMe.getInstance().database.getAuth(name).getSalt();
+            		} catch (NullPointerException npe) {
+            		}
+            	if (salt3.isEmpty() || salt3 == null) {
+            		salt3 = createSalt(8);
+            		userSalt.put(name, salt3);
+            	}
             	return getSaltedMyBB(password, salt3);
             case IPB3:
             	String salt4 = "";
