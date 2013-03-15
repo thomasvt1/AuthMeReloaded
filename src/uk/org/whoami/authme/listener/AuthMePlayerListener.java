@@ -19,7 +19,7 @@ package uk.org.whoami.authme.listener;
 import java.util.Date;
 import java.util.HashMap;
 
-import net.md_5.bungee.api.connection.ConnectedPlayer;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import org.bukkit.Bukkit;
@@ -674,12 +674,13 @@ public class AuthMePlayerListener implements Listener {
         }
 
         String ip = player.getAddress().getAddress().getHostAddress();
-        if (Settings.bungee && player instanceof ProxiedPlayer) {
-        	ProxiedPlayer pPlayer = (ProxiedPlayer) player;
-        	ip = pPlayer.getAddress().getAddress().getHostAddress();
-        } else if (Settings.bungee && player instanceof ConnectedPlayer) {
-        	ConnectedPlayer cPlayer = (ConnectedPlayer) player;
-        	ip = cPlayer.getAddress().getAddress().getHostAddress();
+        if (Settings.bungee) {
+        	try {
+            	ProxiedPlayer pPlayer = ProxyServer.getInstance().getPlayer(player.getName());
+            	ip = pPlayer.getAddress().getAddress().getHostAddress();
+        	} catch (NoClassDefFoundError ncdfe) {
+        		ConsoleLogger.showError("Your BungeeCord version is outdated");
+        	}
         }
             if(Settings.isAllowRestrictedIp && !Settings.getRestrictedIp(name, ip)) {
                 int gM = gameMode.get(name);
