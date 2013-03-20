@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import me.muizers.Notifications.Notification;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -62,10 +60,11 @@ public class Management {
             
         String name = player.getName().toLowerCase();
         String ip = player.getAddress().getAddress().getHostAddress();
+        String playerName = player.getName();
         if (Settings.bungee) {
         	try {
-            	ProxiedPlayer pPlayer = ProxyServer.getInstance().getPlayer(player.getName());
-            	ip = pPlayer.getAddress().getAddress().getHostAddress();
+        		if (plugin.bungeesIp.containsKey(playerName))
+            	ip = plugin.bungeesIp.get(playerName);
         	} catch (NoClassDefFoundError ncdfe) {
         		ConsoleLogger.showError("Your BungeeCord version is outdated");
         	}
