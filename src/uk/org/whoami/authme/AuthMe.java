@@ -252,15 +252,15 @@ public class AuthMe extends JavaPlugin {
         	Bukkit.getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeCordMessage(this));
 
         //Find Permissions
-        if(Settings.isPermissionCheckEnabled) {
-        RegisteredServiceProvider<Permission> permissionProvider =
+        if (pm.getPlugin("Vault") != null) {
+            RegisteredServiceProvider<Permission> permissionProvider =
                 getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
-        if (permissionProvider != null)
-            permission = permissionProvider.getProvider();
-        else {
-            ConsoleLogger.showError("Vault and Permissions plugins is needed for enable AuthMe Reloaded!");
-            ConsoleLogger.showError("Server Shutdown for Security");
-            this.getServer().shutdown();
+            if (permissionProvider != null) {
+            	permission = permissionProvider.getProvider();
+            	ConsoleLogger.info("Vault plugin detected, hook with " + permission.getName() + " system");
+            }
+            else {
+            	ConsoleLogger.showError("Vault plugin is detected but not the permissions plugin!");
             }
         }
 
