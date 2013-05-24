@@ -118,6 +118,9 @@ public class AuthMe extends JavaPlugin {
         pllog = PlayersLogs.getInstance();
 
         server = getServer();
+        
+
+	Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
         //Set Console Filter
         if (Settings.removePassword)
