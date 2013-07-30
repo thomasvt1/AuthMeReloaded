@@ -577,21 +577,26 @@ public class AuthMePlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerLowestJoin(PlayerJoinEvent event) {
     	if (event.getPlayer() == null) return;
-    	Player player = event.getPlayer();
+    	final Player player = event.getPlayer();
 
         if (plugin.getCitizensCommunicator().isNPC(player, plugin) || Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player)) {
             return;
         }
 
         if (Settings.bungee) {
-            ByteArrayOutputStream b = new ByteArrayOutputStream();
+            final ByteArrayOutputStream b = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(b);
              
             try {
                 out.writeUTF("IP");
             } catch (IOException e) {
             }
-            player.sendPluginMessage(this.plugin, "BungeeCord", b.toByteArray());
+            Bukkit.getScheduler().runTask(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    player.sendPluginMessage(AuthMePlayerListener.this.plugin, "BungeeCord", b.toByteArray());
+                }
+            });
         }
     }
 
