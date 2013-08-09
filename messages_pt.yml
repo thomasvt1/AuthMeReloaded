@@ -13,7 +13,7 @@ user_regged: '&cUtilizador já registado'
 usage_reg: '&cUse: /register seu@email.com seu@email.com'
 max_reg: '&cAtingiu o numero máximo de registos permitidos'
 no_perm: '&cSem Permissões'
-error: '&fOcorreu um erro; Por favor contacte um admin
+error: '&fOcorreu um erro; Por favor contacte um admin'
 login_msg: '&cIdentifique-se com "/login password"'
 reg_msg: '&cPor favor registe-se com "/register password ConfirmePassword"'
 reg_email_msg: '&ePor favor registe-se com "/register <email> <confirmarEmail>"'
