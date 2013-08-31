@@ -110,7 +110,7 @@ public class PasswordSecurity {
     
     private static String getPBKDF2(String password, String salt) throws NoSuchAlgorithmException {
     	String result = "pbkdf2_sha256$10000$"+salt+"$";
-    	PBKDF2Parameters params = new PBKDF2Parameters("SHA-256", "UTF-8", salt.getBytes(), 10000);
+    	PBKDF2Parameters params = new PBKDF2Parameters("HmacSHA256", "UTF-8", salt.getBytes(), 10000);
     	PBKDF2Engine engine = new PBKDF2Engine(params);
     	return result + engine.deriveKey(password,57).toString();
     }
@@ -290,7 +290,7 @@ public class PasswordSecurity {
         	String[] line = hash.split("\\$");
         	String salt = line[2];
         	String derivedKey = line[3];
-        	PBKDF2Parameters params = new PBKDF2Parameters("SHA-256", "UTF-8", salt.getBytes(), 10000, derivedKey.getBytes());
+        	PBKDF2Parameters params = new PBKDF2Parameters("HmacSHA256", "UTF-8", salt.getBytes(), 10000, derivedKey.getBytes());
         	PBKDF2Engine engine = new PBKDF2Engine(params);
         	return engine.verifyKey(password);
         }

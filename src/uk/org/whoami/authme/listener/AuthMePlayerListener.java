@@ -1190,19 +1190,6 @@ public class AuthMePlayerListener implements Listener {
         }
         if (Spawn.getInstance().getLocation() != null && Spawn.getInstance().getLocation().getWorld().equals(player.getWorld()))
         	spawn = Spawn.getInstance().getLocation();
-        final PlayerAuth auth = new PlayerAuth(event.getPlayer().getName().toLowerCase(), spawn.getBlockX(), spawn.getBlockY(), spawn.getBlockZ(),spawn.getWorld().getName());
-		try {
-	        if (data instanceof Thread) {
-	        	data.updateQuitLoc(auth);
-	        } else {
-	            Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable(){
-	    			@Override
-	    			public void run() {
-	    				data.updateQuitLoc(auth);
-	    			}
-	            });
-	        }
-		} catch (NullPointerException npe) { }
         event.setRespawnLocation(spawn);
     }
 

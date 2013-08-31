@@ -125,7 +125,7 @@ public class Management {
 							}
 						}
 						if (PasswordSecurity.comparePasswordWithHash(password,
-								hash, name)) {
+								hash, name) && player.isOnline()) {
 							PlayerAuth auth = new PlayerAuth(name, hash, ip,
 									new Date().getTime(), email);
 							database.updateSession(auth);
@@ -351,7 +351,7 @@ public class Management {
 										}
 									});
 
-						} else {
+						} else if (player.isOnline()) {
 							if (!Settings.noConsoleSpam)
 								ConsoleLogger.info(player.getName()
 										+ " used the wrong password");
@@ -381,6 +381,8 @@ public class Management {
 								player.sendMessage(m._("wrong_pwd"));
 								return;
 							}
+						} else {
+							ConsoleLogger.showError("Player " + name + " wasn't online during login process , aborded... ");
 						}
 					} else {
 						// need for bypass password check if passpartu command
