@@ -103,8 +103,7 @@ public class API {
      */
     public static boolean isRegistered(String playerName) {
     	String player = playerName.toLowerCase();
-    	PlayerAuth auth = database.getAuth(player);
-    	if (auth != null)
+    	if (database.isAuthAvailable(player))
     		return true;
     	return false;
     }
