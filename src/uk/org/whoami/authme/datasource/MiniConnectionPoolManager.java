@@ -163,10 +163,10 @@ private synchronized Connection getConnection3() throws SQLException {
       // from within PooledConnection.getConnection(). To detect this within
       // disposeConnection(), we temporarily set connectionInTransition.
       connectionInTransition = pconn;
+      activeConnections++;
       conn = pconn.getConnection(); }
     finally {
       connectionInTransition = null; }
-   activeConnections++;
    assertInnerState();
    return conn; }
 

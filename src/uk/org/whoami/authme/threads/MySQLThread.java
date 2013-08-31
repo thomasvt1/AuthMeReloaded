@@ -619,28 +619,14 @@ public class MySQLThread extends Thread implements DataSource {
 	}
 
     private synchronized Connection makeSureConnectionIsReady() {
+    	Connection con = null;
         try {
-        	conPool.getValidConnection();
-        } catch (TimeoutException te) {
+        	con = conPool.getValidConnection();
+        } catch (Exception te) {
         	try {
+        		con = null;
 				reconnect();
-			} catch (TimeoutException e) {
-	            ConsoleLogger.showError(e.getMessage());
-	            if (Settings.isStopEnabled) {
-	            	ConsoleLogger.showError("Can't reconnect to MySQL database... Please check your MySQL informations ! SHUTDOWN...");
-	            	AuthMe.getInstance().getServer().shutdown();
-	            }
-	            if (!Settings.isStopEnabled)
-	            	AuthMe.getInstance().getServer().getPluginManager().disablePlugin(AuthMe.getInstance());
-			} catch (ClassNotFoundException e) {
-	            ConsoleLogger.showError(e.getMessage());
-	            if (Settings.isStopEnabled) {
-	            	ConsoleLogger.showError("Can't reconnect to MySQL database... Please check your MySQL informations ! SHUTDOWN...");
-	            	AuthMe.getInstance().getServer().shutdown();
-	            }
-	            if (!Settings.isStopEnabled)
-	            	AuthMe.getInstance().getServer().getPluginManager().disablePlugin(AuthMe.getInstance());
-			} catch (SQLException e) {
+			} catch (Exception e) {
 	            ConsoleLogger.showError(e.getMessage());
 	            if (Settings.isStopEnabled) {
 	            	ConsoleLogger.showError("Can't reconnect to MySQL database... Please check your MySQL informations ! SHUTDOWN...");
@@ -651,24 +637,9 @@ public class MySQLThread extends Thread implements DataSource {
 			}
         } catch (AssertionError ae) {
         	try {
+        		con = null;
 				reconnect();
-			} catch (TimeoutException e) {
-	            ConsoleLogger.showError(e.getMessage());
-	            if (Settings.isStopEnabled) {
-	            	ConsoleLogger.showError("Can't reconnect to MySQL database... Please check your MySQL informations ! SHUTDOWN...");
-	            	AuthMe.getInstance().getServer().shutdown();
-	            }
-	            if (!Settings.isStopEnabled)
-	            	AuthMe.getInstance().getServer().getPluginManager().disablePlugin(AuthMe.getInstance());
-			} catch (ClassNotFoundException e) {
-	            ConsoleLogger.showError(e.getMessage());
-	            if (Settings.isStopEnabled) {
-	            	ConsoleLogger.showError("Can't reconnect to MySQL database... Please check your MySQL informations ! SHUTDOWN...");
-	            	AuthMe.getInstance().getServer().shutdown();
-	            }
-	            if (!Settings.isStopEnabled)
-	            	AuthMe.getInstance().getServer().getPluginManager().disablePlugin(AuthMe.getInstance());
-			} catch (SQLException e) {
+			} catch (Exception e) {
 	            ConsoleLogger.showError(e.getMessage());
 	            if (Settings.isStopEnabled) {
 	            	ConsoleLogger.showError("Can't reconnect to MySQL database... Please check your MySQL informations ! SHUTDOWN...");
@@ -678,7 +649,9 @@ public class MySQLThread extends Thread implements DataSource {
 	            	AuthMe.getInstance().getServer().getPluginManager().disablePlugin(AuthMe.getInstance());
 			}
         }
-    	return conPool.getValidConnection();
+        if (con == null)
+        	con = conPool.getValidConnection();
+    	return con;
     }
 
     private synchronized void reconnect() throws ClassNotFoundException, SQLException, TimeoutException {
@@ -691,7 +664,7 @@ public class MySQLThread extends Thread implements DataSource {
         dataSource.setUser(username);
         dataSource.setPassword(password);
         conPool = new MiniConnectionPoolManager(dataSource, 10);
-        ConsoleLogger.info("Connection pool reconnected");
+        ConsoleLogger.info("ConnectionPool was unavailable... Reconnected!");
     }
 
 }
