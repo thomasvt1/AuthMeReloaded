@@ -247,7 +247,7 @@ private synchronized void recycleConnection (PooledConnection pconn) {
       disposeConnection(pconn);
       return; }
    if (activeConnections <= 0) {
-      throw new AssertionError(); }
+      throw new AssertionError("AuthMeDatabaseError"); }
    activeConnections--;
    semaphore.release();
    recycledConnections.add(pconn);
@@ -260,7 +260,7 @@ private synchronized void disposeConnection (PooledConnection pconn) {
       // and is not currently within a PooledConnection.getConnection() call,
       // we assume that the connection was active.
       if (activeConnections <= 0) {
-         throw new AssertionError(); }
+         throw new AssertionError("AuthMeDatabaseError"); }
       activeConnections--;
       semaphore.release(); }
    closeConnectionAndIgnoreException(pconn);
@@ -283,11 +283,11 @@ private void log (String msg) {
 
 private synchronized void assertInnerState() {
    if (activeConnections < 0) {
-      throw new AssertionError(); }
+      throw new AssertionError("AuthMeDatabaseError"); }
    if (activeConnections + recycledConnections.size() > maxConnections) {
-      throw new AssertionError(); }
+      throw new AssertionError("AuthMeDatabaseError"); }
    if (activeConnections + semaphore.availablePermits() > maxConnections) {
-      throw new AssertionError(); }}
+      throw new AssertionError("AuthMeDatabaseError"); }}
 
 private class PoolConnectionEventListener implements ConnectionEventListener {
    public void connectionClosed (ConnectionEvent event) {

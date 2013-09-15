@@ -636,6 +636,9 @@ public class MySQLThread extends Thread implements DataSource {
 	            	AuthMe.getInstance().getServer().getPluginManager().disablePlugin(AuthMe.getInstance());
 			}
         } catch (AssertionError ae) {
+        	// Make sure assertionerror is caused by the connectionpoolmanager, else re-throw it
+        	if (!ae.getMessage().equalsIgnoreCase("AuthMeDatabaseError"))
+        		throw new AssertionError(ae.getMessage());
         	try {
         		con = null;
 				reconnect();
