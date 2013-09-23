@@ -30,7 +30,7 @@ public class PasspartuCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmnd, String label, String[] args) {
     	
-        if (!plugin.authmePermissible(sender, "authme.admin." + args[0].toLowerCase())) {
+        if (!plugin.authmePermissible(sender, "authme.passpartu")) {
             sender.sendMessage(m._("no_perm"));
             return true;
         }
