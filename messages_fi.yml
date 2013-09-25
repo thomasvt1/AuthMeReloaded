@@ -39,7 +39,7 @@ recovery_email: '&cUnohtuiko salasana? Käytä komentoa: /email recovery <Sähk�
 usage_captcha: '&cKäyttötapa: /captcha <Captcha>'
 wrong_captcha: '&cVäärä varmistus, käytä : /captcha CAPTCHA'
 valid_captcha: '&cSinun varmistus onnistui.!'
-kick_forvip: '&cVain VIP pelaaja voi liittyä täyteen palvelimeen!'
+kick_forvip: '&cVIP pelaaja liittyi täyteen palvelimeen!'
 kick_fullserver: '&cPalvelin on täynnä, Yritä pian uudelleen!'
 usage_email_add: '&fKäyttötapa: /email add <email> <confirmEmail> '
 usage_email_change: '&fKäyttötapa: /email change <oldEmail> <newEmail> '
