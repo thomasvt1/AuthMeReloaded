@@ -25,6 +25,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import fr.xephi.authme.AuthMe;
 import fr.xephi.authme.ConsoleLogger;
 import fr.xephi.authme.Utils;
+import fr.xephi.authme.api.API;
 import fr.xephi.authme.cache.auth.PlayerAuth;
 import fr.xephi.authme.cache.auth.PlayerCache;
 import fr.xephi.authme.converter.FlatToSql;
@@ -256,18 +257,20 @@ public class AdminCommand implements CommandExecutor {
             }
             try {
                 String name = args[1].toLowerCase();
-                String hash = PasswordSecurity.getHash(Settings.getPasswordHash, args[2], name);
                 if (database.isAuthAvailable(name)) {
                     sender.sendMessage(m._("user_regged"));
                     return true;
                 }
-                PlayerAuth auth = new PlayerAuth(name, hash, "198.18.0.1", 0);
-                auth.setSalt(PasswordSecurity.userSalt.get(name));
+                String hash = PasswordSecurity.getHash(Settings.getPasswordHash, args[2], name);
+                PlayerAuth auth = new PlayerAuth(name, hash, "198.18.0.1", 0L, "your@email.com", API.getPlayerRealName(name));
+                if (PasswordSecurity.userSalt.containsKey(name) && PasswordSecurity.userSalt.get(name) != null)
+                	auth.setSalt(PasswordSecurity.userSalt.get(name));
+                else
+                	auth.setSalt("");
                 if (!database.saveAuth(auth)) {
                     sender.sendMessage(m._("error"));
                     return true;
                 }
-                database.updateSalt(auth);
                 sender.sendMessage(m._("registered"));
                 ConsoleLogger.info(args[1] + " registered");
             } catch (NoSuchAlgorithmException ex) {

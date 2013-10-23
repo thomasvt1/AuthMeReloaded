@@ -343,7 +343,11 @@ Purge:
     daysBeforeRemovePlayer: 60
     # Do we need to remove the player.dat file during purge process ?
     removePlayerDat: false
-    # Do we need to remove the Essentials/users/player.yml file during purge proecess ?
+    # Do we need to remove the Essentials/users/player.yml file during purge process ?
     removeEssentialsFile: false
     # World where are players.dat stores
     defaultWorld: 'world'
+    # Do we need to remove LimitedCreative/inventories/player.yml , player_creative.yml files during purge process ?
+    removeLimitedCreativesInventories: false
+    # Do we need to remove the AntiXRayData/PlayerData/player file during purge process ?
+    removeAntiXRayFile: false

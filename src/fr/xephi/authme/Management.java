@@ -63,11 +63,13 @@ public class Management {
         protected Player player;
         protected String name;
         protected String password;
+        protected String realName;
 
         public AsyncronousLogin(Player player, String password) {
             this.player = player;
             this.password = password;
             name = player.getName().toLowerCase();
+            realName = player.getName();
         }
 
         protected String getIP() {
@@ -144,7 +146,7 @@ public class Management {
                 return;
             }
             if (passwordVerified && player.isOnline()) {
-                PlayerAuth auth = new PlayerAuth(name, hash, getIP(), new Date().getTime(), email);
+                PlayerAuth auth = new PlayerAuth(name, hash, getIP(), new Date().getTime(), email, realName);
                 database.updateSession(auth);
 
                 /*
@@ -230,7 +232,7 @@ public class Management {
             String hash = pAuth.getHash();
             String email = pAuth.getEmail();
 
-            PlayerAuth auth = new PlayerAuth(name, hash, getIP(), new Date().getTime(), email);
+            PlayerAuth auth = new PlayerAuth(name, hash, getIP(), new Date().getTime(), email, realName);
             database.updateSession(auth);
 
             /*

@@ -13,6 +13,7 @@ import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 
 import fr.xephi.authme.AuthMe;
 import fr.xephi.authme.ConsoleLogger;
+import fr.xephi.authme.api.API;
 import fr.xephi.authme.cache.auth.PlayerAuth;
 import fr.xephi.authme.datasource.DataSource;
 import fr.xephi.authme.datasource.MiniConnectionPoolManager;
@@ -208,14 +209,14 @@ public class MySQLThread extends Thread implements DataSource {
             rs = pst.executeQuery();
             if (rs.next()) {
                 if (rs.getString(columnIp).isEmpty() ) {
-                    return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), "198.18.0.1", rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ), rs.getString(lastlocWorld),rs.getString(columnEmail));
+                    return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), "198.18.0.1", rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ), rs.getString(lastlocWorld),rs.getString(columnEmail), API.getPlayerRealName(rs.getString(columnName)));
                 } else {
                         if(!columnSalt.isEmpty()){
                             if(!columnGroup.isEmpty())
-                            return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword),rs.getString(columnSalt), rs.getInt(columnGroup), rs.getString(columnIp), rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ), rs.getString(lastlocWorld), rs.getString(columnEmail));
-                            else return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword),rs.getString(columnSalt), rs.getString(columnIp), rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ), rs.getString(lastlocWorld),rs.getString(columnEmail));
+                            return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword),rs.getString(columnSalt), rs.getInt(columnGroup), rs.getString(columnIp), rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ), rs.getString(lastlocWorld), rs.getString(columnEmail), API.getPlayerRealName(rs.getString(columnName)));
+                            else return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword),rs.getString(columnSalt), rs.getString(columnIp), rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ), rs.getString(lastlocWorld),rs.getString(columnEmail), API.getPlayerRealName(rs.getString(columnName)));
                         } else {
-                            return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), rs.getString(columnIp), rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ), rs.getString(lastlocWorld), rs.getString(columnEmail));
+                            return new PlayerAuth(rs.getString(columnName), rs.getString(columnPassword), rs.getString(columnIp), rs.getLong(columnLastLogin), rs.getInt(lastlocX), rs.getInt(lastlocY), rs.getInt(lastlocZ), rs.getString(lastlocWorld), rs.getString(columnEmail), API.getPlayerRealName(rs.getString(columnName)));
                         }
                  }
             } else {
@@ -259,7 +260,7 @@ public class MySQLThread extends Thread implements DataSource {
             if (!columnOthers.isEmpty()) {
             	for(String column : columnOthers) {
             		pst = con.prepareStatement("UPDATE " + tableName + " SET " + tableName + "." + column + "=? WHERE " + columnName + "=?;");
-                    pst.setString(1, auth.getNickname());
+                    pst.setString(1, auth.getRealname());
                     pst.setString(2, auth.getNickname());
                     pst.executeUpdate();
             	}
@@ -272,12 +273,25 @@ public class MySQLThread extends Thread implements DataSource {
                 rs = pst.executeQuery();
                 if (rs.next()) {
                 	id = rs.getInt(columnID);
+                	// Insert player in phpbb_user_group
                 	pst = con.prepareStatement("INSERT INTO " + Settings.getPhpbbPrefix + "user_group (group_id, user_id, group_leader, user_pending) VALUES (?,?,?,?);");
                 	pst.setInt(1, Settings.getPhpbbGroup);
                 	pst.setInt(2, id);
                 	pst.setInt(3, 0);
                 	pst.setInt(4, 0);
                 	pst.executeUpdate();
+                	// Update player group in phpbb_users
+            		pst = con.prepareStatement("UPDATE " + tableName + " SET " + tableName + ".group_id=? WHERE " + columnName + "=?;");
+                    pst.setInt(1, Settings.getPhpbbGroup);
+                    pst.setString(2, auth.getNickname());
+                    pst.executeUpdate();
+                    // Apply Register Date
+            		pst = con.prepareStatement("UPDATE " + tableName + " SET " + tableName + ".user_regdate=? WHERE " + columnName + "=?;");
+            		long time = System.currentTimeMillis();
+            		time = Long.parseLong(String.valueOf(time).substring(0, String.valueOf(time).length() - 3));
+                    pst.setLong(1, time);
+                    pst.setString(2, auth.getNickname());
+                    pst.executeUpdate();
                 }
             }
             if (Settings.getPasswordHash == HashAlgorithm.WORDPRESS) {

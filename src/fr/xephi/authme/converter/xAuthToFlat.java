@@ -15,6 +15,7 @@ import com.cypherx.xauth.database.Table;
 import com.cypherx.xauth.utils.xAuthLog;
 
 import fr.xephi.authme.AuthMe;
+import fr.xephi.authme.api.API;
 import fr.xephi.authme.cache.auth.PlayerAuth;
 import fr.xephi.authme.datasource.DataSource;
 
@@ -51,7 +52,7 @@ public class xAuthToFlat {
 			String pl = getIdPlayer(id);
 			String psw = getPassword(id);
 			if (psw != null && !psw.isEmpty() && pl != null) {
-				PlayerAuth auth = new PlayerAuth(pl, psw, "198.18.0.1", 0);
+				PlayerAuth auth = new PlayerAuth(pl, psw, "198.18.0.1", 0, "your@email.com", API.getPlayerRealName(pl));
 				database.saveAuth(auth);
 			}
 		}

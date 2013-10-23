@@ -30,7 +30,7 @@ public final class Settings extends YamlConfiguration {
     public static List<String> getMySQLOtherUsernameColumn = null;
     public static List<String> getForcedWorlds = null;
     public final Plugin plugin;
-    private final File file;    
+    private final File file;
     public static DataSourceType getDataSource;
     public static HashAlgorithm getPasswordHash;
     public static HashAlgorithm rakamakHash;
@@ -45,7 +45,8 @@ public final class Settings extends YamlConfiguration {
             isBackupOnStop, enablePasspartu, isStopEnabled, reloadSupport, rakamakUseIp, noConsoleSpam, removePassword, displayOtherAccounts,
             useCaptcha, emailRegistration, multiverse, notifications, chestshop, bungee, banUnsafeIp, doubleEmailCheck, sessionExpireOnIpChange,
             disableSocialSpy, useMultiThreading, forceOnlyAfterLogin, useEssentialsMotd,
-            usePurge, purgePlayerDat, purgeEssentialsFile, supportOldPassword;
+            usePurge, purgePlayerDat, purgeEssentialsFile, supportOldPassword, purgeLimitedCreative,
+            purgeAntiXray, purgePermissions;
  
     public static String getNickRegex, getUnloggedinGroup, getMySQLHost, getMySQLPort, 
             getMySQLUsername, getMySQLPassword, getMySQLDatabase, getMySQLTablename, 
@@ -206,6 +207,9 @@ public void loadConfigOptions() {
         getPhpbbGroup = configFile.getInt("ExternalBoardOptions.phpbbActivatedGroupId", 2);
         supportOldPassword = configFile.getBoolean("settings.security.supportOldPasswordHash", false);
         getWordPressPrefix = configFile.getString("ExternalBoardOptions.wordpressTablePrefix", "wp_");
+        purgeLimitedCreative = configFile.getBoolean("Purge.removeLimitedCreativesInventories", false);
+        purgeAntiXray = configFile.getBoolean("Purge.removeAntiXRayFile", false);
+        //purgePermissions = configFile.getBoolean("Purge.removePermissions", false);
 
         saveDefaults();
    }
@@ -339,6 +343,9 @@ public static void reloadConfigOptions(YamlConfiguration newConfig) {
         getPhpbbGroup = configFile.getInt("ExternalBoardOptions.phpbbActivatedGroupId", 2);
         supportOldPassword = configFile.getBoolean("settings.security.supportOldPasswordHash", false);
         getWordPressPrefix = configFile.getString("ExternalBoardOptions.wordpressTablePrefix", "wp_");
+        purgeLimitedCreative = configFile.getBoolean("Purge.removeLimitedCreativesInventories", false);
+        purgeAntiXray = configFile.getBoolean("Purge.removeAntiXRayFile", false);
+        //purgePermissions = configFile.getBoolean("Purge.removePermissions", false);
 }
 
 public void mergeConfig() {
@@ -433,6 +440,12 @@ public void mergeConfig() {
     	   set("Xenoforo.predefinedSalt", null);
        if(configFile.getString("settings.security.passwordHash","SHA256").toUpperCase().equals("XFSHA1") || configFile.getString("settings.security.passwordHash","SHA256").toUpperCase().equals("XFSHA256"))
     	   set("settings.security.passwordHash", "XENFORO");
+       if(!contains("Purge.removeLimitedCreativesInventories"))
+    	   set("Purge.removeLimitedCreativesInventories", false);
+       if(!contains("Purge.removeAntiXRayFile"))
+    	   set("Purge.removeAntiXRayFile", false);
+       /*if(!contains("Purge.removePermissions"))
+    	   set("Purge.removePermissions", false);*/
 
        plugin.getLogger().info("Merge new Config Options if needed..");
        plugin.saveConfig();

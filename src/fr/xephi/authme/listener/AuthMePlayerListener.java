@@ -24,6 +24,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -70,6 +71,7 @@ public class AuthMePlayerListener implements Listener {
     public AuthMe plugin;
     private DataSource data;
     private FileCache playerBackup = new FileCache();
+    public boolean causeByAuthMe = false;
 
     public AuthMePlayerListener(AuthMe plugin, DataSource data) {
         this.plugin = plugin;
@@ -526,7 +528,9 @@ public class AuthMePlayerListener implements Listener {
         }
             if(Settings.isAllowRestrictedIp && !Settings.getRestrictedIp(name, ip)) {
                 int gM = gameMode.get(name);
+                this.causeByAuthMe = true;
             	player.setGameMode(GameMode.getByValue(gM));
+            	this.causeByAuthMe = false;
                 player.kickPlayer("You are not the Owner of this account, please try another name!");
                 if (Settings.banUnsafeIp)
                 plugin.getServer().banIP(ip);
@@ -550,22 +554,25 @@ public class AuthMePlayerListener implements Listener {
                          return;
                      } else if (!Settings.sessionExpireOnIpChange){
                      	int gM = gameMode.get(name);
+                     	this.causeByAuthMe = true;
                      	player.setGameMode(GameMode.getByValue(gM));
+                     	this.causeByAuthMe = false;
                      	player.kickPlayer(m._("unvalid_session"));
                      	return;
                      } else if (auth.getNickname().equalsIgnoreCase(name)){
-                         if (Settings.isForceSurvivalModeEnabled && !Settings.forceOnlyAfterLogin)
-                         	sched.scheduleSyncDelayedTask(plugin, new Runnable() {
-                         		public void run() {
-                         			e.getPlayer().setGameMode(GameMode.SURVIVAL);
-                         		}
-                         	});
+                         if (Settings.isForceSurvivalModeEnabled && !Settings.forceOnlyAfterLogin) {
+                        	 this.causeByAuthMe = true;
+                        	 e.getPlayer().setGameMode(GameMode.SURVIVAL);
+                        	 this.causeByAuthMe = false;
+                         }
                 		 //Player change his IP between 2 relog-in
                          PlayerCache.getInstance().removePlayer(name);
                          LimboCache.getInstance().addLimboPlayer(player , utils.removeAll(player));
                 	 } else {
                       	int gM = gameMode.get(name);
+                      	this.causeByAuthMe = true;
                      	player.setGameMode(GameMode.getByValue(gM));
+                     	this.causeByAuthMe = false;
                      	player.kickPlayer(m._("unvalid_session"));
                      	return;
                 	 }
@@ -576,8 +583,11 @@ public class AuthMePlayerListener implements Listener {
                 }
           }
           // isent in session or session was ended correctly
-            if (Settings.isForceSurvivalModeEnabled && !Settings.forceOnlyAfterLogin)
-             			e.getPlayer().setGameMode(GameMode.SURVIVAL);
+            if (Settings.isForceSurvivalModeEnabled && !Settings.forceOnlyAfterLogin) {
+            	this.causeByAuthMe = true;
+            	e.getPlayer().setGameMode(GameMode.SURVIVAL);
+            	this.causeByAuthMe = false;
+            }
             if (Settings.isTeleportToSpawnEnabled || (Settings.isForceSpawnLocOnJoinEnabled  && Settings.getForcedWorlds.contains(player.getWorld().getName()))) {
                 SpawnTeleportEvent tpEvent = new SpawnTeleportEvent(player, player.getLocation(), spawnLoc, PlayerCache.getInstance().isAuthenticated(name));
                 plugin.getServer().getPluginManager().callEvent(tpEvent);
@@ -593,8 +603,11 @@ public class AuthMePlayerListener implements Listener {
             DataFileCache dataFile = new DataFileCache(LimboCache.getInstance().getLimboPlayer(name).getInventory(),LimboCache.getInstance().getLimboPlayer(name).getArmour());
             playerBackup.createCache(name, dataFile, LimboCache.getInstance().getLimboPlayer(name).getGroup(),LimboCache.getInstance().getLimboPlayer(name).getOperator(),LimboCache.getInstance().getLimboPlayer(name).isFlying());
         } else {
-            if (Settings.isForceSurvivalModeEnabled && !Settings.forceOnlyAfterLogin)
-             			e.getPlayer().setGameMode(GameMode.SURVIVAL);
+            if (Settings.isForceSurvivalModeEnabled && !Settings.forceOnlyAfterLogin) {
+            	this.causeByAuthMe = true;
+            	e.getPlayer().setGameMode(GameMode.SURVIVAL);
+            	this.causeByAuthMe = false;
+            }
             if(!Settings.unRegisteredGroup.isEmpty()){
                utils.setGroup(player, Utils.groupType.UNREGISTERED);
             }
@@ -1048,4 +1061,31 @@ public class AuthMePlayerListener implements Listener {
         event.setRespawnLocation(spawn);
     }
 
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
+    	if (event.isCancelled())
+    		return;
+        if (event.getPlayer() == null || event == null)
+            return;
+
+        Player player = event.getPlayer();
+        String name = player.getName().toLowerCase();
+
+        if (Utils.getInstance().isUnrestricted(player) || CombatTagComunicator.isNPC(player))
+            return;
+
+        if(plugin.getCitizensCommunicator().isNPC(player, plugin))
+        	return;
+
+        if (PlayerCache.getInstance().isAuthenticated(name))
+            return;
+
+        if (!data.isAuthAvailable(name))
+            if (!Settings.isForcedRegistrationEnabled)
+                return;
+        
+        if (this.causeByAuthMe)
+        	return;
+        event.setCancelled(true);
+    }
 }

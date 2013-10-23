@@ -48,6 +48,7 @@ import fr.xephi.authme.datasource.FileDataSource;
 import fr.xephi.authme.datasource.MySQLDataSource;
 import fr.xephi.authme.datasource.SqliteDataSource;
 import fr.xephi.authme.listener.AuthMeBlockListener;
+import fr.xephi.authme.listener.AuthMeBungeeCordListener;
 import fr.xephi.authme.listener.AuthMeChestShopListener;
 import fr.xephi.authme.listener.AuthMeEntityListener;
 import fr.xephi.authme.listener.AuthMePlayerListener;
@@ -239,6 +240,8 @@ public class AuthMe extends JavaPlugin {
         if (Settings.bungee) {
         	Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         	Bukkit.getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeCordMessage(this));
+        	pm.registerEvents(new AuthMeBungeeCordListener(database), this);
+        	ConsoleLogger.info("Successfully hook with BungeeCord!");
         }
 
         //Find Permissions
@@ -338,7 +341,7 @@ public class AuthMe extends JavaPlugin {
     		}
     	}
 	}
-	
+
 	private void checkEssentials() {
     	if (this.getServer().getPluginManager().getPlugin("Essentials") != null && this.getServer().getPluginManager().getPlugin("Essentials").isEnabled()) {
     		try {
@@ -405,7 +408,7 @@ public class AuthMe extends JavaPlugin {
         if (database != null) {
             database.close();
         }
-        
+
         if (databaseThread != null) {
         	databaseThread.interrupt();
         }
@@ -414,7 +417,7 @@ public class AuthMe extends JavaPlugin {
         Boolean Backup = new PerformBackup(this).DoBackup();
         if(Backup) ConsoleLogger.info("Backup Complete");
             else ConsoleLogger.showError("Error while making Backup");
-        }       
+        }
         ConsoleLogger.info("Authme " + this.getDescription().getVersion() + " disabled");
     }
 
@@ -427,7 +430,7 @@ public class AuthMe extends JavaPlugin {
 	    		        PlayerAuth pAuth = database.getAuth(name);
 	    	            if(pAuth == null)
 	    	                break;
-	    	            PlayerAuth auth = new PlayerAuth(name, pAuth.getHash(), pAuth.getIp(), new Date().getTime());
+	    	            PlayerAuth auth = new PlayerAuth(name, pAuth.getHash(), pAuth.getIp(), new Date().getTime(), pAuth.getEmail(), player.getName());
 	    	            database.updateSession(auth);
 	    				PlayerCache.getInstance().addPlayer(auth); 
 	    			}
@@ -519,7 +522,7 @@ public class AuthMe extends JavaPlugin {
 		}
 		return player;
 	}
-	
+
 	public boolean authmePermissible(Player player, String perm) {
 		if (player.hasPermission(perm))
 			return true;
@@ -536,7 +539,7 @@ public class AuthMe extends JavaPlugin {
 		}
 		return false;
 	}
-	
+
 	private void autoPurge() {
 		if (!Settings.usePurge) {
 			return;
@@ -551,6 +554,65 @@ public class AuthMe extends JavaPlugin {
 			purgeEssentials(cleared);
 		if (Settings.purgePlayerDat)
 			purgeDat(cleared);
+		if (Settings.purgeLimitedCreative)
+			purgeLimitedCreative(cleared);
+		if (Settings.purgeAntiXray)
+			purgeAntiXray(cleared);
+		//if (Settings.purgePermissions && permission != null)
+			//purgePerms(cleared);
+	}
+
+/*	private void purgePerms(List<String> cleared) {
+		int i = 0;
+		for (String name : cleared) {
+			org.bukkit.OfflinePlayer player = Bukkit.getOfflinePlayer(name);
+			if (player == null) continue;
+			String playerName = player.getName();
+			for (String group : permission.getPlayerGroups((String) null, playerName)) {
+				permission.playerRemoveGroup((String) null, playerName, group);
+			}
+		}
+		ConsoleLogger.info("AutoPurgeDatabase : Remove " + i + " players permissions");
+	} */
+
+	private void purgeAntiXray(List<String> cleared) {
+		int i = 0;
+		for (String name : cleared) {
+			org.bukkit.OfflinePlayer player = Bukkit.getOfflinePlayer(name);
+			if (player == null) continue;
+			String playerName = player.getName();
+			File playerFile = new File("." + File.separator + "plugins" + File.separator + "AntiXRayData" + File.separator + "PlayerData" + File.separator + playerName);
+			if (playerFile.exists()) {
+				playerFile.delete();
+				i++;
+			}
+		}
+		ConsoleLogger.info("AutoPurgeDatabase : Remove " + i + " AntiXRayData Files");
+	}
+
+	private void purgeLimitedCreative(List<String> cleared) {
+		int i = 0;
+		for (String name : cleared) {
+			org.bukkit.OfflinePlayer player = Bukkit.getOfflinePlayer(name);
+			if (player == null) continue;
+			String playerName = player.getName();
+			File playerFile = new File("." + File.separator + "plugins" + File.separator + "LimitedCreative" + File.separator + "inventories" + File.separator + playerName + ".yml");
+			if (playerFile.exists()) {
+				playerFile.delete();
+				i++;
+			}
+			playerFile = new File("." + File.separator + "plugins" + File.separator + "LimitedCreative" + File.separator + "inventories" + File.separator +  playerName + "_creative.yml");
+			if (playerFile.exists()) {
+				playerFile.delete();
+				i++;
+			}
+			playerFile = new File("." + File.separator + "plugins" + File.separator + "LimitedCreative" + File.separator + "inventories" + File.separator +  playerName + "_adventure.yml");
+			if (playerFile.exists()) {
+				playerFile.delete();
+				i++;
+			}
+		}
+		ConsoleLogger.info("AutoPurgeDatabase : Remove " + i + " LimitedCreative Survival, Creative and Adventure files");
 	}
 
 	private void purgeDat(List<String> cleared) {
@@ -597,4 +659,5 @@ public class AuthMe extends JavaPlugin {
             spawnLoc = Spawn.getInstance().getLocation();
         return spawnLoc;
     }
+
 }

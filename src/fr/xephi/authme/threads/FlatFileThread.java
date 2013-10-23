@@ -12,6 +12,7 @@ import java.util.List;
 
 import fr.xephi.authme.AuthMe;
 import fr.xephi.authme.ConsoleLogger;
+import fr.xephi.authme.api.API;
 import fr.xephi.authme.cache.auth.PlayerAuth;
 import fr.xephi.authme.datasource.DataSource;
 import fr.xephi.authme.settings.Settings;
@@ -114,19 +115,19 @@ public class FlatFileThread extends Thread implements DataSource {
                 if (args[0].equals(auth.getNickname())) {
                 	switch (args.length) {
                 		case 4: {
-                			newAuth = new PlayerAuth(args[0], auth.getHash(), args[2], Long.parseLong(args[3]), 0, 0, 0, "world");
+                			newAuth = new PlayerAuth(args[0], auth.getHash(), args[2], Long.parseLong(args[3]), 0, 0, 0, "world", "your@email.com", API.getPlayerRealName(args[0]));
                 			break;
                 		}
                 		case 7: {
-                			newAuth = new PlayerAuth(args[0], auth.getHash(), args[2], Long.parseLong(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]), Integer.parseInt(args[6]), "world");
+                			newAuth = new PlayerAuth(args[0], auth.getHash(), args[2], Long.parseLong(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]), Integer.parseInt(args[6]), "world", "your@email.com", API.getPlayerRealName(args[0]));
                 			break;
                 		}
                 		case 8: {
-                			newAuth = new PlayerAuth(args[0], auth.getHash(), args[2], Long.parseLong(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]), Integer.parseInt(args[6]), args[7]);
+                			newAuth = new PlayerAuth(args[0], auth.getHash(), args[2], Long.parseLong(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]), Integer.parseInt(args[6]), args[7], "your@email.com", API.getPlayerRealName(args[0]));
                 			break;
                 		}
                 		default: {
-                			newAuth = new PlayerAuth(args[0], auth.getHash(), args[2], 0, 0, 0, 0, "world");
+                			newAuth = new PlayerAuth(args[0], auth.getHash(), args[2], 0, 0, 0, 0, "world", "your@email.com", API.getPlayerRealName(args[0]));
                 			break;
                 		}
                 	}
@@ -167,19 +168,19 @@ public class FlatFileThread extends Thread implements DataSource {
                 if (args[0].equals(auth.getNickname())) {
                     switch (args.length) {
                     	case 4: {
-                    		newAuth = new PlayerAuth(args[0], args[1], auth.getIp(), auth.getLastLogin(), 0, 0, 0, "world");
+                    		newAuth = new PlayerAuth(args[0], args[1], auth.getIp(), auth.getLastLogin(), 0, 0, 0, "world", "your@email.com", API.getPlayerRealName(args[0]));
                     		break;
                     	}
                     	case 7: {
-                    		newAuth = new PlayerAuth(args[0], args[1], auth.getIp(), auth.getLastLogin(), Integer.parseInt(args[4]), Integer.parseInt(args[5]), Integer.parseInt(args[6]), "world");
+                    		newAuth = new PlayerAuth(args[0], args[1], auth.getIp(), auth.getLastLogin(), Integer.parseInt(args[4]), Integer.parseInt(args[5]), Integer.parseInt(args[6]), "world", "your@email.com", API.getPlayerRealName(args[0]));
                     		break;
                     	}
                     	case 8: {
-                    		newAuth = new PlayerAuth(args[0], args[1], auth.getIp(), auth.getLastLogin(), Integer.parseInt(args[4]), Integer.parseInt(args[5]), Integer.parseInt(args[6]), args[7]);
+                    		newAuth = new PlayerAuth(args[0], args[1], auth.getIp(), auth.getLastLogin(), Integer.parseInt(args[4]), Integer.parseInt(args[5]), Integer.parseInt(args[6]), args[7], "your@email.com", API.getPlayerRealName(args[0]));
                     		break;
                     	}
                     	default: {
-                    		newAuth = new PlayerAuth(args[0], args[1], auth.getIp(), auth.getLastLogin(), 0, 0, 0, "world");
+                    		newAuth = new PlayerAuth(args[0], args[1], auth.getIp(), auth.getLastLogin(), 0, 0, 0, "world", "your@email.com", API.getPlayerRealName(args[0]));
                     		break;
                     	}
                     }
@@ -218,7 +219,7 @@ public class FlatFileThread extends Thread implements DataSource {
             while ((line = br.readLine()) != null) {
                 String[] args = line.split(":");
                 if (args[0].equals(auth.getNickname())) {
-                    newAuth = new PlayerAuth(args[0], args[1], args[2], Long.parseLong(args[3]), auth.getQuitLocX(), auth.getQuitLocY(), auth.getQuitLocZ(), auth.getWorld());
+                    newAuth = new PlayerAuth(args[0], args[1], args[2], Long.parseLong(args[3]), auth.getQuitLocX(), auth.getQuitLocY(), auth.getQuitLocZ(), auth.getWorld(), "your@email.com", API.getPlayerRealName(args[0]));
                     break;
                 }
             }
@@ -420,15 +421,15 @@ public class FlatFileThread extends Thread implements DataSource {
                 if (args[0].equals(user)) {
                     switch (args.length) {
                         case 2:
-                            return new PlayerAuth(args[0], args[1], "198.18.0.1", 0);
+                            return new PlayerAuth(args[0], args[1], "198.18.0.1", 0, "your@email.com",  API.getPlayerRealName(args[0]));
                         case 3:
-                            return new PlayerAuth(args[0], args[1], args[2], 0);
+                            return new PlayerAuth(args[0], args[1], args[2], 0, "your@email.com",  API.getPlayerRealName(args[0]));
                         case 4:
-                            return new PlayerAuth(args[0], args[1], args[2], Long.parseLong(args[3]));
+                            return new PlayerAuth(args[0], args[1], args[2], Long.parseLong(args[3]), "your@email.com",  API.getPlayerRealName(args[0]));
                         case 7:
-                            return new PlayerAuth(args[0], args[1], args[2], Long.parseLong(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]), Integer.parseInt(args[6]), "unavailableworld");
+                            return new PlayerAuth(args[0], args[1], args[2], Long.parseLong(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]), Integer.parseInt(args[6]), "unavailableworld", "your@email.com", API.getPlayerRealName(args[0]));
                         case 8:
-                        	return new PlayerAuth(args[0], args[1], args[2], Long.parseLong(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]), Integer.parseInt(args[6]), args[7]);
+                        	return new PlayerAuth(args[0], args[1], args[2], Long.parseLong(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]), Integer.parseInt(args[6]), args[7], "your@email.com", API.getPlayerRealName(args[0]));
                     }
                 }
             }

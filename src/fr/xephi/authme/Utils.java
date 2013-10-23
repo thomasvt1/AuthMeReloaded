@@ -12,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import fr.xephi.authme.api.API;
+import fr.xephi.authme.cache.auth.PlayerCache;
 import fr.xephi.authme.events.AuthMeTeleportEvent;
 import fr.xephi.authme.settings.Settings;
 
@@ -126,24 +127,26 @@ public class Utils {
 			}
     	});
 
-    	id = Bukkit.getScheduler().scheduleSyncRepeatingTask(AuthMe.getInstance(), new Runnable()
-    	{
-    		@Override
-    		public void run() {
-    			int current = (int)pl.getLocation().getY();
-    			World currentWorld = pl.getWorld();
-    			if (current != fY && world.getName() == currentWorld.getName()) {
-    				pl.teleport(loc);
-    			}
-    		}
-    	}, 1L, 20L);
-    	Bukkit.getScheduler().scheduleSyncDelayedTask(AuthMe.getInstance(), new Runnable()
-    	{
-    		@Override
-    		public void run() {
-    			Bukkit.getScheduler().cancelTask(id);
-    		}
-      }, 60L);
+    	if (!PlayerCache.getInstance().isAuthenticated(pl.getName().toLowerCase())) {
+        	id = Bukkit.getScheduler().scheduleSyncRepeatingTask(AuthMe.getInstance(), new Runnable()
+        	{
+        		@Override
+        		public void run() {
+        			int current = (int)pl.getLocation().getY();
+        			World currentWorld = pl.getWorld();
+        			if (current != fY && world.getName() == currentWorld.getName()) {
+        				pl.teleport(loc);
+        			}
+        		}
+        	}, 1L, 20L);
+        	Bukkit.getScheduler().scheduleSyncDelayedTask(AuthMe.getInstance(), new Runnable()
+        	{
+        		@Override
+        		public void run() {
+        			Bukkit.getScheduler().cancelTask(id);
+        		}
+          }, 60L);
+    	}
       }
 
 	/*
